@@ -1,0 +1,1 @@
+export const COMMITLINT_CONFIG_CORE_DEPENDENCIES = ["@commitlint/cli", "@commitlint/config-conventional", "@commitlint/cz-commitlint", "commitizen", "conventional-changelog-conventionalcommits", "husky"];

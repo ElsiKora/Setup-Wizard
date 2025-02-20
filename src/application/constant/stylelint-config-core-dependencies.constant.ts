@@ -1,0 +1,1 @@
+export const STYLELINT_CONFIG_CORE_DEPENDENCIES = ["stylelint", "stylelint-config-css-modules", "stylelint-config-rational-order", "stylelint-config-standard-scss", "stylelint-order", "stylelint-prettier"];
