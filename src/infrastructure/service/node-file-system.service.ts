@@ -6,6 +6,7 @@ import path from "node:path";
 export class NodeFileSystemService implements IFileSystemService {
 	async createDirectory(directoryPath: string, options?: { isRecursive: boolean }): Promise<void> {
 		directoryPath = path.dirname(directoryPath);
+		// eslint-disable-next-line @elsikora-typescript/naming-convention
 		await fs.mkdir(directoryPath, { recursive: options?.isRecursive });
 	}
 

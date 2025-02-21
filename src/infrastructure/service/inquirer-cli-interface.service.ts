@@ -14,6 +14,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	private readonly SPINNER: ora.Ora;
 
 	constructor() {
+		// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
 		this.SPINNER = ora();
 	}
 
@@ -23,6 +24,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	async confirm(message: string, isConfirmedByDefault: boolean = false): Promise<boolean> {
 		try {
+			// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
 			const answer: any = await inquirer.prompt({
 				// eslint-disable-next-line @elsikora-typescript/naming-convention
 				default: isConfirmedByDefault,
@@ -57,6 +59,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		}
 
 		try {
+			// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
 			const answer: any = await inquirer.prompt({
 				choices,
 				message: `${message} (space to select)`,
@@ -96,6 +99,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		}));
 
 		try {
+			// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
 			const answer: any = await inquirer.prompt({
 				choices,
 				message: `${message} (space to select)`,
@@ -121,6 +125,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		const choices: Array<{ name: string; value: string }> = options.map((opt: ICliInterfaceServiceSelectOptions) => ({ name: opt.label, value: opt.value }));
 
 		try {
+			// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
 			const answer: any = await inquirer.prompt({
 				choices,
 				default: initialValue,
@@ -154,6 +159,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	async text(message: string, placeholder?: string, initialValue?: string, validate?: (value: string) => Error | string | undefined): Promise<string> {
 		try {
+			// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
 			const answer: any = await inquirer.prompt({
 				default: initialValue,
 				message,
