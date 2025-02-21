@@ -1,12 +1,14 @@
-import {ELicense} from "../../domain/enum/license.enum";
-import {ILicenseConfig} from "../../domain/interface/license-config.interface";
-import {ICliInterfaceServiceSelectOptions} from "../../domain/interface/cli-interface-service-select-options.interface";
+import type { ELicense } from "../../domain/enum/license.enum";
+import type { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
+import type { ILicenseConfig } from "../../domain/interface/license-config.interface";
 
-export class CliInterfaceServiceMapper {
-    static fromLicenseConfigsToSelectOptions(properties: Record<ELicense, ILicenseConfig>): ICliInterfaceServiceSelectOptions[] {
-        return Object.entries(properties).map(([license, config]) => ({
-            label: `${config.name} (${license})`,
-            value: license
-        }));
-    }
-}
+export const CliInterfaceServiceMapper: {
+	fromLicenseConfigsToSelectOptions(properties: Record<ELicense, ILicenseConfig>): Array<ICliInterfaceServiceSelectOptions>;
+} = {
+	fromLicenseConfigsToSelectOptions(properties: Record<ELicense, ILicenseConfig>): Array<ICliInterfaceServiceSelectOptions> {
+		return Object.entries(properties).map(([license, config]: [string, ILicenseConfig]) => ({
+			label: `${config.name} (${license})`,
+			value: license,
+		}));
+	},
+};

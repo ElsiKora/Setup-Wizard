@@ -1,24 +1,52 @@
-import { ICliInterfaceService } from "../interface/cli-interface-service.interface";
-import { ECiProvider } from "../../domain/enum/ci-provider.enum";
-import { ECiModule } from "../../domain/enum/ci-module.enum";
+import type { ICiConfigContent } from "../../domain/interface/ci-config-content.interface";
+import type { ICiConfig } from "../../domain/interface/ci-config.interface";
+import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
+import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
+import type { IConfig } from "../interface/config.interface";
+import type { IFileSystemService } from "../interface/file-system-service.interface";
+import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
+
 import { CI_CONFIG } from "../../domain/constant/ci-config.constant";
 import { ECiModuleType } from "../../domain/enum/ci-module-type.enum";
-import { IModuleService } from "../../infrastructure/interface/module-service.interface";
-import { IFileSystemService } from "../interface/file-system-service.interface";
-import { IModuleSetupResult } from "../interface/module-setup-result.interface";
-import { ConfigService } from "./config.service";
+import { ECiModule } from "../../domain/enum/ci-module.enum";
+import { ECiProvider } from "../../domain/enum/ci-provider.enum";
 import { EModule } from "../../domain/enum/module.enum";
 
-export class CiModuleService implements IModuleService {
-	private selectedProvider?: ECiProvider;
-	private selectedModules: ECiModule[] = [];
-	private readonly configService: ConfigService;
+import { ConfigService } from "./config.service";
 
-	constructor(
-		readonly cliInterfaceService: ICliInterfaceService,
-		readonly fileSystemService: IFileSystemService,
-	) {
-		this.configService = new ConfigService(fileSystemService);
+export class CiModuleService implements IModuleService {
+	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
+
+	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
+
+	private readonly CONFIG_SERVICE: ConfigService;
+
+	private selectedModules: Array<ECiModule> = [];
+
+	private selectedProvider?: ECiProvider;
+
+	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
+		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
+		this.FILE_SYSTEM_SERVICE = fileSystemService;
+		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
+	}
+
+	async handleExistingSetup(): Promise<boolean> {
+		try {
+			const existingFiles: Array<string> = await this.findExistingCiFiles();
+
+			if (existingFiles.length === 0) {
+				return true;
+			}
+
+			this.CLI_INTERFACE_SERVICE.warn("Found existing CI configuration files that might be modified:\n" + existingFiles.map((file: string) => `- ${file}`).join("\n"));
+
+			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to continue? This might overwrite existing files.", false);
+		} catch (error) {
+			this.CLI_INTERFACE_SERVICE.handleError("Failed to check existing CI setup", error);
+
+			return false;
+		}
 	}
 
 	async install(): Promise<IModuleSetupResult> {
@@ -27,70 +55,119 @@ export class CiModuleService implements IModuleService {
 				return { wasInstalled: false };
 			}
 
-			const savedConfig = await this.getSavedConfig();
+			const savedConfig: {
+				isNpmPackage?: boolean;
+				moduleProperties?: Record<string, any>;
+				modules?: Array<ECiModule>;
+				provider?: ECiProvider;
+			} | null = await this.getSavedConfig();
 
-			const moduleType = await this.determineModuleType(savedConfig?.isNpmPackage);
+			const moduleType: ECiModuleType = await this.determineModuleType(savedConfig?.isNpmPackage);
 			this.selectedProvider = await this.selectProvider(savedConfig?.provider);
-			this.selectedModules = await this.selectCompatibleModules(moduleType, savedConfig?.modules || []);
+			this.selectedModules = await this.selectCompatibleModules(moduleType, savedConfig?.modules ?? []);
 
 			if (this.selectedModules.length === 0) {
-				this.cliInterfaceService.warn("No CI modules selected.");
+				this.CLI_INTERFACE_SERVICE.warn("No CI modules selected.");
+
 				return { wasInstalled: false };
 			}
 
 			if (!(await this.handleExistingSetup())) {
-				this.cliInterfaceService.warn("Setup cancelled by user.");
+				this.CLI_INTERFACE_SERVICE.warn("Setup cancelled by user.");
+
 				return { wasInstalled: false };
 			}
 
-			const moduleProperties = await this.setupSelectedModules(savedConfig?.moduleProperties || {});
+			const moduleProperties: Record<string, any> = await this.setupSelectedModules(savedConfig?.moduleProperties ?? {});
 
 			const customProperties: Record<string, any> = {
-				provider: this.selectedProvider,
-				modules: this.selectedModules,
-				moduleProperties,
 				isNpmPackage: moduleType === ECiModuleType.NPM_ONLY,
+				moduleProperties,
+				modules: this.selectedModules,
+				provider: this.selectedProvider,
 			};
 
 			return {
-				wasInstalled: true,
 				customProperties,
+				wasInstalled: true,
 			};
 		} catch (error) {
-			this.cliInterfaceService.handleError("Failed to complete CI setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete CI setup", error);
+
 			throw error;
 		}
 	}
 
-	async handleExistingSetup(): Promise<boolean> {
+	async shouldInstall(): Promise<boolean> {
 		try {
-			const existingFiles = await this.findExistingCiFiles();
-
-			if (existingFiles.length === 0) {
-				return true;
-			}
-
-			this.cliInterfaceService.warn("Found existing CI configuration files that might be modified:\n" + existingFiles.map((file) => `- ${file}`).join("\n"));
-
-			return await this.cliInterfaceService.confirm("Do you want to continue? This might overwrite existing files.", false);
+			return await this.CLI_INTERFACE_SERVICE.confirm("Would you like to set up CI workflows?");
 		} catch (error) {
-			this.cliInterfaceService.handleError("Failed to check existing CI setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
+
 			return false;
 		}
 	}
 
-	private async findExistingCiFiles(): Promise<string[]> {
+	private async collectModuleProperties(module: ECiModule, savedProperties: Record<string, any> = {}): Promise<Record<string, string>> {
+		const properties: Record<string, string> = {};
+
+		if (module === ECiModule.DEPENDABOT) {
+			const defaultBranch: string = (savedProperties.devBranchName as string) || "dev";
+			properties.devBranchName = await this.CLI_INTERFACE_SERVICE.text("Enter the target branch for Dependabot updates:", "dev", defaultBranch);
+		}
+
+		return properties;
+	}
+
+	private async determineModuleType(isSavedNpmPackage: boolean = false): Promise<ECiModuleType> {
+		const isConfirmedByDefault: boolean = isSavedNpmPackage ?? false;
+		const isNpmPackage: boolean = await this.CLI_INTERFACE_SERVICE.confirm("Is this package going to be published to NPM?", isConfirmedByDefault);
+
+		return isNpmPackage ? ECiModuleType.NPM_ONLY : ECiModuleType.NON_NPM;
+	}
+
+	private displaySetupSummary(successful: Array<{ module: ECiModule }>, failed: Array<{ error?: Error; module: ECiModule }>): void {
+		const summary: Array<string> = ["Successfully created configurations:", ...successful.map(({ module }: { module: ECiModule }) => `✓ ${CI_CONFIG[module].name}`)];
+
+		if (failed.length > 0) {
+			summary.push("Failed configurations:", ...failed.map(({ error, module }: { error?: Error; module: ECiModule }) => `✗ ${CI_CONFIG[module].name} - ${error?.message ?? "Unknown error"}`));
+		}
+
+		summary.push("", "The workflows will be activated when you push to the repository.", "", "Note: Make sure to set up required secrets in your CI provider.");
+
+		this.CLI_INTERFACE_SERVICE.note("CI Setup Summary", summary.join("\n"));
+	}
+
+	private extractModuleProperties(moduleConfig: boolean | Record<string, any> | undefined): Record<string, any> {
+		if (!moduleConfig) {
+			return {};
+		}
+
+		if (typeof moduleConfig === "boolean") {
+			return {};
+		}
+
+		if (typeof moduleConfig === "object" && "isEnabled" in moduleConfig) {
+			const { isEnabled, ...properties }: Record<string, any> = moduleConfig;
+
+			return properties;
+		}
+
+		return moduleConfig;
+	}
+
+	private async findExistingCiFiles(): Promise<Array<string>> {
 		if (!this.selectedProvider || !this.selectedModules || this.selectedModules.length === 0) {
 			return [];
 		}
 
-		const existingFiles: string[] = [];
+		const existingFiles: Array<string> = [];
 
 		for (const module of this.selectedModules) {
-			const config = CI_CONFIG[module];
-			const providerConfig = config.content[this.selectedProvider];
+			const config: ICiConfig = CI_CONFIG[module];
+			const providerConfig: ICiConfigContent = config.content[this.selectedProvider];
 
-			if (providerConfig && (await this.fileSystemService.isPathExists(providerConfig.filePath))) {
+			if (providerConfig && (await this.FILE_SYSTEM_SERVICE.isPathExists(providerConfig.filePath))) {
 				existingFiles.push(providerConfig.filePath);
 			}
 		}
@@ -98,55 +175,110 @@ export class CiModuleService implements IModuleService {
 		return existingFiles;
 	}
 
-	async shouldInstall(): Promise<boolean> {
-		try {
-			return await this.cliInterfaceService.confirm("Would you like to set up CI workflows?");
-		} catch (error) {
-			this.cliInterfaceService.handleError("Failed to get user confirmation", error);
-			return false;
-		}
-	}
-
-	private async determineModuleType(savedIsNpmPackage?: boolean): Promise<ECiModuleType> {
-		const defaultValue = savedIsNpmPackage !== undefined ? savedIsNpmPackage : false;
-		const isNpmPackage = await this.cliInterfaceService.confirm("Is this package going to be published to NPM?", defaultValue);
-
-		return isNpmPackage ? ECiModuleType.NPM_ONLY : ECiModuleType.NON_NPM;
-	}
-
-	private async selectProvider(savedProvider?: ECiProvider): Promise<ECiProvider> {
-		const providers = Object.values(ECiProvider).map((provider) => ({
-			label: provider,
-			value: provider,
-			description: this.getProviderDescription(provider),
-		}));
-
-		const initialProvider = savedProvider || undefined;
-		return await this.cliInterfaceService.select<ECiProvider>("Select CI provider:", providers, initialProvider);
-	}
-
 	private getProviderDescription(provider: ECiProvider): string {
 		const descriptions: Record<ECiProvider, string> = {
 			[ECiProvider.GITHUB]: "GitHub Actions - Cloud-based CI/CD",
 		};
+
 		return descriptions[provider] || provider;
 	}
 
-	private async selectCompatibleModules(moduleType: ECiModuleType, savedModules: ECiModule[]): Promise<ECiModule[]> {
-		const compatibleModules = Object.entries(CI_CONFIG)
-			.filter(([_, config]) => {
+	private async getSavedConfig(): Promise<{
+		isNpmPackage?: boolean;
+		moduleProperties?: Record<string, any>;
+		modules?: Array<ECiModule>;
+		provider?: ECiProvider;
+	} | null> {
+		try {
+			if (await this.CONFIG_SERVICE.exists()) {
+				const config: IConfig = await this.CONFIG_SERVICE.get();
+
+				if (config[EModule.CI]) {
+					const ciConfig: Record<string, any> = config[EModule.CI] as Record<string, any>;
+
+					if (ciConfig.moduleProperties) {
+						const standardizedProperties: Record<string, any> = {};
+
+						// eslint-disable-next-line @elsikora-typescript/no-unsafe-argument
+						for (const [moduleKey, moduleValue] of Object.entries(ciConfig.moduleProperties)) {
+							// @ts-ignore
+							standardizedProperties[moduleKey] = this.extractModuleProperties(moduleValue);
+						}
+
+						ciConfig.moduleProperties = standardizedProperties;
+					}
+
+					return ciConfig;
+				}
+			}
+
+			return null;
+		} catch {
+			return null;
+		}
+	}
+
+	private async selectCompatibleModules(moduleType: ECiModuleType, savedModules: Array<ECiModule>): Promise<Array<ECiModule>> {
+		const compatibleModules: Array<{ description: string; label: string; value: ECiModule }> = Object.entries(CI_CONFIG)
+			.filter(([, config]: [string, ICiConfig]) => {
 				return config.type === ECiModuleType.UNIVERSAL || config.type === moduleType;
 			})
-			.map(([key, config]) => ({
+			.map(([key, config]: [string, ICiConfig]) => ({
+				description: config.description,
 				label: config.name,
 				value: key as ECiModule,
-				description: config.description,
 			}));
 
-		const compatibleValues = compatibleModules.map((module) => module.value);
-		const validSavedModules = savedModules.filter((module) => compatibleValues.includes(module));
+		const compatibleValues: Set<ECiModule> = new Set<ECiModule>(compatibleModules.map((module: { description: string; label: string; value: ECiModule }) => module.value));
+		const validSavedModules: Array<ECiModule> = savedModules.filter((module: ECiModule) => compatibleValues.has(module));
 
-		return await this.cliInterfaceService.multiselect<ECiModule>("Select the CI modules you want to set up:", compatibleModules, false, validSavedModules);
+		return await this.CLI_INTERFACE_SERVICE.multiselect<ECiModule>("Select the CI modules you want to set up:", compatibleModules, false, validSavedModules);
+	}
+
+	private async selectProvider(savedProvider?: ECiProvider): Promise<ECiProvider> {
+		const providers: Array<{
+			description: string;
+			label: string;
+			value: string;
+		}> = Object.values(ECiProvider).map((provider: ECiProvider) => ({
+			description: this.getProviderDescription(provider),
+			label: provider,
+			value: provider,
+		}));
+
+		const initialProvider: ECiProvider | undefined = savedProvider ?? undefined;
+
+		return await this.CLI_INTERFACE_SERVICE.select<ECiProvider>("Select CI provider:", providers, initialProvider);
+	}
+
+	private async setupModule(module: ECiModule, properties: Record<string, any>): Promise<{ error?: Error; isSuccess: boolean; module: ECiModule }> {
+		try {
+			const config: ICiConfig = CI_CONFIG[module];
+			// eslint-disable-next-line @elsikora-typescript/no-non-null-assertion
+			const providerConfig: ICiConfigContent = config.content[this.selectedProvider!];
+
+			if (!providerConfig) {
+				// eslint-disable-next-line @elsikora-typescript/restrict-template-expressions
+				throw new Error(`Provider ${this.selectedProvider} is not supported for ${config.name}`);
+			}
+
+			const directionPath: string = providerConfig.filePath.split("/").slice(0, -1).join("/");
+
+			if (directionPath) {
+				await this.FILE_SYSTEM_SERVICE.createDirectory(directionPath, {
+					isRecursive: true,
+				});
+			}
+
+			const content: string = providerConfig.template(properties);
+			await this.FILE_SYSTEM_SERVICE.writeFile(providerConfig.filePath, content);
+
+			return { isSuccess: true, module };
+		} catch (error) {
+			const formattedError: Error = error as Error;
+
+			return { error: formattedError, isSuccess: false, module };
+		}
 	}
 
 	private async setupSelectedModules(savedProperties: Record<string, any> = {}): Promise<Record<string, any>> {
@@ -158,135 +290,53 @@ export class CiModuleService implements IModuleService {
 			const moduleProperties: Record<string, any> = {};
 
 			for (const module of this.selectedModules) {
-				// Get only actual properties, not the isEnabled flag
-				const savedModuleProps = this.extractModuleProperties(savedProperties[module]);
-				const properties = await this.collectModuleProperties(module, savedModuleProps);
+				// eslint-disable-next-line @elsikora-typescript/no-unsafe-argument
+				const savedModuleProperties: Record<string, any> = this.extractModuleProperties(savedProperties[module]);
+				const properties: Record<string, string> = await this.collectModuleProperties(module, savedModuleProperties);
 
-				// Only store properties if they exist, don't use boolean flags
 				if (Object.keys(properties).length > 0) {
 					moduleProperties[module] = properties;
 				}
 			}
 
-			this.cliInterfaceService.startSpinner("Setting up CI configuration...");
+			this.CLI_INTERFACE_SERVICE.startSpinner("Setting up CI configuration...");
 
-			const results = await Promise.all(
-				this.selectedModules.map((module) => {
-					const setupProps = moduleProperties[module] || {};
-					return this.setupModule(module, setupProps);
+			const results: Array<Awaited<{ error?: Error; isSuccess: boolean; module: ECiModule }>> = await Promise.all(
+				this.selectedModules.map((module: ECiModule) => {
+					// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
+					const setupProperties: Record<string, any> = moduleProperties[module] || {};
+
+					return this.setupModule(module, setupProperties);
 				}),
 			);
 
-			this.cliInterfaceService.stopSpinner("CI configuration completed successfully!");
+			this.CLI_INTERFACE_SERVICE.stopSpinner("CI configuration completed successfully!");
 
-			const successfulSetups = results.filter((r) => r.success);
-			const failedSetups = results.filter((r) => !r.success);
+			const successfulSetups: Array<
+				Awaited<{
+					error?: Error;
+					isSuccess: boolean;
+					module: ECiModule;
+				}>
+			> = results.filter((r: Awaited<{ error?: Error; isSuccess: boolean; module: ECiModule }>) => r.isSuccess);
+
+			const failedSetups: Array<Awaited<{ error?: Error; isSuccess: boolean; module: ECiModule }>> = results.filter(
+				(
+					r: Awaited<{
+						error?: Error;
+						isSuccess: boolean;
+						module: ECiModule;
+					}>,
+				) => !r.isSuccess,
+			);
 
 			this.displaySetupSummary(successfulSetups, failedSetups);
 
 			return moduleProperties;
 		} catch (error) {
-			this.cliInterfaceService.stopSpinner();
+			this.CLI_INTERFACE_SERVICE.stopSpinner();
+
 			throw error;
 		}
-	}
-
-	private extractModuleProperties(moduleConfig: any): Record<string, any> {
-		if (!moduleConfig) {
-			return {};
-		}
-
-		if (typeof moduleConfig === "boolean") {
-			return {};
-		}
-
-		if (typeof moduleConfig === "object" && moduleConfig !== null && "isEnabled" in moduleConfig) {
-			// Remove isEnabled flag and return actual properties
-			const { isEnabled, ...properties } = moduleConfig;
-			return properties;
-		}
-
-		return moduleConfig;
-	}
-
-	private async setupModule(module: ECiModule, properties: Record<string, any>): Promise<{ module: ECiModule; success: boolean; error?: Error }> {
-		try {
-			const config = CI_CONFIG[module];
-			const providerConfig = config.content[this.selectedProvider!];
-
-			if (!providerConfig) {
-				throw new Error(`Provider ${this.selectedProvider} is not supported for ${config.name}`);
-			}
-
-			const dirPath = providerConfig.filePath.split("/").slice(0, -1).join("/");
-			if (dirPath) {
-				await this.fileSystemService.createDirectory(dirPath, {
-					recursive: true,
-				});
-			}
-
-			const content = providerConfig.template(properties);
-			await this.fileSystemService.writeFile(providerConfig.filePath, content);
-
-			return { module, success: true };
-		} catch (error) {
-			const formattedError: Error = error as Error;
-			return { module, success: false, error: formattedError };
-		}
-	}
-
-	private async collectModuleProperties(module: ECiModule, savedProperties: Record<string, any> = {}): Promise<Record<string, string>> {
-		const properties: Record<string, string> = {};
-
-		if (module === ECiModule.DEPENDABOT) {
-			const defaultBranch = savedProperties.devBranchName || "dev";
-			properties.devBranchName = await this.cliInterfaceService.text("Enter the target branch for Dependabot updates:", "dev", defaultBranch);
-		}
-
-		return properties;
-	}
-
-	private async getSavedConfig(): Promise<{
-		provider?: ECiProvider;
-		modules?: ECiModule[];
-		moduleProperties?: Record<string, any>;
-		isNpmPackage?: boolean;
-	} | null> {
-		try {
-			if (await this.configService.exists()) {
-				const config = await this.configService.get();
-				if (config[EModule.CI]) {
-					const ciConfig = config[EModule.CI] as any;
-
-					// Standardize the moduleProperties format
-					if (ciConfig.moduleProperties) {
-						const standardizedProps: Record<string, any> = {};
-
-						Object.entries(ciConfig.moduleProperties).forEach(([moduleKey, moduleValue]) => {
-							standardizedProps[moduleKey] = this.extractModuleProperties(moduleValue);
-						});
-
-						ciConfig.moduleProperties = standardizedProps;
-					}
-
-					return ciConfig;
-				}
-			}
-			return null;
-		} catch (error) {
-			return null;
-		}
-	}
-
-	private displaySetupSummary(successful: Array<{ module: ECiModule }>, failed: Array<{ module: ECiModule; error?: Error }>): void {
-		const summary = ["Successfully created configurations:", ...successful.map(({ module }) => `✓ ${CI_CONFIG[module].name}`)];
-
-		if (failed.length > 0) {
-			summary.push("Failed configurations:", ...failed.map(({ module, error }) => `✗ ${CI_CONFIG[module].name} - ${error?.message || "Unknown error"}`));
-		}
-
-		summary.push("", "The workflows will be activated when you push to the repository.", "", "Note: Make sure to set up required secrets in your CI provider.");
-
-		this.cliInterfaceService.note("CI Setup Summary", summary.join("\n"));
 	}
 }

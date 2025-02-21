@@ -1,5 +1,5 @@
 export enum ECiModuleType {
-    UNIVERSAL = 'universal',
-    NPM_ONLY = 'npm_only',
-    NON_NPM = 'non_npm'
+	NON_NPM = "non_npm",
+	NPM_ONLY = "npm_only",
+	UNIVERSAL = "universal",
 }

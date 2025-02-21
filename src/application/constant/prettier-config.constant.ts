@@ -1,4 +1,4 @@
-export const PRETTIER_CONFIG = `export default {
+export const PRETTIER_CONFIG: string = `export default {
   useTabs: true,
   tabWidth: 2,
   semi: true,

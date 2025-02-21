@@ -1,9 +1,8 @@
-import { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
-import { IFileSystemService } from "../../application/interface/file-system-service.interface";
-import { ConfigService } from "../../application/service/config.service";
+import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
+import type { IFileSystemService } from "../../application/interface/file-system-service.interface";
 
 export interface ICommand {
-	cliInterfaceService: ICliInterfaceService;
-	fileSystemService: IFileSystemService;
+	CLI_INTERFACE_SERVICE: ICliInterfaceService;
 	execute(): Promise<void>;
+	FILE_SYSTEM_SERVICE: IFileSystemService;
 }

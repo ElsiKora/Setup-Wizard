@@ -1,4 +1,4 @@
-export const STYLELINT_CONFIG = `export default {
+export const STYLELINT_CONFIG: string = `export default {
   extends: [
     'stylelint-config-standard-scss',
     'stylelint-config-rational-order',

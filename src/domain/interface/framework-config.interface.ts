@@ -1,19 +1,20 @@
-import { EEslintFeature } from "../enum/eslint-feature.enum";
-import { IFrameworkConfigIgnorePath } from "./framework-config-ignore-path.interface";
-import { EFramework } from "../enum/framework.enum";
+import type { EEslintFeature } from "../enum/eslint-feature.enum";
+import type { EFramework } from "../enum/framework.enum";
+
+import type { IFrameworkConfigIgnorePath } from "./framework-config-ignore-path.interface";
 
 export interface IFrameworkConfig {
-  name: EFramework;
-  displayName: string;
-  description?: string;
-  fileIndicators?: string[];
-  isSupportWatch?: boolean;
-  packageIndicators: {
-    dependencies?: string[];
-    devDependencies?: string[];
-    either?: string[];
-  };
-  lintPaths: string[];
-  ignorePath: IFrameworkConfigIgnorePath;
-  features: Array<EEslintFeature>;
+	description?: string;
+	displayName: string;
+	features: Array<EEslintFeature>;
+	fileIndicators?: Array<string>;
+	ignorePath: IFrameworkConfigIgnorePath;
+	isSupportWatch?: boolean;
+	lintPaths: Array<string>;
+	name: EFramework;
+	packageIndicators: {
+		dependencies?: Array<string>;
+		devDependencies?: Array<string>;
+		either?: Array<string>;
+	};
 }

@@ -1,6 +1,25 @@
 export default {
-  eslint: {
+  ci: {
     isEnabled: true,
+    isNpmPackage: false,
+    moduleProperties: {
+      dependabot: {
+        devBranchName: 'dev'
+      }
+    },
+    modules: [
+      'codecommit-sync',
+      'qodana',
+      'dependabot',
+      'snyk',
+      'release'
+    ],
+    provider: 'GitHub'
+  },
+  commitlint: {
+    isEnabled: true
+  },
+  eslint: {
     features: [
       'typescript',
       'tailwindCss',
@@ -16,56 +35,37 @@ export default {
       'perfectionist',
       'regexp',
       'stylistic'
-    ]
-  },
-  prettier: {
-    isEnabled: false
-  },
-  stylelint: {
-    isEnabled: false
-  },
-  "semantic-release": {
-    isEnabled: false,
-    repositoryUrl: 'https://github.com/test',
-    mainBranch: 'main',
-    needsPreRelease: true,
-    preReleaseBranch: 'dev',
-    preReleaseChannel: 'beta'
-  },
-  commitlint: {
-    isEnabled: false
+    ],
+    isEnabled: true
   },
   gitignore: {
     isEnabled: false
   },
-  license: {
-    isEnabled: false,
-    year: 2025,
-    author: 'Your Name',
-    license: 'UNLICENSED'
-  },
   ide: {
-    isEnabled: false,
     ides: [
       'vs-code',
       'intellij-idea'
-    ]
-  },
-  ci: {
-    isEnabled: true,
-    provider: 'GitHub',
-    modules: [
-      'codecommit-sync',
-      'qodana',
-      'dependabot',
-      'release-npm',
-      'snyk'
     ],
-    moduleProperties: {
-      dependabot: {
-        devBranchName: 'dev'
-      }
-    },
-    isNpmPackage: false
+    isEnabled: false
+  },
+  license: {
+    author: 'Your Name',
+    isEnabled: false,
+    license: 'UNLICENSED',
+    year: 2025
+  },
+  prettier: {
+    isEnabled: false
+  },
+  "semantic-release": {
+    isEnabled: false,
+    isPrereleaseEnabled: true,
+    mainBranch: 'main',
+    preReleaseBranch: 'dev',
+    preReleaseChannel: 'beta',
+    repositoryUrl: 'https://github.com/test'
+  },
+  stylelint: {
+    isEnabled: false
   }
 };

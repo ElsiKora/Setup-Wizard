@@ -1,31 +1,34 @@
-import { IPackageJsonBugs } from "./package-json-bugs.interface";
-import { IPackageJsonRepository } from "./package-json-repository.interface";
-import { IPackageJsonAuthor } from "./package-json-author.interface";
-import { IPackageJsonScripts } from "./package-json-scripts.interface";
+import type { EPackageJsonDependencyType } from "../enum/package-json-dependency-type.enum";
+import type { TPackageJsonScripts } from "../type/package-json-scripts.type";
+
+import type { IPackageJsonAuthor } from "./package-json-author.interface";
+import type { IPackageJsonBugs } from "./package-json-bugs.interface";
+import type { IPackageJsonRepository } from "./package-json-repository.interface";
 
 export interface IPackageJson {
-	name: string;
-	version: string;
-	description?: string;
-	main?: string;
+	[EPackageJsonDependencyType.DEV]?: Record<string, string>;
+	[EPackageJsonDependencyType.OPTIONAL]?: Record<string, string>;
+	[EPackageJsonDependencyType.PEER]?: Record<string, string>;
+	[EPackageJsonDependencyType.PROD]?: Record<string, string>;
+	author?: IPackageJsonAuthor | string;
+	bugs?: IPackageJsonBugs | string;
 	config?: Record<string, any>;
-	dependencies?: Record<string, string>;
-	devDependencies?: Record<string, string>;
-	peerDependencies?: Record<string, string>;
-	optionalDependencies?: Record<string, string>;
-	scripts?: IPackageJsonScripts;
-	author?: string | IPackageJsonAuthor;
-	contributors?: Array<string | IPackageJsonAuthor>;
-	homepage?: string;
-	repository?: string | IPackageJsonRepository;
-	bugs?: string | IPackageJsonBugs;
-	license?: string;
-	private?: boolean;
-	workspaces?: string[] | { packages: string[] };
-	eslintConfig?: Record<string, any>;
-	prettier?: Record<string, any>;
-	stylelint?: Record<string, any>;
-	type?: "module" | "commonjs";
+	contributors?: Array<IPackageJsonAuthor | string>;
+	description?: string;
 	engines?: Record<string, string>;
-	keywords?: string[];
+	eslintConfig?: Record<string, any>;
+	homepage?: string;
+	keywords?: Array<string>;
+	license?: string;
+	main?: string;
+	name: string;
+	prettier?: Record<string, any>;
+	// eslint-disable-next-line @elsikora-typescript/naming-convention
+	private?: boolean;
+	repository?: IPackageJsonRepository | string;
+	scripts?: TPackageJsonScripts;
+	stylelint?: Record<string, any>;
+	type?: "commonjs" | "module";
+	version: string;
+	workspaces?: { packages: Array<string> } | Array<string>;
 }

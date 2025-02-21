@@ -1,3 +1,3 @@
 export interface ICommandService {
-    execute(command: string): Promise<void>;
+	execute(command: string): Promise<void>;
 }

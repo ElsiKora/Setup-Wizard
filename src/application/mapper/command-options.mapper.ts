@@ -1,16 +1,19 @@
-import {COMMAND_FLAG_CONFIG} from "../constant/command-flag-config.constant";
-import {EModule} from "../../domain/enum/module.enum";
-import {IModuleEnableStatusProperties} from "../interface/module-enable-status-properties.interface";
+import type { EModule } from "../../domain/enum/module.enum";
+import type { TModuleEnableStatusProperties } from "../type/module-enable-status-properties.type";
 
-export class CommandOptionsMapper {
-    static fromFlagToModule(properties: Record<string, boolean>): IModuleEnableStatusProperties {
-        const commandProperties: IModuleEnableStatusProperties = {};
+import { COMMAND_FLAG_CONFIG } from "../constant/command-flag-config.constant";
 
-        Object.entries(COMMAND_FLAG_CONFIG).forEach(([module, config]) => {
-            const moduleKey = module as EModule;
-            commandProperties[moduleKey] = properties[config.fullFlag] || false;
-        });
+export const CommandOptionsMapper: {
+	fromFlagToModule(properties: Record<string, boolean>): TModuleEnableStatusProperties;
+} = {
+	fromFlagToModule(properties: Record<string, boolean>): TModuleEnableStatusProperties {
+		const commandProperties: TModuleEnableStatusProperties = {};
 
-        return commandProperties;
-    }
-}
+		for (const [module, config] of Object.entries(COMMAND_FLAG_CONFIG)) {
+			const moduleKey: EModule = module as EModule;
+			commandProperties[moduleKey] = properties[config.fullFlag] || false;
+		}
+
+		return commandProperties;
+	},
+};

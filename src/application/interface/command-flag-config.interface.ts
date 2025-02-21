@@ -1,5 +1,5 @@
 export interface ICommandFlagConfig {
-    shortFlag: string;
-    fullFlag: string;
-    description: string;
+	description: string;
+	fullFlag: string;
+	shortFlag: string;
 }

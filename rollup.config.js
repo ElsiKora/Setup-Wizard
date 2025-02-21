@@ -1,20 +1,23 @@
 import typescript from "@rollup/plugin-typescript";
 
 export default {
-    external: ["fs", "path", "openai", "chalk", "commander", "@anthropic-ai/sdk", "dotenv", "cli-progress", "@clack/prompts", "axios", "glob", "ignore", "@ai-ai/sdk", "fs/promises", "node:fs", "node:path", "node:os", "node:util", "rimraf", "node:child_process"],
-    input: "src/presentation/index.ts",
-    output: {
-        banner: "#!/usr/bin/env node",
-        exports: "auto",
-        file: "bin/index.js",
-        format: "esm",
-        sourcemap: true,
-    },
-    plugins: [
-        typescript({
-            declaration: false,
-            sourceMap: true,
-            tsconfig: "./tsconfig.json",
-        }),
-    ],
+	external: ["node:fs", "node:fs/promises", "node:path", "node:child_process", "node:util", "commander", "@clack/prompts"],
+	input: "src/presentation/index.ts",
+	output: {
+		banner: "#!/usr/bin/env node",
+		exports: "auto",
+		dir: "bin", // Вместо file используем dir
+		format: "esm",
+		sourcemap: true,
+		preserveModules: true, // Сохраняет структуру модулей
+		preserveModulesRoot: "src", // Корневая директория для модулей
+	},
+	plugins: [
+		typescript({
+			declaration: true, // Включаем генерацию типов
+			sourceMap: true,
+			tsconfig: "./tsconfig.json",
+			outDir: "bin", // Указываем выходную директорию для TypeScript
+		}),
+	],
 };

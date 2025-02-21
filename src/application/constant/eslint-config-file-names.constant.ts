@@ -1,10 +1,1 @@
-export const ESLINT_CONFIG_FILE_NAMES: Array<string> = [ "eslint.config.js",
-    "eslint.config.cjs",
-    "eslint.config.mjs",
-    ".eslintrc.js",
-    ".eslintrc.cjs",
-    ".eslintrc.yaml",
-    ".eslintrc.yml",
-    ".eslintrc.json",
-    ".eslintrc",
-    ".eslintignore"];
+export const ESLINT_CONFIG_FILE_NAMES: Array<string> = ["eslint.config.js", "eslint.config.cjs", "eslint.config.mjs", ".eslintrc.js", ".eslintrc.cjs", ".eslintrc.yaml", ".eslintrc.yml", ".eslintrc.json", ".eslintrc", ".eslintignore"];

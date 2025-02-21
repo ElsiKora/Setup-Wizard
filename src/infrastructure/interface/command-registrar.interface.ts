@@ -1,8 +1,9 @@
-import {Command} from "commander";
-import {ICommandFactory} from "./command-factory.interface";
+import type { Command } from "commander";
+
+import type { ICommandFactory } from "./command-factory.interface";
 
 export interface ICommandRegistrar {
-    program: Command;
-    commandFactory: ICommandFactory;
-    execute(): Command;
+	COMMAND_FACTORY: ICommandFactory;
+	execute(): Command;
+	PROGRAM: Command;
 }

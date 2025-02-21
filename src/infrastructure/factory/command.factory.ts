@@ -1,28 +1,38 @@
-import {ICommandFactory} from "../interface/command-factory.interface";
-import {ICommand} from "../interface/command.interface";
-import {InitCommand} from "../command/init.command";
-import {ICliInterfaceService} from "../../application/interface/cli-interface-service.interface";
-import {ECommand} from "../enum/command.enum";
-import {AnalyzeCommand} from "../command/analyze.command";
-import {IFileSystemService} from "../../application/interface/file-system-service.interface";
+import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
+import type { IFileSystemService } from "../../application/interface/file-system-service.interface";
+import type { ICommandFactory } from "../interface/command-factory.interface";
+import type { ICommand } from "../interface/command.interface";
+import type { TInitCommandProperties } from "../type/init-command-properties.type";
+
+import { AnalyzeCommand } from "../command/analyze.command";
+import { InitCommand } from "../command/init.command";
+import { ECommand } from "../enum/command.enum";
 
 export class CommandFactory implements ICommandFactory {
-    readonly cliInterfaceService: ICliInterfaceService;
-    readonly fileSystemService: IFileSystemService;
+	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
-    constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
-        this.cliInterfaceService = cliInterfaceService;
-        this.fileSystemService = fileSystemService;
-    }
+	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
-    createCommand(name: ECommand, options: any): ICommand {
-        switch (name) {
-            case ECommand.INIT:
-                return new InitCommand(options, this.cliInterfaceService, this.fileSystemService);
-            case ECommand.ANALYZE:
-                return new AnalyzeCommand(options, this.cliInterfaceService, this.fileSystemService);
-            default:
-                throw new Error(`Unknown command: ${name}`);
-        }
-    }
+	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
+		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
+		this.FILE_SYSTEM_SERVICE = fileSystemService;
+	}
+
+	createCommand(name: ECommand, options: TInitCommandProperties): ICommand {
+		console.log("OPTIONS", options);
+
+		switch (name) {
+			case ECommand.ANALYZE: {
+				return new AnalyzeCommand(options, this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+			}
+
+			case ECommand.INIT: {
+				return new InitCommand(options, this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+			}
+
+			default: {
+				throw new Error(`Unknown command: ${name as string}`);
+			}
+		}
+	}
 }

@@ -1,10 +1,11 @@
-import {ECiProvider} from "../enum/ci-provider.enum";
-import {ICiConfigContent} from "./ci-config-content.interface";
-import {ECiModuleType} from "../enum/ci-module-type.enum";
+import type { ECiModuleType } from "../enum/ci-module-type.enum";
+import type { ECiProvider } from "../enum/ci-provider.enum";
+
+import type { ICiConfigContent } from "./ci-config-content.interface";
 
 export interface ICiConfig {
-    type: ECiModuleType;
-    name: string;
-    description: string;
-    content: Record<ECiProvider, ICiConfigContent>;
+	content: Record<ECiProvider, ICiConfigContent>;
+	description: string;
+	name: string;
+	type: ECiModuleType;
 }

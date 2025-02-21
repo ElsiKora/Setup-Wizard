@@ -1,8 +1,8 @@
 export interface IEslintFeatureConfig {
-  description: string;
-  packages?: string[];
-  required?: boolean;
-  detect?: string[];
-  requiresTypescript?: boolean;
-  configFlag: string;
+	configFlag: string;
+	description: string;
+	detect?: Array<string>;
+	isRequired?: boolean;
+	isRequiresTypescript?: boolean;
+	packages?: Array<string>;
 }

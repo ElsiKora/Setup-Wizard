@@ -1,4 +1,4 @@
 export interface IFrameworkConfigIgnorePath {
-    directories: string[];
-    patterns: string[];
+	directories: Array<string>;
+	patterns: Array<string>;
 }

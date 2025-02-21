@@ -1,4 +1,4 @@
-export const COMMITLINT_CONFIG = `const Configuration = {
+export const COMMITLINT_CONFIG: string = `const Configuration = {
   extends: ['@commitlint/config-conventional'],
   parserPreset: 'conventional-changelog-conventionalcommits',
   formatter: '@commitlint/format',

@@ -1,6 +1,8 @@
-export const SEMANTIC_RELEASE_CONFIG = {
+export const SEMANTIC_RELEASE_CONFIG: {
+	template: (repositoryUrl: string, mainBranch: string, preReleaseBranch?: string, preReleaseChannel?: string) => string;
+} = {
 	template: (repositoryUrl: string, mainBranch: string, preReleaseBranch?: string, preReleaseChannel?: string) => {
-		let branchesConfig = `  branches: [
+		let branchesConfig: string = `  branches: [
     '${mainBranch}'`;
 
 		if (preReleaseBranch && preReleaseChannel) {

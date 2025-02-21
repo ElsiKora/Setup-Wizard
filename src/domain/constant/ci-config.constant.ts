@@ -1,17 +1,17 @@
-import {ECiModule} from "../enum/ci-module.enum";
-import {ICiConfig} from "../interface/ci-config.interface";
-import {ECiProvider} from "../enum/ci-provider.enum";
-import {ECiModuleType} from "../enum/ci-module-type.enum";
+/* eslint-disable @elsikora-typescript/no-unsafe-argument */
+import type { ICiConfig } from "../interface/ci-config.interface";
+
+import { ECiModuleType } from "../enum/ci-module-type.enum";
+import { ECiModule } from "../enum/ci-module.enum";
+import { ECiProvider } from "../enum/ci-provider.enum";
 
 export const CI_CONFIG: Record<ECiModule, ICiConfig> = {
-    [ECiModule.CODECOMMIT_SYNC]: {
-        name: "CodeCommit Sync",
-        description: "Syncs the repository with AWS CodeCommit.",
-        type: ECiModuleType.UNIVERSAL,
-        content: {
-            [ECiProvider.GITHUB]: {
-                template: (properties = {}) => {
-                    let content = `name: Mirror to CodeCommit
+	[ECiModule.CODECOMMIT_SYNC]: {
+		content: {
+			[ECiProvider.GITHUB]: {
+				filePath: ".github/workflows/codecommit-sync.yml",
+				template: (properties: object = {}) => {
+					let content: string = `name: Mirror to CodeCommit
 on: push
 
 jobs:
@@ -31,24 +31,55 @@ jobs:
           ssh_private_key: \${{ secrets.CODECOMMIT_SSH_PRIVATE_KEY }}
           ssh_username: \${{ secrets.CODECOMMIT_SSH_PRIVATE_KEY_ID }}`;
 
-                    Object.entries(properties).forEach(([key, value]) => {
-                        content = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
-                    });
+					for (const [key, value] of Object.entries(properties)) {
+						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
+					}
 
-                    return content;
-                },
-                filePath: ".github/workflows/codecommit-sync.yml"
-            }
-        }
-    },
-    [ECiModule.QODANA]: {
-        name: "Qodana",
-        description: "Runs Qodana static analysis.",
-        type: ECiModuleType.UNIVERSAL,
-        content: {
-            [ECiProvider.GITHUB]: {
-                template: (properties = {}) => {
-                    let content = `name: Qodana Quality Scan
+					return content;
+				},
+			},
+		},
+		description: "Syncs the repository with AWS CodeCommit.",
+		name: "CodeCommit Sync",
+		type: ECiModuleType.UNIVERSAL,
+	},
+	[ECiModule.DEPENDABOT]: {
+		content: {
+			[ECiProvider.GITHUB]: {
+				filePath: ".github/dependabot.yml",
+				template: (properties: object = {}) => {
+					let content: string = `version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "{{devBranchName}}"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "{{devBranchName}}"`;
+
+					for (const [key, value] of Object.entries(properties)) {
+						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
+					}
+
+					return content;
+				},
+			},
+		},
+		description: "Runs Dependabot dependency updates.",
+		name: "Dependabot",
+		type: ECiModuleType.UNIVERSAL,
+	},
+	[ECiModule.QODANA]: {
+		content: {
+			[ECiProvider.GITHUB]: {
+				filePath: ".github/workflows/qodana.yml",
+				template: (properties: object = {}) => {
+					let content: string = `name: Qodana Quality Scan
 on: push
 
 jobs:
@@ -74,207 +105,118 @@ jobs:
         env:
           QODANA_TOKEN: \${{ secrets.QODANA_TOKEN }}`;
 
-                    Object.entries(properties).forEach(([key, value]) => {
-                        content = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
-                    });
+					for (const [key, value] of Object.entries(properties)) {
+						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
+					}
 
-                    return content;
-                },
-                filePath: ".github/workflows/qodana.yml"
-            }
-        }
-    },
-    [ECiModule.DEPENDABOT]: {
-        name: "Dependabot",
-        description: "Runs Dependabot dependency updates.",
-        type: ECiModuleType.UNIVERSAL,
-        content: {
-            [ECiProvider.GITHUB]: {
-                template: (properties = {}) => {
-                    let content = `version: 2
-updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    target-branch: "{{devBranchName}}"
-
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    target-branch: "{{devBranchName}}"`;
-
-                    Object.entries(properties).forEach(([key, value]) => {
-                        content = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
-                    });
-
-                    return content;
-                },
-         filePath:  ".github/dependabot.yml"
-            }
-        }
-    },
-    [ECiModule.RELEASE]: {
-        name: "Release",
-        description: "Runs release process.",
-        type: ECiModuleType.NON_NPM,
-        content: {
-            [ECiProvider.GITHUB]: {
-                template: (properties = {}) => {
-                    let content = `name: Release and Publish
+					return content;
+				},
+			},
+		},
+		description: "Runs Qodana static analysis.",
+		name: "Qodana",
+		type: ECiModuleType.UNIVERSAL,
+	},
+	[ECiModule.RELEASE]: {
+		content: {
+			[ECiProvider.GITHUB]: {
+				filePath: ".github/workflows/release.yml",
+				template: (properties: object = {}) => {
+					let content: string = `name: Release
 on:
   push:
     branches:
       - main
 
-jobs:
-  changesets:
-    runs-on: ubuntu-latest
-    outputs:
-      hasChangesets: \${{ steps.changesets.outputs.hasChangesets }}
-      publishedPackages: \${{ steps.changesets.outputs.publishedPackages }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install Dependencies
-        run: yarn install
-
-      - name: Create Release Pull Request
-        id: changesets
-        uses: changesets/action@v1
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-
-  prepare-release-info:
-    needs: changesets
-    runs-on: ubuntu-latest
-    outputs:
-      version: \${{ steps.get_version.outputs.version }}
-      release_notes: \${{ steps.generate_release_notes.outputs.release_notes }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: List tags
-        run: git tag
-
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Get package version
-        id: get_version
-        run: echo "::set-output name=version::$(jq -r '.version' package.json)"
-
-      - name: Generate release notes
-        id: generate_release_notes
-        run: |
-          notes=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%h: %s")
-          if [ -z "$notes" ]; then
-            echo "No new changes to release."
-            notes="No new changes."
-          fi
-          echo "::set-output name=release_notes::$(echo "$notes" | base64)"
-
-  github-release:
-    needs: prepare-release-info
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Decode Release Notes
-        id: decode
-        run: echo "::set-output name=release_notes::$(echo '\${{ needs.prepare-release-info.outputs.release_notes }}' | base64 --decode)"
-
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: \${{ needs.prepare-release-info.outputs.version }}
-          release_name: Release \${{ needs.prepare-release-info.outputs.version }}
-          body: \${{ steps.decode.outputs.release_notes }}
-          draft: false
-          prerelease: false`;
-
-                    Object.entries(properties).forEach(([key, value]) => {
-                        content = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
-                    });
-
-                    return content;
-                },
-                filePath: ".github/workflows/release.yml"
-        }
-        }
-    },
-    [ECiModule.RELEASE_NPM]: {
-        name: "Release NPM",
-        description: "Runs NPM release process.",
-        type: ECiModuleType.NPM_ONLY,
-        content: {
-            [ECiProvider.GITHUB]: {
-                template: (properties = {}) => {
-                    let content = `name: Release
-on:
-  push:
-    branches:
-      - main
-
-concurrency: \${{ github.workflow }}-\${{ github.ref }}
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
-      - name: Install Dependencies
-        run: yarn
+          node-version: 20
 
-      - name: Create Release Pull Request or Publish to NPM
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          publish: yarn release
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}`;
+        run: npx semantic-release`;
 
-                    Object.entries(properties).forEach(([key, value]) => {
-                        content = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
-                    });
+					for (const [key, value] of Object.entries(properties)) {
+						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
+					}
 
-                    return content;
-                },
-                filePath: ".github/workflows/release.yml"
-        }
-        }
-    },
-    [ECiModule.SNYK]: {
-        name: "Snyk",
-        description: "Runs Snyk security scan.",
-        type: ECiModuleType.UNIVERSAL,
-        content: {
-            [ECiProvider.GITHUB]: {
-                template: (properties = {}) => {
-                    let content = `name: Snyk Security Scan
+					return content;
+				},
+			},
+		},
+		description: "Runs release process.",
+		name: "Release",
+		type: ECiModuleType.NON_NPM,
+	},
+	[ECiModule.RELEASE_NPM]: {
+		content: {
+			[ECiProvider.GITHUB]: {
+				filePath: ".github/workflows/release.yml",
+				template: (properties: object = {}) => {
+					let content: string = `name: Release And Publish
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: \${{ secrets.NPM_TOKEN }}
+        run: npx semantic-release`;
+
+					for (const [key, value] of Object.entries(properties)) {
+						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
+					}
+
+					return content;
+				},
+			},
+		},
+		description: "Runs NPM release process.",
+		name: "Release NPM",
+		type: ECiModuleType.NPM_ONLY,
+	},
+	[ECiModule.SNYK]: {
+		content: {
+			[ECiProvider.GITHUB]: {
+				filePath: ".github/workflows/snyk.yml",
+				template: (properties: object = {}) => {
+					let content: string = `name: Snyk Security Scan
 on: push
 
 jobs:
@@ -312,14 +254,16 @@ jobs:
         run: |
           snyk iac test || true`;
 
-                    Object.entries(properties).forEach(([key, value]) => {
-                        content = content.replace(new RegExp(`{{${key}}}`, 'g'), value);
-                    });
+					for (const [key, value] of Object.entries(properties)) {
+						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
+					}
 
-                    return content;
-                },
-                filePath: ".github/workflows/snyk.yml"
-        }
-        }
-    }
+					return content;
+				},
+			},
+		},
+		description: "Runs Snyk security scan.",
+		name: "Snyk",
+		type: ECiModuleType.UNIVERSAL,
+	},
 };

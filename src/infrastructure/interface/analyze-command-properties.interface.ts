@@ -1,4 +1,4 @@
 export interface IAnalyzeCommandProperties {
-    hasEslint?: boolean;
-    hasPrettier?: boolean;
+	hasEslint?: boolean;
+	hasPrettier?: boolean;
 }

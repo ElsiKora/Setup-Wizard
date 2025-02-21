@@ -1,11 +1,12 @@
-import {ELicense} from "../enum/license.enum";
-import {ILicenseConfig} from "../interface/license-config.interface";
+import type { ILicenseConfig } from "../interface/license-config.interface";
+
+import { ELicense } from "../enum/license.enum";
 
 export const LICENSE_CONFIG: Record<ELicense, ILicenseConfig> = {
-    [ELicense.AGPL_3_0]: {
-        description: "Similar to GPLv3 but requires source code distribution for software running over networks (e.g., web applications)",
-        name: "GNU Affero General Public License v3.0",
-        template: (year: string, author: string) => `GNU AFFERO GENERAL PUBLIC LICENSE
+	[ELicense.AGPL_3_0]: {
+		description: "Similar to GPLv3 but requires source code distribution for software running over networks (e.g., web applications)",
+		name: "GNU Affero General Public License v3.0",
+		template: (year: string, author: string) => `GNU AFFERO GENERAL PUBLIC LICENSE
 Version 3, 19 November 2007
 
 Copyright (c) ${year} ${author}
@@ -28,11 +29,11 @@ Additional permission under GNU GPL version 3 section 7
 If you modify this Program, or any covered work, by linking or combining
 it with other code, such other code is not for that reason alone subject
 to any of the requirements of the GNU Affero GPL version 3.`,
-    },
-    [ELicense.APACHE_2_0]: {
-        description: "A permissive license with strong patent protection and requirements for preserving copyright and license notices",
-        name: "Apache License 2.0",
-        template: (year: string, author: string) => `Apache License
+	},
+	[ELicense.APACHE_2_0]: {
+		description: "A permissive license with strong patent protection and requirements for preserving copyright and license notices",
+		name: "Apache License 2.0",
+		template: (year: string, author: string) => `Apache License
 Version 2.0, January 2004
 http://www.apache.org/licenses/
 
@@ -69,11 +70,11 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.`,
-    },
-    [ELicense.BSL_1_0]: {
-        description: "A simple permissive license only requiring preservation of copyright and license notices for source distributions",
-        name: "Boost Software License 1.0",
-        template: (year: string, author: string) => `Boost Software License - Version 1.0 - August 17th, 2003
+	},
+	[ELicense.BSL_1_0]: {
+		description: "A simple permissive license only requiring preservation of copyright and license notices for source distributions",
+		name: "Boost Software License 1.0",
+		template: (year: string, author: string) => `Boost Software License - Version 1.0 - August 17th, 2003
 
 Copyright (c) ${year} ${author}
 
@@ -94,11 +95,11 @@ a source language processor.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.`,
-    },
-    [ELicense.GPL_3_0]: {
-        description: "A copyleft license that requires anyone who distributes your code or a derivative work to make the source available under the same terms",
-        name: "GNU General Public License v3.0",
-        template: (year: string, author: string) => `GNU GENERAL PUBLIC LICENSE
+	},
+	[ELicense.GPL_3_0]: {
+		description: "A copyleft license that requires anyone who distributes your code or a derivative work to make the source available under the same terms",
+		name: "GNU General Public License v3.0",
+		template: (year: string, author: string) => `GNU GENERAL PUBLIC LICENSE
 Version 3, 29 June 2007
 
 Copyright (c) ${year} ${author}
@@ -115,11 +116,11 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.`,
-    },
-    [ELicense.ISC]: {
-        description: "A permissive license letting people do anything with your code with proper attribution and without warranty",
-        name: "ISC License",
-        template: (year: string, author: string) => `ISC License
+	},
+	[ELicense.ISC]: {
+		description: "A permissive license letting people do anything with your code with proper attribution and without warranty",
+		name: "ISC License",
+		template: (year: string, author: string) => `ISC License
 
 Copyright (c) ${year} ${author}
 
@@ -134,11 +135,11 @@ INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
 LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.`,
-    },
-    [ELicense.LGPL_3_0]: {
-        description: "A copyleft license that permits use in proprietary software while maintaining copyleft for the LGPL-licensed components",
-        name: "GNU Lesser General Public License v3.0",
-        template: (year: string, author: string) => `GNU LESSER GENERAL PUBLIC LICENSE
+	},
+	[ELicense.LGPL_3_0]: {
+		description: "A copyleft license that permits use in proprietary software while maintaining copyleft for the LGPL-licensed components",
+		name: "GNU Lesser General Public License v3.0",
+		template: (year: string, author: string) => `GNU LESSER GENERAL PUBLIC LICENSE
 Version 3, 29 June 2007
 
 Copyright (c) ${year} ${author}
@@ -155,11 +156,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.`,
-    },
-    [ELicense.MIT]: {
-        description: "A short and simple permissive license with conditions only requiring preservation of copyright and license notices",
-        name: "MIT License",
-        template: (year: string, author: string) => `MIT License
+	},
+	[ELicense.MIT]: {
+		description: "A short and simple permissive license with conditions only requiring preservation of copyright and license notices",
+		name: "MIT License",
+		template: (year: string, author: string) => `MIT License
 
 Copyright (c) ${year} ${author}
 
@@ -180,11 +181,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.`,
-    },
-    [ELicense.MPL_2_0]: {
-        description: "A copyleft license that is file-based and allows inclusion in larger works under different licenses",
-        name: "Mozilla Public License 2.0",
-        template: (year: string, author: string) => `Mozilla Public License Version 2.0
+	},
+	[ELicense.MPL_2_0]: {
+		description: "A copyleft license that is file-based and allows inclusion in larger works under different licenses",
+		name: "Mozilla Public License 2.0",
+		template: (year: string, author: string) => `Mozilla Public License Version 2.0
 ==================================
 
 Copyright (c) ${year} ${author}
@@ -212,11 +213,11 @@ Copyright (c) ${year} ${author}
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.`,
-    },
-    [ELicense.UNLICENSED]: {
-        description: "A license with no conditions whatsoever which dedicates works to the public domain",
-        name: "The Unlicense",
-        template: (_year: string, _author: string) => `This is free and unencumbered software released into the public domain.
+	},
+	[ELicense.UNLICENSED]: {
+		description: "A license with no conditions whatsoever which dedicates works to the public domain",
+		name: "The Unlicense",
+		template: () => `This is free and unencumbered software released into the public domain.
 
 Anyone is free to copy, modify, publish, use, compile, sell, or
 distribute this software, either in source code form or as a compiled
@@ -240,5 +241,5 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <https://unlicense.org>`,
-    },
+	},
 };

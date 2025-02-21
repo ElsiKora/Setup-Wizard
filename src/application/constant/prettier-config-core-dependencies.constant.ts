@@ -1,1 +1,1 @@
-export const PRETTIER_CONFIG_CORE_DEPENDENCIES = ["prettier"];
+export const PRETTIER_CONFIG_CORE_DEPENDENCIES: Array<string> = ["prettier"];

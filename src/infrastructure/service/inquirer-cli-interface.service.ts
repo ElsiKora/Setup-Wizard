@@ -1,76 +1,111 @@
+/* eslint-disable @elsikora-unicorn/no-process-exit,elsikora-node/no-process-exit,@elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-call,@elsikora-typescript/no-unsafe-return,@elsikora-sonar/function-return-type,elsikora-node/no-unpublished-import */
+import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
+import type { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
+
+import chalk from "chalk";
 import inquirer from "inquirer";
 import ora from "ora";
-import chalk from "chalk";
-import { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
-import { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
 
 export class InquirerCliInterface implements ICliInterfaceService {
-	private spinner: ora.Ora;
+	// @ts-ignore
+	private readonly SPINNER: ora.Ora;
 
 	constructor() {
-		this.spinner = ora();
-	}
-
-	success(message: string): void {
-		console.log(chalk.green(message));
-	}
-
-	warn(message: string): void {
-		console.log(chalk.yellow(message));
-	}
-
-	log(message: string): void {
-		console.log(message);
-	}
-
-	error(message: string): void {
-		console.error(chalk.red(message));
+		this.SPINNER = ora();
 	}
 
 	clear(): void {
 		console.clear();
 	}
 
-	async select<T>(message: string, options: Array<ICliInterfaceServiceSelectOptions>, initialValue?: string): Promise<T> {
-		const choices = options.map((opt) => ({ name: opt.label, value: opt.value }));
+	async confirm(message: string, isConfirmedByDefault: boolean = false): Promise<boolean> {
 		try {
-			const answer = await inquirer.prompt({
-				type: "list",
-				name: "selection",
+			const answer: any = await inquirer.prompt({
+				// eslint-disable-next-line @elsikora-typescript/naming-convention
+				default: isConfirmedByDefault,
 				message,
-				choices,
-				default: initialValue,
-			});
-			return answer.selection as T;
-		} catch (error) {
-			this.error("Operation cancelled by user");
-			process.exit(0);
-		}
-	}
-
-	async confirm(message: string, initialValue?: boolean): Promise<boolean> {
-		try {
-			const answer = await inquirer.prompt({
-				type: "confirm",
 				name: "confirmation",
-				message,
-				default: initialValue,
+				type: "confirm",
 			});
+
 			return answer.confirmation;
-		} catch (error) {
+		} catch {
 			this.error("Operation cancelled by user");
 			process.exit(0);
 		}
 	}
 
-	startSpinner(message: string): void {
-		this.spinner.start(message);
+	error(message: string): void {
+		console.error(chalk.red(message));
 	}
 
-	stopSpinner(message?: string): void {
-		this.spinner.stop();
-		if (message) {
-			console.log(message);
+	async groupMultiselect<T>(message: string, options: Record<string, Array<ICliInterfaceServiceSelectOptions>>, isRequired: boolean = false, initialValues?: Array<string>): Promise<Array<T>> {
+		const choices: Array<any> = [];
+
+		for (const [group, groupOptions] of Object.entries(options)) {
+			for (const opt of groupOptions) {
+				choices.push({
+					// eslint-disable-next-line @elsikora-typescript/naming-convention
+					checked: initialValues?.includes(opt.value) ?? false,
+					name: `${group}: ${opt.label}`,
+					value: opt.value,
+				});
+			}
+		}
+
+		try {
+			const answer: any = await inquirer.prompt({
+				choices,
+				message: `${message} (space to select)`,
+				name: "selection",
+				type: "checkbox",
+				// @ts-ignore
+				validate: isRequired ? (input: Array<any> | string): boolean | string | undefined => input.length > 0 || "You must select at least one option" : undefined,
+			});
+
+			return answer.selection as Array<T>;
+		} catch {
+			this.error("Operation cancelled by user");
+			process.exit(0);
+		}
+	}
+
+	handleError(message: string, error: unknown): void {
+		console.error(chalk.red(message));
+		console.error(error);
+	}
+
+	info(message: string): void {
+		console.log(chalk.blue(message));
+	}
+
+	log(message: string): void {
+		console.log(message);
+	}
+
+	async multiselect<T>(message: string, options: Array<ICliInterfaceServiceSelectOptions>, isRequired: boolean = false, initialValues?: Array<string>): Promise<Array<T>> {
+		// eslint-disable-next-line @elsikora-typescript/naming-convention
+		const choices: Array<{ checked: boolean; name: string; value: string }> = options.map((opt: ICliInterfaceServiceSelectOptions) => ({
+			// eslint-disable-next-line @elsikora-typescript/naming-convention
+			checked: initialValues?.includes(opt.value) ?? false,
+			name: opt.label,
+			value: opt.value,
+		}));
+
+		try {
+			const answer: any = await inquirer.prompt({
+				choices,
+				message: `${message} (space to select)`,
+				name: "selection",
+				type: "checkbox",
+				// @ts-ignore
+				validate: isRequired ? (input: Array<any> | string): boolean | string | undefined => input.length > 0 || "You must select at least one option" : undefined,
+			});
+
+			return answer.selection as Array<T>;
+		} catch {
+			this.error("Operation cancelled by user");
+			process.exit(0);
 		}
 	}
 
@@ -79,83 +114,71 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		console.log(message);
 	}
 
-	handleError(message: string, error: unknown): void {
-		console.error(chalk.red(message));
-		console.error(error);
+	async select<T>(message: string, options: Array<ICliInterfaceServiceSelectOptions>, initialValue?: string): Promise<T> {
+		const choices: Array<{ name: string; value: string }> = options.map((opt: ICliInterfaceServiceSelectOptions) => ({ name: opt.label, value: opt.value }));
+
+		try {
+			const answer: any = await inquirer.prompt({
+				choices,
+				default: initialValue,
+				message,
+				name: "selection",
+				type: "list",
+			});
+
+			return answer.selection as T;
+		} catch {
+			this.error("Operation cancelled by user");
+			process.exit(0);
+		}
 	}
 
-	async text(message: string, placeholder?: string, initialValue?: string, validate?: (value: string) => string | Error | undefined): Promise<string> {
+	startSpinner(message: string): void {
+		this.SPINNER.start(message);
+	}
+
+	stopSpinner(message?: string): void {
+		this.SPINNER.stop();
+
+		if (message) {
+			console.log(message);
+		}
+	}
+
+	success(message: string): void {
+		console.log(chalk.green(message));
+	}
+
+	async text(message: string, placeholder?: string, initialValue?: string, validate?: (value: string) => Error | string | undefined): Promise<string> {
 		try {
-			const answer = await inquirer.prompt({
-				type: "input",
-				name: "text",
-				message,
+			const answer: any = await inquirer.prompt({
 				default: initialValue,
+				message,
+				name: "text",
+				type: "input",
 				validate: validate
-					? (input) => {
-							const result = validate(input);
-							if (result === undefined) return true; // Валидно
-							if (typeof result === "string") return result; // Сообщение об ошибке
-							if (result instanceof Error) return result.message; // Сообщение из Error
-							return "Invalid input"; // На всякий случай
+					? (input: string): boolean | string => {
+							const result: Error | string | undefined = validate(input);
+
+							if (result === undefined) return true;
+
+							if (typeof result === "string") return result;
+
+							if (result instanceof Error) return result.message;
+
+							return "Invalid input";
 						}
 					: undefined,
 			});
+
 			return answer.text;
-		} catch (error) {
+		} catch {
 			this.error("Operation cancelled by user");
 			process.exit(0);
 		}
 	}
 
-	async multiselect<T>(message: string, options: Array<ICliInterfaceServiceSelectOptions>, required?: boolean, initialValues?: Array<string>): Promise<Array<T>> {
-		const choices = options.map((opt) => ({
-			name: opt.label,
-			value: opt.value,
-			checked: initialValues?.includes(opt.value) || false,
-		}));
-		try {
-			const answer = await inquirer.prompt({
-				type: "checkbox",
-				name: "selection",
-				message: `${message} (space to select)`,
-				choices,
-				validate: required ? (input) => input.length > 0 || "You must select at least one option" : undefined,
-			});
-			return answer.selection as Array<T>;
-		} catch (error) {
-			this.error("Operation cancelled by user");
-			process.exit(0);
-		}
-	}
-
-	async groupMultiselect<T>(message: string, options: Record<string, Array<ICliInterfaceServiceSelectOptions>>, required?: boolean, initialValues?: Array<string>): Promise<Array<T>> {
-		const choices = [];
-		for (const [group, groupOptions] of Object.entries(options)) {
-			for (const opt of groupOptions) {
-				choices.push({
-					name: `${group}: ${opt.label}`,
-					value: opt.value,
-					checked: initialValues?.includes(opt.value) || false,
-				});
-			}
-		}
-		try {
-			const answer = await inquirer.prompt({
-				type: "checkbox",
-				name: "selection",
-				message: `${message} (space to select)`,
-				choices,
-				validate: required ? (input) => input.length > 0 || "You must select at least one option" : undefined,
-			});
-			return answer.selection as Array<T>;
-		} catch (error) {
-			this.error("Operation cancelled by user");
-			process.exit(0);
-		}
-	}
-
-	info(message: string): void {
-		console.log(chalk.blue(message));
+	warn(message: string): void {
+		console.log(chalk.yellow(message));
 	}
 }

@@ -1,18 +1,42 @@
-import { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
-import { confirm, spinner, log, select, note, text, multiselect, groupMultiselect, isCancel } from "@clack/prompts";
-import { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
+/* eslint-disable @elsikora-unicorn/no-process-exit,elsikora-node/no-process-exit */
+import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
+import type { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
+
+import { confirm, groupMultiselect, isCancel, log, multiselect, note, select, spinner, text } from "@clack/prompts";
 
 export class ClackCliInterface implements ICliInterfaceService {
-	private SPINNER: any;
+	private spinner: any;
 
-	constructor() {}
+	clear(): void {
+		console.clear();
+	}
 
-	async multiselect<T>(message: string, options: Array<ICliInterfaceServiceSelectOptions>, required?: boolean, initialValues?: Array<string>): Promise<Array<T>> {
-		const result = (await multiselect({
-			options,
-			message: `${message} (space to select)`,
-			required,
+	async confirm(message: string, isConfirmedByDefault: boolean = false): Promise<boolean> {
+		const isConfirmed: boolean = (await confirm({
+			// eslint-disable-next-line @elsikora-typescript/naming-convention
+			initialValue: isConfirmedByDefault,
+			message,
+		})) as boolean;
+
+		if (isCancel(isConfirmed)) {
+			this.error("Operation cancelled by user");
+			process.exit(0);
+		} else {
+			return isConfirmed;
+		}
+	}
+
+	error(message: string): void {
+		log.error(message);
+	}
+
+	async groupMultiselect<T>(message: string, options: Record<string, Array<ICliInterfaceServiceSelectOptions>>, isRequired: boolean = false, initialValues?: Array<string>): Promise<Array<T>> {
+		const result: Array<T> = (await groupMultiselect({
 			initialValues,
+			message: `${message} (space to select)`,
+			options,
+			// eslint-disable-next-line @elsikora-typescript/naming-convention
+			required: isRequired,
 		})) as Array<T>;
 
 		if (isCancel(result)) {
@@ -23,12 +47,26 @@ export class ClackCliInterface implements ICliInterfaceService {
 		}
 	}
 
-	async groupMultiselect<T>(message: string, options: Record<string, Array<ICliInterfaceServiceSelectOptions>>, required?: boolean, initialValues?: Array<string>): Promise<Array<T>> {
-		const result = (await groupMultiselect({
-			options,
-			message: `${message} (space to select)`,
-			required,
+	handleError(message: string, error: unknown): void {
+		log.error(message);
+		console.log(error);
+	}
+
+	info(message: string): void {
+		log.info(message);
+	}
+
+	log(message: string): void {
+		log.message(message);
+	}
+
+	async multiselect<T>(message: string, options: Array<ICliInterfaceServiceSelectOptions>, isRequired: boolean = false, initialValues?: Array<string>): Promise<Array<T>> {
+		const result: Array<T> = (await multiselect({
 			initialValues,
+			message: `${message} (space to select)`,
+			options,
+			// eslint-disable-next-line @elsikora-typescript/naming-convention
+			required: isRequired,
 		})) as Array<T>;
 
 		if (isCancel(result)) {
@@ -39,8 +77,51 @@ export class ClackCliInterface implements ICliInterfaceService {
 		}
 	}
 
-	async text(message: string, placeholder?: string, initialValue?: string, validate?: (value: string) => string | Error | undefined): Promise<string> {
-		const result = (await text({
+	note(title: string, message: string): void {
+		note(message, title);
+	}
+
+	async select<T>(message: string, options: Array<ICliInterfaceServiceSelectOptions>, initialValue?: string): Promise<T> {
+		const result: T = (await select({
+			initialValue,
+			message,
+			options,
+		})) as T;
+
+		if (isCancel(result)) {
+			this.error("Operation cancelled by user");
+			process.exit(0);
+		} else {
+			return result;
+		}
+	}
+
+	startSpinner(message: string): void {
+		// eslint-disable-next-line @elsikora-typescript/no-unsafe-member-access
+		if (typeof this.spinner?.stop === "function") {
+			// eslint-disable-next-line @elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-call
+			this.spinner.stop();
+		}
+
+		this.spinner = spinner();
+		// eslint-disable-next-line @elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-call
+		this.spinner.start(message);
+	}
+
+	stopSpinner(message?: string): void {
+		// eslint-disable-next-line @elsikora-typescript/no-unsafe-member-access
+		if (typeof this.spinner?.stop === "function") {
+			// eslint-disable-next-line @elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-call
+			this.spinner.stop(message);
+		}
+	}
+
+	success(message: string): void {
+		log.success(message);
+	}
+
+	async text(message: string, placeholder?: string, initialValue?: string, validate?: (value: string) => Error | string | undefined): Promise<string> {
+		const result: string = (await text({
 			initialValue,
 			message,
 			placeholder,
@@ -55,80 +136,7 @@ export class ClackCliInterface implements ICliInterfaceService {
 		}
 	}
 
-	note(title: string, message: string): void {
-		note(message, title);
-	}
-
 	warn(message: string): void {
 		log.warn(message);
-	}
-
-	log(message: string): void {
-		log.message(message);
-	}
-
-	handleError(message: string, error: unknown): void {
-		log.error(message);
-		console.log(error);
-	}
-
-	error(message: string): void {
-		log.error(message);
-	}
-
-	success(message: string): void {
-		log.success(message);
-	}
-
-	clear(): void {
-		console.clear();
-	}
-
-	info(message: string): void {
-		log.info(message);
-	}
-
-	async confirm(message: string, initialValue?: boolean): Promise<boolean> {
-		const result = (await confirm({
-			initialValue,
-			message,
-		})) as boolean;
-
-		if (isCancel(result)) {
-			this.error("Operation cancelled by user");
-			process.exit(0);
-		} else {
-			return result;
-		}
-	}
-
-	startSpinner(message: string): void {
-		if (typeof this.SPINNER?.stop === "function") {
-			this.SPINNER.stop();
-		}
-
-		this.SPINNER = spinner();
-		this.SPINNER.start(message);
-	}
-
-	stopSpinner(message?: string): void {
-		if (typeof this.SPINNER?.stop === "function") {
-			this.SPINNER.stop(message);
-		}
-	}
-
-	async select<T>(message: string, options: Array<ICliInterfaceServiceSelectOptions>, initialValue?: string): Promise<T> {
-		const result = (await select({
-			options,
-			message,
-			initialValue,
-		})) as T;
-
-		if (isCancel(result)) {
-			this.error("Operation cancelled by user");
-			process.exit(0);
-		} else {
-			return result;
-		}
 	}
 }

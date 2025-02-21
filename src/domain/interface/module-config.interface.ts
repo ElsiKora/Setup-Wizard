@@ -1,6 +1,6 @@
-import {EModule} from "../enum/module.enum";
+import type { EModule } from "../enum/module.enum";
 
 export interface IModuleConfig {
-    name: EModule;
-    dependencies?: EModule[];
+	dependencies?: Array<EModule>;
+	name: EModule;
 }

@@ -1,45 +1,47 @@
-import { Command } from "commander";
-import { ICommandRegistrar } from "../../infrastructure/interface/command-registrar.interface";
-import { ICommandFactory } from "../../infrastructure/interface/command-factory.interface";
-import { ECommand } from "../../infrastructure/enum/command.enum";
+import type { Command } from "commander";
+
+import type { ICommandFactory } from "../../infrastructure/interface/command-factory.interface";
+import type { ICommandRegistrar } from "../../infrastructure/interface/command-registrar.interface";
+import type { ICommand } from "../../infrastructure/interface/command.interface";
+import type { TInitCommandProperties } from "../../infrastructure/type/init-command-properties.type";
+
 import { COMMAND_FLAG_CONFIG } from "../../application/constant/command-flag-config.constant";
-import { ICommandFlagConfig } from "../../application/interface/command-flag-config.interface";
 import { CommandOptionsMapper } from "../../application/mapper/command-options.mapper";
-import { IInitCommandProperties } from "../../infrastructure/interface/init-command-properties.interface";
-import { EModule } from "../../domain/enum/module.enum";
+import { ECommand } from "../../infrastructure/enum/command.enum";
 
 export class InitCommandRegistrar implements ICommandRegistrar {
-	readonly program: Command;
-	readonly commandFactory: ICommandFactory;
+	readonly COMMAND_FACTORY: ICommandFactory;
+
+	readonly PROGRAM: Command;
 
 	constructor(program: Command, commandFactory: ICommandFactory) {
-		this.program = program;
-		this.commandFactory = commandFactory;
+		this.PROGRAM = program;
+		this.COMMAND_FACTORY = commandFactory;
 	}
 
 	execute(): Command {
-		const command: Command = this.program.command(ECommand.INIT).description(
+		const command: Command = this.PROGRAM.command(ECommand.INIT).description(
 			`Initialize project configuration files
 
 This command generates configuration files for your project based on selected options.`,
 		);
 
-		Object.values(COMMAND_FLAG_CONFIG).forEach((commandFlagConfig: ICommandFlagConfig): void => {
+		for (const commandFlagConfig of Object.values(COMMAND_FLAG_CONFIG)) {
 			command.option(`-${commandFlagConfig.shortFlag}, --${commandFlagConfig.fullFlag}`, commandFlagConfig.description);
-		});
+		}
 
 		command.option(`-a, --all`, "Enable all modules");
 
 		command.action(async (properties: Record<string, boolean>) => {
-			const mapperProperties: IInitCommandProperties = CommandOptionsMapper.fromFlagToModule(properties);
+			const mapperProperties: TInitCommandProperties = CommandOptionsMapper.fromFlagToModule(properties);
 
 			if (properties.all) {
-				Object.keys(mapperProperties).forEach((key) => {
-					mapperProperties[key as keyof IInitCommandProperties] = true;
-				});
+				for (const key of Object.keys(mapperProperties)) {
+					mapperProperties[key as keyof TInitCommandProperties] = true;
+				}
 			}
 
-			const command = this.commandFactory.createCommand(ECommand.INIT, mapperProperties);
+			const command: ICommand = this.COMMAND_FACTORY.createCommand(ECommand.INIT, mapperProperties);
 			await command.execute();
 		});
 
