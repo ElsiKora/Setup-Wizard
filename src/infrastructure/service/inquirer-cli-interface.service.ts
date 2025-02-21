@@ -1,9 +1,12 @@
-/* eslint-disable @elsikora-unicorn/no-process-exit,elsikora-node/no-process-exit,@elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-call,@elsikora-typescript/no-unsafe-return,@elsikora-sonar/function-return-type,elsikora-node/no-unpublished-import */
+/* eslint-disable @elsikora-unicorn/no-process-exit,elsikora-node/no-process-exit,@elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-call,@elsikora-typescript/no-unsafe-return,@elsikora-sonar/function-return-type */
 import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
 import type { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
 
 import chalk from "chalk";
+// @ts-ignore
+// eslint-disable-next-line elsikora-node/no-extraneous-import
 import inquirer from "inquirer";
+// @ts-ignore
 import ora from "ora";
 
 export class InquirerCliInterface implements ICliInterfaceService {
