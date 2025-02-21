@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/ElsiKora/Setup-Wizard/compare/v1.1.1...v1.2.0) (2025-02-21)
+
+
+### Features
+
+* **module:** Add lint-staged module integration ([f7039e3](https://github.com/ElsiKora/Setup-Wizard/commit/f7039e300a52329dfce55c485e6e1604ef290215))
+
 ## [1.1.1](https://github.com/ElsiKora/Setup-Wizard/compare/v1.1.0...v1.1.1) (2025-02-21)
 
 
