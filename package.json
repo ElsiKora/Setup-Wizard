@@ -1,6 +1,6 @@
 {
   "name": "@elsikora/setup-wizard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Setup Wizard - CLI scaffolding utility",
   "license": "MIT",
   "author": "ElsiKora",
