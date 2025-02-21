@@ -1,3 +1,3 @@
-import type { IModuleEnableStatusProperties } from "../../application/interface/module-enable-status-properties.interface";
+import type { TModuleEnableStatusProperties } from "../../application/type/module-enable-status-properties.type";
 
-export type TInitCommandProperties = IModuleEnableStatusProperties;
+export type TInitCommandProperties = TModuleEnableStatusProperties;
