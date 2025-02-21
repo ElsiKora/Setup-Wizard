@@ -29,6 +29,10 @@ export default {
 		license: "MIT",
 		year: 2025,
 	},
+	"lint-staged": {
+		features: ["eslint", "prettier"],
+		isEnabled: true,
+	},
 	prettier: {
 		isEnabled: false,
 	},

@@ -27,6 +27,10 @@ export const MODULE_CONFIG: Record<EModule, IModuleConfig> = {
 		dependencies: [],
 		name: EModule.LICENSE,
 	},
+	[EModule.LINT_STAGED]: {
+		dependencies: [],
+		name: EModule.LINT_STAGED,
+	},
 	[EModule.PRETTIER]: {
 		dependencies: [EModule.ESLINT],
 		name: EModule.PRETTIER,

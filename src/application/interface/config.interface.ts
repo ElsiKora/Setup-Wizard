@@ -3,6 +3,7 @@ import type { ECiProvider } from "../../domain/enum/ci-provider.enum";
 import type { EEslintFeature } from "../../domain/enum/eslint-feature.enum";
 import type { EIde } from "../../domain/enum/ide.enum";
 import type { ELicense } from "../../domain/enum/license.enum";
+import type { ELintStagedFeature } from "../../domain/enum/lint-staged-feature.enum";
 import type { EModule } from "../../domain/enum/module.enum";
 
 export interface IConfig {
@@ -36,6 +37,10 @@ export interface IConfig {
 		isEnabled?: boolean;
 		license?: ELicense;
 		year?: number;
+	};
+	[EModule.LINT_STAGED]?: {
+		features?: Array<ELintStagedFeature>;
+		isEnabled?: boolean;
 	};
 	[EModule.PRETTIER]?: boolean;
 	[EModule.SEMANTIC_RELEASE]?: {

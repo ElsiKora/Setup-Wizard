@@ -20,6 +20,7 @@ export interface IPackageJson {
 	homepage?: string;
 	keywords?: Array<string>;
 	license?: string;
+	"lint-staged"?: Record<string, string>;
 	main?: string;
 	name: string;
 	prettier?: Record<string, any>;

@@ -8,6 +8,7 @@ import { EslintModuleService } from "../../application/service/eslint-module.ser
 import { GitignoreModuleService } from "../../application/service/gitignore-module.service";
 import { IdeModuleService } from "../../application/service/ide-module.service";
 import { LicenseModuleService } from "../../application/service/license-module.service";
+import { LintStagedModuleService } from "../../application/service/lint-staged-module.service";
 import { PrettierModuleService } from "../../application/service/prettier-module.service";
 import { SemanticReleaseModuleService } from "../../application/service/semantic-release-module.service";
 import { StylelintModuleService } from "../../application/service/stylelint-module.service";
@@ -48,6 +49,10 @@ export class ModuleServiceMapper {
 
 			case EModule.LICENSE: {
 				return new LicenseModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+			}
+
+			case EModule.LINT_STAGED: {
+				return new LintStagedModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
 			}
 
 			case EModule.PRETTIER: {

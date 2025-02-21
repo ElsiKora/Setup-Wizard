@@ -5,6 +5,7 @@ export enum EModule {
 	GITIGNORE = "gitignore",
 	IDE = "ide",
 	LICENSE = "license",
+	LINT_STAGED = "lint-staged",
 	PRETTIER = "prettier",
 	SEMANTIC_RELEASE = "semantic-release",
 	STYLELINT = "stylelint",

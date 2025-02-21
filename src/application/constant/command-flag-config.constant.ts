@@ -33,6 +33,11 @@ export const COMMAND_FLAG_CONFIG: Record<EModule, ICommandFlagConfig> = {
 		fullFlag: "withLicense",
 		shortFlag: "l",
 	},
+	[EModule.LINT_STAGED]: {
+		description: "Add lint-staged configuration",
+		fullFlag: "withLintStaged",
+		shortFlag: "t",
+	},
 	[EModule.PRETTIER]: {
 		description: "Add Prettier configuration",
 		fullFlag: "withPrettier",
