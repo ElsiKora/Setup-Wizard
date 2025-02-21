@@ -5,19 +5,19 @@ export default {
 	input: "src/presentation/index.ts",
 	output: {
 		banner: "#!/usr/bin/env node",
-		exports: "auto",
 		dir: "bin", // Вместо file используем dir
+		exports: "auto",
 		format: "esm",
-		sourcemap: true,
 		preserveModules: true, // Сохраняет структуру модулей
 		preserveModulesRoot: "src", // Корневая директория для модулей
+		sourcemap: true,
 	},
 	plugins: [
 		typescript({
 			declaration: true, // Включаем генерацию типов
+			outDir: "bin", // Указываем выходную директорию для TypeScript
 			sourceMap: true,
 			tsconfig: "./tsconfig.json",
-			outDir: "bin", // Указываем выходную директорию для TypeScript
 		}),
 	],
 };
