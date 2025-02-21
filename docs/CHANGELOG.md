@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/ElsiKora/Setup-Wizard/compare/v1.0.1...v1.1.0) (2025-02-21)
+
+
+### Features
+
+* **remove unused next.config.ts:** Remove unused next.config.ts and update package.json formatting ([dbeb81c](https://github.com/ElsiKora/Setup-Wizard/commit/dbeb81c1420c3ce88fd8345169882b0cf923baf3))
+
 ## [1.0.1](https://github.com/ElsiKora/Setup-Wizard/compare/v1.0.0...v1.0.1) (2025-02-21)
 
 
