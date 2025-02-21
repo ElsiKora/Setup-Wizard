@@ -117,8 +117,6 @@ export class LicenseModuleService implements IModuleService {
 	}
 
 	private async createLicenseFile(license: ELicense, savedAuthor?: string): Promise<{ author: string }> {
-		this.cliInterfaceService.startSpinner("Generating license file...");
-
 		try {
 			let packageAuthor: IPackageJsonAuthor | string | undefined;
 
@@ -147,6 +145,7 @@ export class LicenseModuleService implements IModuleService {
 
 			authorName = await this.cliInterfaceService.text("Enter the copyright holder's name:", "Your Name", authorName);
 
+			this.cliInterfaceService.startSpinner("Generating license file...");
 			const year: string = new Date().getFullYear().toString();
 			const licenseFileContent: string = LICENSE_CONFIG[license].template(year, authorName);
 

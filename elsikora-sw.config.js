@@ -1,21 +1,20 @@
 export default {
 	ci: {
 		isEnabled: true,
-		isNpmPackage: false,
+		isNpmPackage: true,
 		moduleProperties: {
 			dependabot: {
 				devBranchName: "dev",
 			},
 		},
-		modules: ["codecommit-sync", "qodana", "dependabot", "snyk", "release"],
+		modules: ["codecommit-sync", "qodana", "dependabot", "snyk", "release-npm"],
 		provider: "GitHub",
 	},
 	commitlint: {
-		isEnabled: true,
+		isEnabled: false,
 	},
 	eslint: {
-		features: ["typescript", "tailwindCss", "prettier", "javascript", "node", "json", "yaml", "checkFile", "packageJson", "sonar", "unicorn", "perfectionist", "regexp", "stylistic"],
-		isEnabled: true,
+		isEnabled: false,
 	},
 	gitignore: {
 		isEnabled: false,
@@ -25,9 +24,9 @@ export default {
 		isEnabled: false,
 	},
 	license: {
-		author: "Your Name",
-		isEnabled: false,
-		license: "UNLICENSED",
+		author: "ElsiKora",
+		isEnabled: true,
+		license: "MIT",
 		year: 2025,
 	},
 	prettier: {

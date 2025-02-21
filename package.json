@@ -90,6 +90,7 @@
 		"eslint-plugin-unicorn": "^56.0.1",
 		"eslint-plugin-yml": "^1.17.0",
 		"husky": "^9.1.7",
+		"lint-staged": "^15.4.3",
 		"prettier": "^3.5.1",
 		"rollup": "^4.34.6",
 		"semantic-release": "^24.2.3",

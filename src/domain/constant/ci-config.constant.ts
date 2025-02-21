@@ -149,7 +149,7 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release --no-ci`;
+        run: npx semantic-release`;
 
 					for (const [key, value] of Object.entries(properties)) {
 						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
@@ -196,7 +196,7 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: \${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
         run: npx semantic-release`;
 
 					for (const [key, value] of Object.entries(properties)) {
