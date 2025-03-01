@@ -30,23 +30,41 @@ import { ConfigService } from "./config.service";
 import { FrameworkService } from "./framework.service";
 import { PackageJsonService } from "./package-json.service";
 
+/**
+ * Service for setting up and managing ESLint configuration.
+ * Handles the detection, installation, and configuration of ESLint features.
+ */
 export class EslintModuleService implements IModuleService {
+	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** Command service for executing shell commands */
 	readonly COMMAND_SERVICE: ICommandService;
 
+	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
+	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
 
+	/** Configuration service for managing app settings */
 	private readonly CONFIG_SERVICE: ConfigService;
 
+	/** Frameworks detected in the project */
 	private detectedFrameworks: Array<IFrameworkConfig> = [];
 
+	/** Service for framework detection and configuration */
 	private readonly FRAMEWORK_SERVICE: FrameworkService;
 
+	/** ESLint features selected by the user */
 	private selectedFeatures: Array<EEslintFeature> = [];
 
+	/**
+	 * Initializes a new instance of the EslintModuleService.
+	 *
+	 * @param cliInterfaceService - Service for CLI user interactions
+	 * @param fileSystemService - Service for file system operations
+	 */
 	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
@@ -56,6 +74,12 @@ export class EslintModuleService implements IModuleService {
 		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
 	}
 
+	/**
+	 * Checks if the installed ESLint version meets the minimum requirements.
+	 * Offers to update ESLint if the version is too old.
+	 *
+	 * @returns Promise resolving to true if ESLint version is acceptable, false otherwise
+	 */
 	async checkEslintVersion(): Promise<boolean> {
 		const eslintVersion:
 			| {
@@ -93,6 +117,12 @@ export class EslintModuleService implements IModuleService {
 		return true;
 	}
 
+	/**
+	 * Handles existing ESLint setup.
+	 * Checks for existing configuration and asks if user wants to remove it.
+	 *
+	 * @returns Promise resolving to true if setup should proceed, false otherwise
+	 */
 	async handleExistingSetup(): Promise<boolean> {
 		const hasConfig: boolean = await this.PACKAGE_JSON_SERVICE.isExistsDependency(ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME);
 
@@ -127,6 +157,12 @@ export class EslintModuleService implements IModuleService {
 		return true;
 	}
 
+	/**
+	 * Installs and configures ESLint.
+	 * Guides the user through the setup process including feature selection.
+	 *
+	 * @returns Promise resolving to the module setup result
+	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
 			if (!(await this.shouldInstall())) {
@@ -173,6 +209,12 @@ export class EslintModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Determines if ESLint should be installed.
+	 * Asks the user if they want to set up ESLint for their project.
+	 *
+	 * @returns Promise resolving to true if ESLint should be installed, false otherwise
+	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
 			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up ESLint for your project?", true);
@@ -183,6 +225,11 @@ export class EslintModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Collects all required npm dependencies for selected ESLint features.
+	 *
+	 * @returns Array of package names to install
+	 */
 	private collectDependencies(): Array<string> {
 		const dependencies: Set<string> = new Set<string>(ESLINT_CONFIG_CORE_DEPENDENCIES);
 
@@ -197,12 +244,20 @@ export class EslintModuleService implements IModuleService {
 		return [...dependencies];
 	}
 
+	/**
+	 * Creates the ESLint configuration file.
+	 * Generates a configuration with the selected features and ignore paths.
+	 */
 	private async createConfig(): Promise<void> {
 		const ignores: Array<string> = this.generateLintIgnorePaths();
 
 		await this.FILE_SYSTEM_SERVICE.writeFile(ESLINT_CONFIG_FILE_NAME, ESLINT_CONFIG.template(ignores, this.selectedFeatures), "utf8");
 	}
 
+	/**
+	 * Detects frameworks used in the project.
+	 * Identifies frameworks like React, Angular, TypeScript, etc.
+	 */
 	private async detectFrameworks(): Promise<void> {
 		this.CLI_INTERFACE_SERVICE.startSpinner("Detecting frameworks...");
 
@@ -222,6 +277,12 @@ export class EslintModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Detects ESLint features that should be installed based on project dependencies.
+	 * Examines package.json and detected frameworks to determine appropriate features.
+	 *
+	 * @returns Promise resolving to an array of detected ESLint features
+	 */
 	private async detectInstalledFeatures(): Promise<Array<EEslintFeature>> {
 		const detectedFeatures: Set<EEslintFeature> = new Set<EEslintFeature>();
 
@@ -249,6 +310,10 @@ export class EslintModuleService implements IModuleService {
 		return [...detectedFeatures];
 	}
 
+	/**
+	 * Displays a summary of the ESLint setup results.
+	 * Shows detected frameworks, selected features, and generated scripts.
+	 */
 	private async displaySetupSummary(): Promise<void> {
 		const packageJsonScripts: TPackageJsonScripts | undefined = await this.PACKAGE_JSON_SERVICE.getProperty("scripts");
 
@@ -276,6 +341,11 @@ export class EslintModuleService implements IModuleService {
 		this.CLI_INTERFACE_SERVICE.note("ESLint Setup", summary.join("\n"));
 	}
 
+	/**
+	 * Finds existing ESLint configuration files.
+	 *
+	 * @returns Promise resolving to an array of file paths for existing configuration files
+	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {
 		const existingFiles: Array<string> = [];
 
@@ -288,28 +358,56 @@ export class EslintModuleService implements IModuleService {
 		return existingFiles;
 	}
 
+	/**
+	 * Generates the ESLint command for linting.
+	 * Creates a command string targeting appropriate directories based on detected frameworks.
+	 *
+	 * @returns The eslint command string
+	 */
 	private generateLintCommand(): string {
 		const lintPaths: Array<string> = this.FRAMEWORK_SERVICE.getLintPaths(this.detectedFrameworks);
 
 		return `eslint ${lintPaths.length > 0 ? lintPaths.join(" ") : "."}`;
 	}
 
+	/**
+	 * Generates the ESLint command for fixing linting issues.
+	 * Creates a command string with the --fix flag targeting appropriate directories.
+	 *
+	 * @returns The eslint fix command string
+	 */
 	private generateLintFixCommand(): string {
 		const lintPaths: Array<string> = this.FRAMEWORK_SERVICE.getLintPaths(this.detectedFrameworks);
 
 		return `eslint --fix ${lintPaths.length > 0 ? lintPaths.join(" ") : "."}`;
 	}
 
+	/**
+	 * Generates the list of paths to ignore in the ESLint configuration.
+	 *
+	 * @returns Array of ignore patterns for ESLint
+	 */
 	private generateLintIgnorePaths(): Array<string> {
 		const ignorePatterns: Array<string> = this.getIgnorePatterns();
 
 		return ignorePatterns.length > 0 ? ignorePatterns : [];
 	}
 
+	/**
+	 * Gets the patterns of files and directories to ignore during linting.
+	 * Combines framework-specific ignore patterns with general ones.
+	 *
+	 * @returns Array of ignore patterns
+	 */
 	private getIgnorePatterns(): Array<string> {
 		return [...this.FRAMEWORK_SERVICE.getIgnorePatterns(this.detectedFrameworks), ...ESLINT_CONFIG_IGNORE_PATHS];
 	}
 
+	/**
+	 * Gets the saved ESLint configuration from the config file.
+	 *
+	 * @returns Promise resolving to the saved ESLint configuration or null if not found
+	 */
 	private async getSavedConfig(): Promise<{ features?: Array<EEslintFeature> } | null> {
 		try {
 			if (await this.CONFIG_SERVICE.exists()) {
@@ -326,6 +424,13 @@ export class EslintModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Prompts the user to select which ESLint features to enable.
+	 * Presents detected features and saved features as initial selections.
+	 *
+	 * @param savedFeatures - Previously saved ESLint features
+	 * @returns Promise resolving to an array of selected ESLint features
+	 */
 	private async selectFeatures(savedFeatures: Array<EEslintFeature> = []): Promise<Array<EEslintFeature>> {
 		const detectedFeatures: Array<EEslintFeature> = await this.detectInstalledFeatures();
 		let shouldUseDetected: boolean = false;
@@ -351,6 +456,10 @@ export class EslintModuleService implements IModuleService {
 		return await this.CLI_INTERFACE_SERVICE.groupMultiselect<EEslintFeature>("Select the features you want to enable:", groupedOptions, true, initialValues);
 	}
 
+	/**
+	 * Sets up npm scripts for ESLint.
+	 * Adds scripts for linting, fixing, watching, and type checking.
+	 */
 	private async setupScripts(): Promise<void> {
 		await this.PACKAGE_JSON_SERVICE.addScript("lint", this.generateLintCommand());
 		await this.PACKAGE_JSON_SERVICE.addScript("lint:fix", this.generateLintFixCommand());
@@ -368,6 +477,10 @@ export class EslintModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Sets up the selected ESLint features.
+	 * Installs dependencies, creates config files, and sets up scripts.
+	 */
 	private async setupSelectedFeatures(): Promise<void> {
 		this.CLI_INTERFACE_SERVICE.startSpinner("Setting up ESLint configuration...");
 
@@ -386,6 +499,9 @@ export class EslintModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Uninstalls existing ESLint configuration packages.
+	 */
 	private async uninstallExistingConfig(): Promise<void> {
 		this.CLI_INTERFACE_SERVICE.startSpinner("Uninstalling existing ESLint configuration...");
 
@@ -399,6 +515,12 @@ export class EslintModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Validates if the selected features are compatible with the detected frameworks.
+	 * Checks if TypeScript features are selected only when TypeScript is detected.
+	 *
+	 * @returns Boolean indicating whether the feature selection is valid
+	 */
 	private validateFeatureSelection(): boolean {
 		const errors: Array<string> = [];
 

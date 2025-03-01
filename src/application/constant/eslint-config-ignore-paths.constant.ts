@@ -4,6 +4,7 @@ export const ESLINT_CONFIG_IGNORE_PATHS: Array<string> = [
 	"bun.lock",
 	"pnpm-lock.yaml",
 	"dist",
+	"bin",
 	"build",
 	"out",
 	"www",

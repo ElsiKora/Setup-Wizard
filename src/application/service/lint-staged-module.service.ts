@@ -21,19 +21,36 @@ import { LINT_STAGED_CORE_DEPENDENCIES } from "../constant/lint-staged-core-depe
 import { ConfigService } from "./config.service";
 import { PackageJsonService } from "./package-json.service";
 
+/**
+ * Service for setting up and managing lint-staged configuration.
+ * Provides functionality to run linters on git staged files,
+ * ensuring only properly formatted code is committed.
+ */
 export class LintStagedModuleService implements IModuleService {
+	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** Command service for executing shell commands */
 	readonly COMMAND_SERVICE: ICommandService;
 
+	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
+	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
 
+	/** Configuration service for managing app configuration */
 	private readonly CONFIG_SERVICE: ConfigService;
 
+	/** Selected lint-staged features to configure */
 	private selectedFeatures: Array<ELintStagedFeature> = [];
 
+	/**
+	 * Initializes a new instance of the LintStagedModuleService.
+	 *
+	 * @param cliInterfaceService - Service for CLI user interactions
+	 * @param fileSystemService - Service for file system operations
+	 */
 	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
@@ -42,6 +59,12 @@ export class LintStagedModuleService implements IModuleService {
 		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
 	}
 
+	/**
+	 * Handles existing lint-staged setup.
+	 * Checks for existing configuration files and asks if user wants to remove them.
+	 *
+	 * @returns Promise resolving to true if setup should proceed, false otherwise
+	 */
 	async handleExistingSetup(): Promise<boolean> {
 		const existingFiles: Array<string> = await this.findExistingConfigFiles();
 		const packageJson: IPackageJson = await this.PACKAGE_JSON_SERVICE.get();
@@ -79,6 +102,12 @@ export class LintStagedModuleService implements IModuleService {
 		return true;
 	}
 
+	/**
+	 * Installs and configures lint-staged.
+	 * Guides the user through selecting linting tools and setting up git hooks.
+	 *
+	 * @returns Promise resolving to the module setup result
+	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
 			if (!(await this.shouldInstall())) {
@@ -107,6 +136,12 @@ export class LintStagedModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Determines if lint-staged should be installed.
+	 * Asks the user if they want to set up lint-staged with Husky pre-commit hooks.
+	 *
+	 * @returns Promise resolving to true if the module should be installed, false otherwise
+	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
 			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up lint-staged with Husky pre-commit hooks?", true);
@@ -117,11 +152,22 @@ export class LintStagedModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Creates the lint-staged configuration file.
+	 *
+	 * @param selectedFeatures - Array of selected lint-staged features
+	 */
 	private async createConfigs(selectedFeatures: Array<ELintStagedFeature>): Promise<void> {
 		const config: string = LINT_STAGED_CONFIG.template(selectedFeatures);
 		await this.FILE_SYSTEM_SERVICE.writeFile("lint-staged.config.js", config, "utf8");
 	}
 
+	/**
+	 * Displays a summary of the lint-staged setup results.
+	 * Lists selected linting tools and required packages.
+	 *
+	 * @param selectedFeatures - Array of selected lint-staged features
+	 */
 	private displaySetupSummary(selectedFeatures: Array<ELintStagedFeature>): void {
 		const requiredPackages: Array<string> = selectedFeatures.flatMap((feature: ELintStagedFeature) => LINT_STAGED_FEATURE_CONFIG[feature].requiredPackages);
 
@@ -144,6 +190,11 @@ export class LintStagedModuleService implements IModuleService {
 		this.CLI_INTERFACE_SERVICE.note("lint-staged Setup", summary.join("\n"));
 	}
 
+	/**
+	 * Finds existing lint-staged configuration files.
+	 *
+	 * @returns Promise resolving to an array of file paths for existing configuration files
+	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {
 		const existingFiles: Array<string> = [];
 
@@ -160,6 +211,11 @@ export class LintStagedModuleService implements IModuleService {
 		return existingFiles;
 	}
 
+	/**
+	 * Gets the saved lint-staged configuration from the config file.
+	 *
+	 * @returns Promise resolving to the saved lint-staged configuration or null if not found
+	 */
 	private async getSavedConfig(): Promise<{ features?: Array<ELintStagedFeature> } | null> {
 		try {
 			if (await this.CONFIG_SERVICE.exists()) {
@@ -176,6 +232,10 @@ export class LintStagedModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Sets up Husky git hooks.
+	 * Initializes Husky, adds prepare script, and creates pre-commit hook.
+	 */
 	private async setupHusky(): Promise<void> {
 		await this.COMMAND_SERVICE.execute("npx husky install");
 
@@ -186,6 +246,12 @@ export class LintStagedModuleService implements IModuleService {
 		await this.COMMAND_SERVICE.execute("chmod +x .husky/pre-commit");
 	}
 
+	/**
+	 * Sets up lint-staged configuration.
+	 * Guides the user through selecting linting tools and creates necessary config files.
+	 *
+	 * @param savedFeatures - Previously saved lint-staged features
+	 */
 	private async setupLintStaged(savedFeatures: Array<ELintStagedFeature> = []): Promise<void> {
 		try {
 			const options: Array<ICliInterfaceServiceSelectOptions> = Object.entries(LINT_STAGED_FEATURE_CONFIG).map(([value, config]: [string, ILintStagedFeatureConfig]) => ({

@@ -14,16 +14,36 @@ import { SemanticReleaseModuleService } from "../../application/service/semantic
 import { StylelintModuleService } from "../../application/service/stylelint-module.service";
 import { EModule } from "../../domain/enum/module.enum";
 
+/**
+ * Mapper class for creating module service instances based on module type.
+ * Provides a central factory for all available module services in the application.
+ */
 export class ModuleServiceMapper {
+	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
+	/**
+	 * Initializes a new instance of the ModuleServiceMapper.
+	 *
+	 * @param cliInterfaceService - Service for CLI user interactions
+	 * @param fileSystemService - Service for file system operations
+	 */
 	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
 	}
 
+	/**
+	 * Gets a module service instance based on the specified module type.
+	 * Factory method that creates the appropriate service implementation.
+	 *
+	 * @param module - The module type enum value
+	 * @returns An implementation of IModuleService for the specified module
+	 * @throws Error if the module type is not supported
+	 */
 	getModuleService(module: EModule): IModuleService {
 		// eslint-disable-next-line @elsikora-unicorn/prefer-module
 		switch (module) {
