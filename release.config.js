@@ -45,7 +45,7 @@ const config = {
 			},
 		],
 	],
-	repositoryUrl: "https://github.com/ElsiKora/ESLint-Config",
+	repositoryUrl: "https://github.com/ElsiKora/Setup-Wizard",
 };
 
 const isPrereleaseBranch = config.branches.some((b) => typeof b === "object" && branch.includes(b.name) && b.prerelease);
