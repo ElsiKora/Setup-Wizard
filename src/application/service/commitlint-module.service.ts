@@ -14,15 +14,30 @@ import { COMMITLINT_CONFIG } from "../constant/commitlint-config.constant";
 
 import { PackageJsonService } from "./package-json.service";
 
+/**
+ * Service for setting up and managing Commitlint and Commitizen configuration.
+ * Provides functionality to enforce consistent commit message formats using Commitlint
+ * and simplify commit creation using Commitizen.
+ */
 export class CommitlintModuleService implements IModuleService {
+	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** Command service for executing shell commands */
 	readonly COMMAND_SERVICE: ICommandService;
 
+	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
+	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
 
+	/**
+	 * Initializes a new instance of the CommitlintModuleService.
+	 *
+	 * @param cliInterfaceService - Service for CLI user interactions
+	 * @param fileSystemService - Service for file system operations
+	 */
 	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
@@ -30,6 +45,12 @@ export class CommitlintModuleService implements IModuleService {
 		this.PACKAGE_JSON_SERVICE = new PackageJsonService(fileSystemService, this.COMMAND_SERVICE);
 	}
 
+	/**
+	 * Handles existing Commitlint/Commitizen setup.
+	 * Checks for existing configuration files and asks if user wants to remove them.
+	 *
+	 * @returns Promise resolving to true if setup should proceed, false otherwise
+	 */
 	async handleExistingSetup(): Promise<boolean> {
 		const existingFiles: Array<string> = await this.findExistingConfigFiles();
 
@@ -59,6 +80,12 @@ export class CommitlintModuleService implements IModuleService {
 		return true;
 	}
 
+	/**
+	 * Installs and configures Commitlint and Commitizen.
+	 * Sets up configuration files, git hooks, and package.json scripts.
+	 *
+	 * @returns Promise resolving to the module setup result
+	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
 			if (!(await this.shouldInstall())) {
@@ -79,6 +106,12 @@ export class CommitlintModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Determines if Commitlint/Commitizen should be installed.
+	 * Asks the user if they want to set up these tools for their project.
+	 *
+	 * @returns Promise resolving to true if the module should be installed, false otherwise
+	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
 			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Commitlint and Commitizen for your project?", true);
@@ -89,16 +122,27 @@ export class CommitlintModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Creates the Commitlint configuration file.
+	 */
 	private async createConfigs(): Promise<void> {
 		await this.FILE_SYSTEM_SERVICE.writeFile("commitlint.config.js", COMMITLINT_CONFIG, "utf8");
 	}
 
+	/**
+	 * Displays a summary of the setup results.
+	 */
 	private displaySetupSummary(): void {
 		const summary: Array<string> = ["Commitlint and Commitizen configuration has been created.", "", "Generated scripts:", "- npm run commit (for commitizen)", "", "Configuration files:", "- commitlint.config.js", "- .husky/commit-msg", "", "Husky git hooks have been set up to validate your commits.", "Use 'npm run commit' to create commits using the interactive commitizen interface."];
 
 		this.CLI_INTERFACE_SERVICE.note("Commitlint Setup", summary.join("\n"));
 	}
 
+	/**
+	 * Finds existing Commitlint/Commitizen configuration files.
+	 *
+	 * @returns Promise resolving to an array of file paths for existing configuration files
+	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {
 		const existingFiles: Array<string> = [];
 
@@ -115,6 +159,10 @@ export class CommitlintModuleService implements IModuleService {
 		return existingFiles;
 	}
 
+	/**
+	 * Sets up Commitlint and Commitizen.
+	 * Installs dependencies, creates configuration files, and configures git hooks.
+	 */
 	private async setupCommitlint(): Promise<void> {
 		this.CLI_INTERFACE_SERVICE.startSpinner("Setting up Commitlint and Commitizen configuration...");
 
@@ -134,6 +182,10 @@ export class CommitlintModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Sets up Husky git hooks.
+	 * Initializes Husky, adds prepare script, and creates commit-msg hook.
+	 */
 	private async setupHusky(): Promise<void> {
 		// Initialize husky
 		await this.COMMAND_SERVICE.execute("npx husky install");
@@ -147,6 +199,9 @@ export class CommitlintModuleService implements IModuleService {
 		await this.COMMAND_SERVICE.execute("chmod +x .husky/commit-msg");
 	}
 
+	/**
+	 * Sets up Commitizen configuration in package.json.
+	 */
 	private async setupPackageJsonConfigs(): Promise<void> {
 		const packageJson: IPackageJson = await this.PACKAGE_JSON_SERVICE.get();
 
@@ -160,6 +215,10 @@ export class CommitlintModuleService implements IModuleService {
 		await this.PACKAGE_JSON_SERVICE.set(packageJson);
 	}
 
+	/**
+	 * Sets up npm scripts for Commitizen.
+	 * Adds 'commit' script for starting the Commitizen CLI.
+	 */
 	private async setupScripts(): Promise<void> {
 		await this.PACKAGE_JSON_SERVICE.addScript("commit", "cz");
 	}

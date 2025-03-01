@@ -1,5 +1,6 @@
 # Compiled output
 /dist/
+/bin/
 /build/
 /out/
 /tmp/
@@ -123,7 +124,6 @@ pids/
 *.pid
 
 # System Files
-.husky/
 .git-rewrite/
 
 # Process Managers

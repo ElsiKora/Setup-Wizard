@@ -5,11 +5,16 @@ import { ECiModuleType } from "../enum/ci-module-type.enum";
 import { ECiModule } from "../enum/ci-module.enum";
 import { ECiProvider } from "../enum/ci-provider.enum";
 
+/**
+ * Configuration constant for Continuous Integration modules.
+ * Provides configuration details and template functions for generating CI workflow files
+ * for different CI providers and module types.
+ */
 export const CI_CONFIG: Record<ECiModule, ICiConfig> = {
 	[ECiModule.CODECOMMIT_SYNC]: {
 		content: {
 			[ECiProvider.GITHUB]: {
-				filePath: ".github/workflows/codecommit-sync.yml",
+				filePath: ".github/workflows/mirror-to-codecommit.yml",
 				template: (properties: object = {}) => {
 					let content: string = `name: Mirror to CodeCommit
 on: push
@@ -77,7 +82,7 @@ updates:
 	[ECiModule.QODANA]: {
 		content: {
 			[ECiProvider.GITHUB]: {
-				filePath: ".github/workflows/qodana.yml",
+				filePath: ".github/workflows/qodana-quality-scan.yml",
 				template: (properties: object = {}) => {
 					let content: string = `name: Qodana Quality Scan
 on: push
@@ -213,7 +218,7 @@ jobs:
 	[ECiModule.SNYK]: {
 		content: {
 			[ECiProvider.GITHUB]: {
-				filePath: ".github/workflows/snyk.yml",
+				filePath: ".github/workflows/snyk-security-scan.yml",
 				template: (properties: object = {}) => {
 					let content: string = `name: Snyk Security Scan
 on: push

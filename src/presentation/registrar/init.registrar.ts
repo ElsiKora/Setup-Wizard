@@ -9,16 +9,34 @@ import { COMMAND_FLAG_CONFIG } from "../../application/constant/command-flag-con
 import { CommandOptionsMapper } from "../../application/mapper/command-options.mapper";
 import { ECommand } from "../../infrastructure/enum/command.enum";
 
+/**
+ * Registrar for the 'init' command.
+ * Configures and registers the command that initializes project configuration files.
+ */
 export class InitCommandRegistrar implements ICommandRegistrar {
+	/** The command factory used to create command instances */
 	readonly COMMAND_FACTORY: ICommandFactory;
 
+	/** The root Commander program instance */
 	readonly PROGRAM: Command;
 
+	/**
+	 * Initializes a new instance of the InitCommandRegistrar.
+	 *
+	 * @param program - The Commander program to attach the command to
+	 * @param commandFactory - Factory for creating command instances
+	 */
 	constructor(program: Command, commandFactory: ICommandFactory) {
 		this.PROGRAM = program;
 		this.COMMAND_FACTORY = commandFactory;
 	}
 
+	/**
+	 * Configures and registers the 'init' command.
+	 * Sets up command description, options, and action handler.
+	 *
+	 * @returns The configured Commander command instance
+	 */
 	execute(): Command {
 		const command: Command = this.PROGRAM.command(ECommand.INIT).description(
 			`Initialize project configuration files

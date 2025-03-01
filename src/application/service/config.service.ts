@@ -5,13 +5,33 @@ import type { TConfigModule } from "../type/config-module.type";
 
 import { CONFIG_FILE_PATH } from "../constant/config-file-path.constant";
 
+/**
+ * Service for managing application configuration.
+ * Handles reading, writing, and manipulating configuration settings.
+ */
 export class ConfigService {
+	/**
+	 * Initializes a new instance of the ConfigService.
+	 *
+	 * @param fileSystemService - Service for file system operations
+	 */
 	constructor(private readonly fileSystemService: IFileSystemService) {}
 
+	/**
+	 * Checks if the configuration file exists.
+	 *
+	 * @returns Promise resolving to true if the configuration file exists, false otherwise
+	 */
 	public async exists(): Promise<boolean> {
 		return this.fileSystemService.isPathExists(CONFIG_FILE_PATH);
 	}
 
+	/**
+	 * Retrieves the current configuration.
+	 * Attempts to load configuration from file, with fallbacks for different scenarios.
+	 *
+	 * @returns Promise resolving to the configuration object
+	 */
 	public async get(): Promise<IConfig> {
 		try {
 			const isExists: boolean = await this.exists();
@@ -57,12 +77,24 @@ export class ConfigService {
 		}
 	}
 
+	/**
+	 * Gets a specific property from the configuration.
+	 *
+	 * @param property - The property key to retrieve
+	 * @returns Promise resolving to the value of the specified property
+	 */
 	public async getProperty<K extends keyof IConfig>(property: K): Promise<IConfig[K]> {
 		const config: IConfig = await this.get();
 
 		return config[property];
 	}
 
+	/**
+	 * Merges partial configuration with the existing configuration.
+	 *
+	 * @param partial - Partial configuration to merge
+	 * @returns Promise that resolves when the merged configuration is saved
+	 */
 	public async merge(partial: Partial<IConfig>): Promise<void> {
 		try {
 			const config: IConfig = (await this.exists()) ? await this.get() : ({} as IConfig);
@@ -74,17 +106,36 @@ export class ConfigService {
 		}
 	}
 
+	/**
+	 * Saves the entire configuration.
+	 *
+	 * @param config - The complete configuration to save
+	 * @returns Promise that resolves when the configuration is saved
+	 */
 	public async set(config: IConfig): Promise<void> {
 		const configContent: string = `export default ${this.objectToJsString(config)};`;
 		await this.fileSystemService.writeFile(CONFIG_FILE_PATH, configContent);
 	}
 
+	/**
+	 * Sets a specific property in the configuration.
+	 *
+	 * @param property - The property key to set
+	 * @param value - The value to assign to the property
+	 * @returns Promise that resolves when the updated configuration is saved
+	 */
 	public async setProperty<K extends keyof IConfig>(property: K, value: IConfig[K]): Promise<void> {
 		const config: IConfig = await this.get();
 		config[property] = value;
 		await this.set(config);
 	}
 
+	/**
+	 * Determines if a JavaScript object key needs quotes when serialized.
+	 *
+	 * @param key - The object key to check
+	 * @returns True if the key needs quotes in JavaScript object notation, false otherwise
+	 */
 	private needsQuotes(key: string): boolean {
 		const validIdentifier: RegExp = /^[a-z_$][\w$]*$/i;
 
@@ -93,6 +144,13 @@ export class ConfigService {
 		return !validIdentifier.test(key) || reservedWords.has(key) || key.includes("-");
 	}
 
+	/**
+	 * Converts an object to a formatted JavaScript string representation.
+	 *
+	 * @param object - The object to convert to a string
+	 * @param indent - Current indentation level (used for recursive calls)
+	 * @returns A string representation of the object in JavaScript syntax
+	 */
 	private objectToJsString(object: any, indent: number = 0): string {
 		if (object === null) return "null";
 

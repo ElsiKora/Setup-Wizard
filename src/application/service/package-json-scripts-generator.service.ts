@@ -4,7 +4,20 @@ import type { TPackageJsonScripts } from "../../domain/type/package-json-scripts
 import { EEslintFeature } from "../../domain/enum/eslint-feature.enum";
 import { EFramework } from "../../domain/enum/framework.enum";
 
+/**
+ * Service for generating package.json scripts based on project configuration.
+ * Provides functionality to create appropriate lint, test, and build scripts
+ * for different frameworks and project setups.
+ */
 export class PackageJsonScriptsGeneratorService {
+	/**
+	 * Generates lint-related npm scripts based on detected frameworks.
+	 * Creates appropriate scripts for linting, fixing, watching, and type checking.
+	 *
+	 * @param frameworks - Array of detected frameworks in the project
+	 * @param customPaths - Array of custom file paths to lint if no frameworks are detected
+	 * @returns Object containing generated npm scripts
+	 */
 	generateLintScripts(frameworks: Array<IFrameworkConfig>, customPaths: Array<string>): TPackageJsonScripts {
 		const lintPaths: string = frameworks.length > 0 ? frameworks.flatMap((f: IFrameworkConfig) => f.lintPaths).join(" ") : customPaths.join(" ");
 
@@ -20,6 +33,15 @@ export class PackageJsonScriptsGeneratorService {
 		return baseScripts;
 	}
 
+	/**
+	 * Adds framework-specific lint scripts based on detected frameworks.
+	 * Includes watch scripts for supported frameworks, TypeScript type checking,
+	 * and test linting where appropriate.
+	 *
+	 * @param scripts - Base scripts object to add framework-specific scripts to
+	 * @param frameworks - Array of detected frameworks in the project
+	 * @returns Extended scripts object with framework-specific lint scripts
+	 */
 	private addFrameworkSpecificLintScripts(scripts: TPackageJsonScripts, frameworks: Array<IFrameworkConfig>): TPackageJsonScripts {
 		const watchableFrameworks: Set<EFramework> = new Set<EFramework>([EFramework.EXPRESS, EFramework.FASTIFY, EFramework.KOA, EFramework.NEST, EFramework.NEXT]);
 		const hasWatchableFramework: boolean = frameworks.some((f: IFrameworkConfig) => watchableFrameworks.has(f.name));
