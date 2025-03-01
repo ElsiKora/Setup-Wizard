@@ -12,21 +12,42 @@ import { EModule } from "../../domain/enum/module.enum";
 
 import { ConfigService } from "./config.service";
 
+/**
+ * Service for setting up and managing IDE-specific configurations.
+ * Provides functionality to generate editor configurations for different IDEs
+ * to ensure consistent code style and linting settings.
+ */
 export class IdeModuleService implements IModuleService {
+	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
+	/** Configuration service for managing app configuration */
 	private readonly CONFIG_SERVICE: ConfigService;
 
+	/** Selected IDEs to configure */
 	private selectedIdes: Array<EIde> = [];
 
+	/**
+	 * Initializes a new instance of the IdeModuleService.
+	 *
+	 * @param cliInterfaceService - Service for CLI user interactions
+	 * @param fileSystemService - Service for file system operations
+	 */
 	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
 		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
 	}
 
+	/**
+	 * Handles existing IDE configuration setup.
+	 * Checks for existing configuration files and asks for user confirmation if found.
+	 *
+	 * @returns Promise resolving to true if setup should proceed, false otherwise
+	 */
 	async handleExistingSetup(): Promise<boolean> {
 		const existingFiles: Array<string> = await this.findExistingConfigFiles();
 
@@ -39,6 +60,12 @@ export class IdeModuleService implements IModuleService {
 		return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to continue? This might overwrite existing files.", false);
 	}
 
+	/**
+	 * Installs and configures IDE-specific settings.
+	 * Guides the user through selecting IDEs and generating configuration files.
+	 *
+	 * @returns Promise resolving to the module setup result
+	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
 			if (!(await this.shouldInstall())) {
@@ -76,10 +103,22 @@ export class IdeModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Determines if IDE configuration should be installed.
+	 * Asks the user if they want to set up IDE configurations for their project.
+	 *
+	 * @returns Promise resolving to true if the module should be installed, false otherwise
+	 */
 	async shouldInstall(): Promise<boolean> {
 		return await this.CLI_INTERFACE_SERVICE.confirm("Would you like to set up ESLint and Prettier configurations for your code editors?", true);
 	}
 
+	/**
+	 * Displays a summary of successful and failed IDE configuration setups.
+	 *
+	 * @param successful - Array of successfully set up IDE configurations
+	 * @param failed - Array of IDE configurations that failed to set up
+	 */
 	private displaySetupSummary(successful: Array<{ ide: EIde }>, failed: Array<{ error?: Error; ide: EIde }>): void {
 		const summary: Array<string> = [
 			"Successfully created configurations:",
@@ -97,6 +136,11 @@ export class IdeModuleService implements IModuleService {
 		this.CLI_INTERFACE_SERVICE.note("IDE Setup Summary", summary.join("\n"));
 	}
 
+	/**
+	 * Finds existing IDE configuration files that might be overwritten.
+	 *
+	 * @returns Promise resolving to an array of file paths for existing configuration files
+	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {
 		const existingFiles: Array<string> = [];
 
@@ -113,6 +157,11 @@ export class IdeModuleService implements IModuleService {
 		return existingFiles;
 	}
 
+	/**
+	 * Gets the saved IDE configuration from the config file.
+	 *
+	 * @returns Promise resolving to the saved IDE configuration or null if not found
+	 */
 	private async getSavedConfig(): Promise<{ ides?: Array<EIde> } | null> {
 		try {
 			if (await this.CONFIG_SERVICE.exists()) {
@@ -129,6 +178,12 @@ export class IdeModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Prompts the user to select which IDEs they want to configure.
+	 *
+	 * @param savedIdes - Previously saved IDE selections
+	 * @returns Promise resolving to an array of selected IDE enum values
+	 */
 	private async selectIdes(savedIdes: Array<EIde> = []): Promise<Array<EIde>> {
 		const choices: Array<{ description: string; label: string; value: string }> = Object.entries(IDE_CONFIG).map(([ide, config]: [string, IIdeConfig]) => ({
 			description: config.description,
@@ -143,6 +198,13 @@ export class IdeModuleService implements IModuleService {
 		return await this.CLI_INTERFACE_SERVICE.multiselect<EIde>("Select your code editor(s):", choices, true, initialSelection);
 	}
 
+	/**
+	 * Sets up configuration for a specific IDE.
+	 * Creates necessary directories and configuration files.
+	 *
+	 * @param ide - The IDE to set up configuration for
+	 * @returns Promise resolving to an object indicating success or failure with optional error
+	 */
 	private async setupIde(ide: EIde): Promise<{ error?: Error; ide: EIde; isSuccess: boolean }> {
 		try {
 			const configContent: Array<IIdeConfigContent> = IDE_CONFIG[ide].content;
@@ -158,6 +220,10 @@ export class IdeModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Sets up configuration for all selected IDEs.
+	 * Creates and writes IDE-specific configuration files.
+	 */
 	private async setupSelectedIdes(): Promise<void> {
 		this.CLI_INTERFACE_SERVICE.startSpinner("Setting up IDE configurations...");
 

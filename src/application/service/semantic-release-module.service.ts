@@ -17,17 +17,33 @@ import { SEMANTIC_RELEASE_CONFIG } from "../constant/semantic-release-config.con
 import { ConfigService } from "./config.service";
 import { PackageJsonService } from "./package-json.service";
 
+/**
+ * Service for setting up and managing semantic-release configuration.
+ * Provides functionality to automate version management and package publishing
+ * based on commit messages following conventional commits standard.
+ */
 export class SemanticReleaseModuleService implements IModuleService {
+	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** Command service for executing shell commands */
 	readonly COMMAND_SERVICE: ICommandService;
 
+	/** Configuration service for managing app configuration */
 	readonly CONFIG_SERVICE: ConfigService;
 
+	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
+	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
 
+	/**
+	 * Initializes a new instance of the SemanticReleaseModuleService.
+	 *
+	 * @param cliInterfaceService - Service for CLI user interactions
+	 * @param fileSystemService - Service for file system operations
+	 */
 	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
@@ -36,6 +52,12 @@ export class SemanticReleaseModuleService implements IModuleService {
 		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
 	}
 
+	/**
+	 * Handles existing semantic-release setup.
+	 * Checks for existing configuration files and asks if user wants to remove them.
+	 *
+	 * @returns Promise resolving to true if setup should proceed, false otherwise
+	 */
 	async handleExistingSetup(): Promise<boolean> {
 		const existingFiles: Array<string> = await this.findExistingConfigFiles();
 
@@ -65,6 +87,12 @@ export class SemanticReleaseModuleService implements IModuleService {
 		return true;
 	}
 
+	/**
+	 * Installs and configures semantic-release.
+	 * Guides the user through setting up automated versioning and publishing.
+	 *
+	 * @returns Promise resolving to the module setup result
+	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
 			if (!(await this.shouldInstall())) {
@@ -88,6 +116,12 @@ export class SemanticReleaseModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Determines if semantic-release should be installed.
+	 * Asks the user if they want to set up automated versioning and publishing.
+	 *
+	 * @returns Promise resolving to true if the module should be installed, false otherwise
+	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
 			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Semantic Release for automated versioning and publishing?", true);
@@ -98,10 +132,27 @@ export class SemanticReleaseModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Creates semantic-release configuration files.
+	 * Generates the config file with repository URL and branch settings.
+	 *
+	 * @param repositoryUrl - The repository URL for semantic-release
+	 * @param mainBranch - The main branch for production releases
+	 * @param preReleaseBranch - Optional branch for pre-releases
+	 * @param preReleaseChannel - Optional channel name for pre-releases
+	 */
 	private async createConfigs(repositoryUrl: string, mainBranch: string, preReleaseBranch?: string, preReleaseChannel?: string): Promise<void> {
 		await this.FILE_SYSTEM_SERVICE.writeFile(SEMANTIC_RELEASE_CONFIG_FILE_NAME, SEMANTIC_RELEASE_CONFIG.template(repositoryUrl, mainBranch, preReleaseBranch, preReleaseChannel), "utf8");
 	}
 
+	/**
+	 * Displays a summary of the semantic-release setup results.
+	 * Lists configured branches, scripts, and usage instructions.
+	 *
+	 * @param mainBranch - The main branch for production releases
+	 * @param preReleaseBranch - Optional branch for pre-releases
+	 * @param preReleaseChannel - Optional channel name for pre-releases
+	 */
 	private displaySetupSummary(mainBranch: string, preReleaseBranch?: string, preReleaseChannel?: string): void {
 		const summary: Array<string> = ["Semantic Release configuration has been created.", "", "Release branches:", `- Main release branch: ${mainBranch}`];
 
@@ -131,12 +182,21 @@ export class SemanticReleaseModuleService implements IModuleService {
 		this.CLI_INTERFACE_SERVICE.note("Semantic Release Setup", summary.join("\n"));
 	}
 
+	/**
+	 * Ensures the changelog directory exists.
+	 * Creates the docs directory if it doesn't exist.
+	 */
 	private async ensureChangelogDirectory(): Promise<void> {
 		if (!(await this.FILE_SYSTEM_SERVICE.isPathExists("docs"))) {
 			await this.COMMAND_SERVICE.execute("mkdir -p docs");
 		}
 	}
 
+	/**
+	 * Finds existing semantic-release configuration files.
+	 *
+	 * @returns Promise resolving to an array of file paths for existing configuration files
+	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {
 		const existingFiles: Array<string> = [];
 
@@ -153,6 +213,11 @@ export class SemanticReleaseModuleService implements IModuleService {
 		return existingFiles;
 	}
 
+	/**
+	 * Prompts the user for the main release branch name.
+	 *
+	 * @returns Promise resolving to the main branch name
+	 */
 	private async getMainBranch(): Promise<string> {
 		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
 		const initialBranch: string = (savedConfig?.mainBranch as string) || "main";
@@ -164,6 +229,11 @@ export class SemanticReleaseModuleService implements IModuleService {
 		});
 	}
 
+	/**
+	 * Prompts the user for the pre-release branch name.
+	 *
+	 * @returns Promise resolving to the pre-release branch name
+	 */
 	private async getPreReleaseBranch(): Promise<string> {
 		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
 		const initialBranch: string = (savedConfig?.preReleaseBranch as string) || "dev";
@@ -175,6 +245,11 @@ export class SemanticReleaseModuleService implements IModuleService {
 		});
 	}
 
+	/**
+	 * Prompts the user for the pre-release channel name.
+	 *
+	 * @returns Promise resolving to the pre-release channel name
+	 */
 	private async getPreReleaseChannel(): Promise<string> {
 		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
 		const initialChannel: string = (savedConfig?.preReleaseChannel as string) || "beta";
@@ -186,6 +261,12 @@ export class SemanticReleaseModuleService implements IModuleService {
 		});
 	}
 
+	/**
+	 * Gets the repository URL for semantic-release.
+	 * Attempts to detect URL from package.json before prompting the user.
+	 *
+	 * @returns Promise resolving to the repository URL
+	 */
 	private async getRepositoryUrl(): Promise<string> {
 		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
 		let savedRepoUrl: string = (savedConfig?.repositoryUrl as string) || "";
@@ -237,6 +318,11 @@ export class SemanticReleaseModuleService implements IModuleService {
 		return savedRepoUrl;
 	}
 
+	/**
+	 * Gets the saved semantic-release configuration from the config file.
+	 *
+	 * @returns Promise resolving to the saved configuration or null if not found
+	 */
 	private async getSavedConfig(): Promise<null | Record<string, any>> {
 		try {
 			if (await this.CONFIG_SERVICE.exists()) {
@@ -253,6 +339,11 @@ export class SemanticReleaseModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Prompts the user if they want to enable pre-release channels.
+	 *
+	 * @returns Promise resolving to true if pre-release should be enabled, false otherwise
+	 */
 	private async isPrereleaseEnabledChannel(): Promise<boolean> {
 		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
 		const isConfirmedByDefault: boolean = savedConfig?.isPrereleaseEnabled === true;
@@ -260,6 +351,10 @@ export class SemanticReleaseModuleService implements IModuleService {
 		return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to configure a pre-release channel for development branches?", isConfirmedByDefault);
 	}
 
+	/**
+	 * Sets up npm scripts for semantic-release.
+	 * Adds scripts for running semantic-release and CI processes.
+	 */
 	private async setupScripts(): Promise<void> {
 		await this.PACKAGE_JSON_SERVICE.addScript("semantic-release", "semantic-release");
 		await this.PACKAGE_JSON_SERVICE.addScript("release", "semantic-release");
@@ -268,6 +363,13 @@ export class SemanticReleaseModuleService implements IModuleService {
 		await this.PACKAGE_JSON_SERVICE.addScript("ci", ciScript);
 	}
 
+	/**
+	 * Sets up semantic-release configuration.
+	 * Collects user input, installs dependencies, creates config files,
+	 * and sets up scripts.
+	 *
+	 * @returns Promise resolving to an object containing setup parameters
+	 */
 	private async setupSemanticRelease(): Promise<Record<string, string>> {
 		try {
 			const parameters: Record<string, any> = {};

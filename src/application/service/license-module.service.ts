@@ -17,17 +17,33 @@ import { CliInterfaceServiceMapper } from "../mapper/cli-interface-service.mappe
 import { ConfigService } from "./config.service";
 import { PackageJsonService } from "./package-json.service";
 
+/**
+ * Service for generating and managing LICENSE files for projects.
+ * Provides functionality to select a license type, generate the LICENSE file,
+ * and update the package.json with license information.
+ */
 export class LicenseModuleService implements IModuleService {
+	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** Command service for executing shell commands */
 	readonly COMMAND_SERVICE: ICommandService;
 
+	/** Configuration service for managing app configuration */
 	readonly CONFIG_SERVICE: ConfigService;
 
+	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
+	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
 
+	/**
+	 * Initializes a new instance of the LicenseModuleService.
+	 *
+	 * @param cliInterfaceService - Service for CLI user interactions
+	 * @param fileSystemService - Service for file system operations
+	 */
 	constructor(
 		readonly cliInterfaceService: ICliInterfaceService,
 		readonly fileSystemService: IFileSystemService,
@@ -39,6 +55,12 @@ export class LicenseModuleService implements IModuleService {
 		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
 	}
 
+	/**
+	 * Handles existing license setup.
+	 * Checks for existing license files and asks if user wants to replace them.
+	 *
+	 * @returns Promise resolving to true if setup should proceed, false otherwise
+	 */
 	async handleExistingSetup(): Promise<boolean> {
 		try {
 			const existingLicense: string | undefined = await this.fileSystemService.isOneOfPathsExists(LICENSE_FILE_NAMES);
@@ -72,6 +94,12 @@ export class LicenseModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Installs and configures a LICENSE file.
+	 * Guides the user through selecting a license type and generating the file.
+	 *
+	 * @returns Promise resolving to the module setup result
+	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
 			if (!(await this.shouldInstall())) {
@@ -106,6 +134,12 @@ export class LicenseModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Determines if the LICENSE module should be installed.
+	 * Asks the user if they want to generate a LICENSE file for their project.
+	 *
+	 * @returns Promise resolving to true if the module should be installed, false otherwise
+	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
 			return await this.cliInterfaceService.confirm("Do you want to generate LICENSE for your project?");
@@ -116,6 +150,14 @@ export class LicenseModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Creates a LICENSE file with the selected license type and author information.
+	 * Also updates the package.json license field.
+	 *
+	 * @param license - The selected license type
+	 * @param savedAuthor - Previously saved author name, if any
+	 * @returns Promise resolving to an object containing the author name
+	 */
 	private async createLicenseFile(license: ELicense, savedAuthor?: string): Promise<{ author: string }> {
 		try {
 			let packageAuthor: IPackageJsonAuthor | string | undefined;
@@ -161,6 +203,15 @@ export class LicenseModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Displays a summary of the LICENSE setup results.
+	 * Lists details about the generated license file.
+	 *
+	 * @param isSuccess - Whether the setup was successful
+	 * @param license - The selected license type, if successful
+	 * @param author - The copyright holder's name, if successful
+	 * @param error - Optional error if setup failed
+	 */
 	private displaySetupSummary(isSuccess: boolean, license?: ELicense, author?: string, error?: Error): void {
 		const summary: Array<string> = [];
 		const year: string = new Date().getFullYear().toString();
@@ -176,6 +227,12 @@ export class LicenseModuleService implements IModuleService {
 		this.cliInterfaceService.note("License Setup Summary", summary.join("\n"));
 	}
 
+	/**
+	 * Generates a new LICENSE file.
+	 *
+	 * @param savedConfig - Previously saved license configuration, if any
+	 * @returns Promise resolving to an object indicating success or failure with optional license, author, and error details
+	 */
 	private async generateNewLicense(
 		savedConfig?: {
 			author?: string;
@@ -205,6 +262,11 @@ export class LicenseModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Gets the saved license configuration from the config file.
+	 *
+	 * @returns Promise resolving to the saved license configuration or null if not found
+	 */
 	private async getSavedConfig(): Promise<{
 		author?: string;
 		license?: ELicense;
@@ -229,6 +291,12 @@ export class LicenseModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Prompts the user to select a license type for their project.
+	 *
+	 * @param savedLicense - Previously saved license type, if any
+	 * @returns Promise resolving to the selected license enum value
+	 */
 	private async selectLicense(savedLicense?: ELicense): Promise<ELicense> {
 		try {
 			const options: Array<ICliInterfaceServiceSelectOptions> = CliInterfaceServiceMapper.fromLicenseConfigsToSelectOptions(LICENSE_CONFIG);

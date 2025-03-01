@@ -9,7 +9,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "AdonisJS Node.js framework project",
 		displayName: "AdonisJS",
 		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT],
-		fileIndicators: [".adonisrc.json"], // оставлен только уникальный конфиг
+		fileIndicators: [".adonisrc.json"],
 		ignorePath: {
 			directories: [],
 			patterns: [],
@@ -357,7 +357,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Express.js Node.js framework project",
 		displayName: "Express.js",
 		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.PERFECTIONIST, EEslintFeature.SONAR],
-		fileIndicators: [], // удалены общие файлы типа app.js, server.js, index.js
+		fileIndicators: [],
 		ignorePath: {
 			directories: [],
 			patterns: ["public/**/*", "uploads/**/*"],
@@ -407,10 +407,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.FLUTTER]: {
 		description: "Flutter cross-platform framework (Dart)",
 		displayName: "Flutter",
-		features: [
-			// для Dart ESLint нет, поэтому оставляем только Prettier
-			EEslintFeature.PRETTIER,
-		],
+		features: [EEslintFeature.PRETTIER],
 		fileIndicators: ["pubspec.yaml"],
 		ignorePath: {
 			directories: [".dart_tool"],
@@ -428,7 +425,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Fresh full-stack framework for Deno",
 		displayName: "Fresh (Deno)",
 		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
-		fileIndicators: ["fresh.config.ts"], // оставляем только fresh.config.ts
+		fileIndicators: ["fresh.config.ts"],
 		ignorePath: {
 			directories: [".git", ".vscode"],
 			patterns: [],
@@ -497,7 +494,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "hapi Node.js framework project",
 		displayName: "hapi",
 		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT],
-		fileIndicators: [], // удалены общие файлы
+		fileIndicators: [],
 		ignorePath: {
 			directories: [],
 			patterns: [],
@@ -614,7 +611,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Koa Node.js framework project",
 		displayName: "Koa",
 		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.PERFECTIONIST],
-		fileIndicators: [], // удалены общие app.js, server.js, index.js
+		fileIndicators: [],
 		ignorePath: {
 			directories: [],
 			patterns: ["public/**/*", "test/**/*"],
@@ -647,7 +644,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Lit library project for web components",
 		displayName: "Lit",
 		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
-		fileIndicators: [], // убраны неоднозначные конфиги
+		fileIndicators: [],
 		ignorePath: {
 			directories: [],
 			patterns: [],
@@ -992,7 +989,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Preact lightweight React alternative",
 		displayName: "Preact",
 		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
-		fileIndicators: ["preact.config.js"], // оставляем только preact.config.js
+		fileIndicators: ["preact.config.js"],
 		ignorePath: {
 			directories: [],
 			patterns: ["**/*.d.ts"],
@@ -1063,7 +1060,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Qwik resumable frontend framework project",
 		displayName: "Qwik",
 		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
-		fileIndicators: ["qwik.config.ts"], // оставляем только qwik.config.ts
+		fileIndicators: ["qwik.config.ts"],
 		ignorePath: {
 			directories: [],
 			patterns: [],
@@ -1080,7 +1077,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "React library project",
 		displayName: "React",
 		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.TAILWIND_CSS, EEslintFeature.PRETTIER],
-		fileIndicators: ["src/App.jsx", "src/App.tsx"], // удалены файлы vite.config.*
+		fileIndicators: ["src/App.jsx", "src/App.tsx"],
 		ignorePath: {
 			directories: [],
 			patterns: ["**/*.d.ts", "public/**/*"],
@@ -1096,7 +1093,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "React Native mobile application project",
 		displayName: "React Native",
 		features: [EEslintFeature.REACT, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
-		fileIndicators: [], // удалены общие файлы index.js, App.js
+		fileIndicators: [],
 		ignorePath: {
 			directories: ["android", "ios"],
 			patterns: [],
@@ -1201,7 +1198,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Restify Node.js framework project",
 		displayName: "Restify",
 		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT],
-		fileIndicators: [], // удалены общие server.js, index.js
+		fileIndicators: [],
 		ignorePath: {
 			directories: [],
 			patterns: [],
@@ -1233,7 +1230,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Sails.js MVC Node.js framework project",
 		displayName: "Sails.js",
 		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT],
-		fileIndicators: ["sails.config.js"], // удалён общий app.js
+		fileIndicators: ["sails.config.js"],
 		ignorePath: {
 			directories: ["views"],
 			patterns: [],
@@ -1300,7 +1297,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Solid.js frontend library project",
 		displayName: "Solid.js",
 		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
-		fileIndicators: [], // удалены неоднозначные файлы
+		fileIndicators: [],
 		ignorePath: {
 			directories: [],
 			patterns: [],
@@ -1332,7 +1329,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Strapi Headless CMS framework project",
 		displayName: "Strapi",
 		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
-		fileIndicators: [], // удалены неоднозначные конфигурационные файлы
+		fileIndicators: [],
 		ignorePath: {
 			directories: [],
 			patterns: [],
@@ -1365,7 +1362,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Svelte framework project",
 		displayName: "Svelte",
 		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.TAILWIND_CSS],
-		fileIndicators: ["svelte.config.js"], // оставляем только svelte.config.js
+		fileIndicators: ["svelte.config.js"],
 		ignorePath: {
 			directories: [".svelte-kit"],
 			patterns: ["static/**/*", "**/*.d.ts"],
@@ -1562,7 +1559,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		description: "Vue.js framework project",
 		displayName: "Vue.js",
 		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.TAILWIND_CSS],
-		fileIndicators: ["vue.config.js", ".vuerc"], // удалён vite.config.ts
+		fileIndicators: ["vue.config.js", ".vuerc"],
 		ignorePath: {
 			directories: [],
 			patterns: ["public/**/*", "**/*.d.ts"],

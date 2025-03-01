@@ -1,6 +1,29 @@
+/**
+ * Configuration constant for semantic-release.
+ * Provides a template function for generating semantic-release configuration files.
+ */
 export const SEMANTIC_RELEASE_CONFIG: {
+	/**
+	 * Generates a semantic-release configuration file content.
+	 *
+	 * @param repositoryUrl - The URL of the git repository
+	 * @param mainBranch - The main branch name for production releases
+	 * @param preReleaseBranch - Optional branch name for pre-releases
+	 * @param preReleaseChannel - Optional channel name for pre-releases
+	 * @returns String content for the semantic-release configuration file
+	 */
 	template: (repositoryUrl: string, mainBranch: string, preReleaseBranch?: string, preReleaseChannel?: string) => string;
 } = {
+	/**
+	 * Generates a semantic-release configuration file content.
+	 * Creates a configuration with release rules, plugin configurations, and branch settings.
+	 *
+	 * @param repositoryUrl - The URL of the git repository
+	 * @param mainBranch - The main branch name for production releases
+	 * @param preReleaseBranch - Optional branch name for pre-releases
+	 * @param preReleaseChannel - Optional channel name for pre-releases
+	 * @returns String content for the semantic-release configuration file
+	 */
 	template: (repositoryUrl: string, mainBranch: string, preReleaseBranch?: string, preReleaseChannel?: string) => {
 		let branchesConfig: string = `  branches: [
     '${mainBranch}'`;

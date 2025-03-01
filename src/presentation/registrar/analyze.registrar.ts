@@ -6,16 +6,34 @@ import type { ICommand } from "../../infrastructure/interface/command.interface"
 
 import { ECommand } from "../../infrastructure/enum/command.enum";
 
+/**
+ * Registrar for the 'analyze' command.
+ * Configures and registers the command that analyzes project structure and dependencies.
+ */
 export class AnalyzeCommandRegistrar implements ICommandRegistrar {
+	/** The command factory used to create command instances */
 	readonly COMMAND_FACTORY: ICommandFactory;
 
+	/** The root Commander program instance */
 	readonly PROGRAM: Command;
 
+	/**
+	 * Initializes a new instance of the AnalyzeCommandRegistrar.
+	 *
+	 * @param program - The Commander program to attach the command to
+	 * @param commandFactory - Factory for creating command instances
+	 */
 	constructor(program: Command, commandFactory: ICommandFactory) {
 		this.PROGRAM = program;
 		this.COMMAND_FACTORY = commandFactory;
 	}
 
+	/**
+	 * Configures and registers the 'analyze' command.
+	 * Sets up command description, options, and action handler.
+	 *
+	 * @returns The configured Commander command instance
+	 */
 	execute(): Command {
 		return this.PROGRAM.command(ECommand.ANALYZE)
 			.description(

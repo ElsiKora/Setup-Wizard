@@ -5,16 +5,35 @@ import type { IModuleSetupResult } from "../interface/module-setup-result.interf
 
 import { GITIGNORE_CONFIG } from "../../domain/constant/gitignore-config.constant";
 
+/**
+ * Service for setting up and managing .gitignore file.
+ * Provides functionality to create a comprehensive .gitignore file
+ * that helps prevent unwanted files from being tracked by Git.
+ */
 export class GitignoreModuleService implements IModuleService {
+	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
+	/**
+	 * Initializes a new instance of the GitignoreModuleService.
+	 *
+	 * @param cliInterfaceService - Service for CLI user interactions
+	 * @param fileSystemService - Service for file system operations
+	 */
 	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
 	}
 
+	/**
+	 * Handles existing .gitignore setup.
+	 * Checks for existing .gitignore file and asks if user wants to replace it.
+	 *
+	 * @returns Promise resolving to true if setup should proceed, false otherwise
+	 */
 	async handleExistingSetup(): Promise<boolean> {
 		try {
 			const existingGitignore: string | undefined = await this.FILE_SYSTEM_SERVICE.isOneOfPathsExists([".gitignore"]);
@@ -48,6 +67,12 @@ export class GitignoreModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Installs and configures .gitignore.
+	 * Generates a new .gitignore file with common patterns.
+	 *
+	 * @returns Promise resolving to the module setup result
+	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
 			if (!(await this.shouldInstall())) {
@@ -69,6 +94,12 @@ export class GitignoreModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Determines if .gitignore should be installed.
+	 * Asks the user if they want to generate a .gitignore file.
+	 *
+	 * @returns Promise resolving to true if the module should be installed, false otherwise
+	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
 			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to generate .gitignore file for your project?");
@@ -79,6 +110,13 @@ export class GitignoreModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Displays a summary of the setup results.
+	 * Lists what was included in the generated .gitignore file.
+	 *
+	 * @param isSuccess - Whether the setup was successful
+	 * @param error - Optional error if setup failed
+	 */
 	private displaySetupSummary(isSuccess: boolean, error?: Error): void {
 		const summary: Array<string> = [];
 
@@ -93,6 +131,11 @@ export class GitignoreModuleService implements IModuleService {
 		this.CLI_INTERFACE_SERVICE.note("Gitignore Setup Summary", summary.join("\n"));
 	}
 
+	/**
+	 * Generates a new .gitignore file.
+	 *
+	 * @returns Promise resolving to an object indicating success or failure with optional error
+	 */
 	private async generateNewGitignore(): Promise<{ error?: Error; isSuccess: boolean }> {
 		this.CLI_INTERFACE_SERVICE.startSpinner("Generating .gitignore file...");
 

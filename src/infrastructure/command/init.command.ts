@@ -11,15 +11,30 @@ import { ConfigService } from "../../application/service/config.service";
 import { EModule } from "../../domain/enum/module.enum";
 import { ModuleServiceMapper } from "../mapper/module-service.mapper";
 
+/**
+ * Command responsible for initializing and installing selected modules.
+ * Implements the ICommand interface to provide standard command execution.
+ */
 export class InitCommand implements ICommand {
+	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** Configuration service for reading and writing config */
 	readonly CONFIG_SERVICE: ConfigService;
 
+	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
+	/** Properties defining which modules to install */
 	readonly PROPERTIES: TInitCommandProperties;
 
+	/**
+	 * Initializes a new instance of the InitCommand.
+	 *
+	 * @param properties - Properties defining which modules to install
+	 * @param cliInterfaceService - Service for CLI user interactions
+	 * @param fileSystemService - Service for file system operations
+	 */
 	constructor(properties: TInitCommandProperties, cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.PROPERTIES = properties;
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
@@ -27,6 +42,13 @@ export class InitCommand implements ICommand {
 		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
 	}
 
+	/**
+	 * Executes the initialization command.
+	 * Reads existing configuration if available, determines which modules to install,
+	 * installs selected modules, and updates the configuration.
+	 *
+	 * @returns Promise that resolves when execution is complete
+	 */
 	async execute(): Promise<void> {
 		let properties: TInitCommandProperties = this.PROPERTIES;
 

@@ -2,6 +2,11 @@ import type { ILicenseConfig } from "../interface/license-config.interface";
 
 import { ELicense } from "../enum/license.enum";
 
+/**
+ * Configuration constant for software licenses.
+ * Provides information about different license types and template functions
+ * for generating LICENSE files with proper copyright information.
+ */
 export const LICENSE_CONFIG: Record<ELicense, ILicenseConfig> = {
 	[ELicense.AGPL_3_0]: {
 		description: "Similar to GPLv3 but requires source code distribution for software running over networks (e.g., web applications)",

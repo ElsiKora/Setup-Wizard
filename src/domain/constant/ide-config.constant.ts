@@ -3,6 +3,11 @@ import type { IIdeConfig } from "../interface/ide-config.interface";
 
 import { EIde } from "../enum/ide.enum";
 
+/**
+ * Configuration constant for IDE-specific settings.
+ * Provides configuration details and template functions for generating
+ * IDE-specific configuration files for different editors.
+ */
 export const IDE_CONFIG: Record<EIde, IIdeConfig> = {
 	[EIde.INTELLIJ_IDEA]: {
 		content: [

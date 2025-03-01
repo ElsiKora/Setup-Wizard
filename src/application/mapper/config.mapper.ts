@@ -9,10 +9,34 @@ import type { TInitCommandProperties } from "../../infrastructure/type/init-comm
 import type { IConfig } from "../interface/config.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
+/**
+ * Mapper for configuration processing.
+ * Provides utility functions for transforming between configuration formats.
+ */
 export const ConfigMapper: {
+	/**
+	 * Converts a configuration object to initialization command properties.
+	 *
+	 * @param config - The configuration object
+	 * @returns Command properties for initialization
+	 */
 	fromConfigToInitCommandProperties(config: IConfig): TInitCommandProperties;
+
+	/**
+	 * Converts setup results to a configuration object.
+	 *
+	 * @param setupResults - Partial record of module setup results
+	 * @returns Configuration object
+	 */
 	fromSetupResultsToConfig(setupResults: Partial<Record<EModule, IModuleSetupResult>>): IConfig;
 } = {
+	/**
+	 * Converts a configuration object to initialization command properties.
+	 * Extracts the enabled status from complex configuration objects.
+	 *
+	 * @param config - The configuration object
+	 * @returns Command properties for initialization
+	 */
 	fromConfigToInitCommandProperties(config: IConfig): TInitCommandProperties {
 		const properties: TInitCommandProperties = {} as TInitCommandProperties;
 
@@ -55,6 +79,13 @@ export const ConfigMapper: {
 		return properties;
 	},
 
+	/**
+	 * Converts setup results to a configuration object.
+	 * Combines wasInstalled flag with custom properties into a configuration.
+	 *
+	 * @param setupResults - Partial record of module setup results
+	 * @returns Configuration object
+	 */
 	fromSetupResultsToConfig(setupResults: Partial<Record<EModule, IModuleSetupResult>>): IConfig {
 		const config: IConfig = {} as IConfig;
 

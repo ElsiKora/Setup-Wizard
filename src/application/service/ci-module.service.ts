@@ -14,23 +14,44 @@ import { EModule } from "../../domain/enum/module.enum";
 
 import { ConfigService } from "./config.service";
 
+/**
+ * Service for setting up and managing Continuous Integration (CI) modules.
+ * Handles the selection, configuration, and setup of CI workflows for different providers.
+ */
 export class CiModuleService implements IModuleService {
+	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
+	/** Configuration service for managing app configuration */
 	private readonly CONFIG_SERVICE: ConfigService;
 
+	/** Selected CI modules to install */
 	private selectedModules: Array<ECiModule> = [];
 
+	/** Selected CI provider (e.g., GitHub) */
 	private selectedProvider?: ECiProvider;
 
+	/**
+	 * Initializes a new instance of the CiModuleService.
+	 *
+	 * @param cliInterfaceService - Service for CLI user interactions
+	 * @param fileSystemService - Service for file system operations
+	 */
 	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
 		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
 	}
 
+	/**
+	 * Handles existing CI setup files.
+	 * Checks for existing CI configuration files and asks for user confirmation if found.
+	 *
+	 * @returns Promise resolving to true if setup should proceed, false otherwise
+	 */
 	async handleExistingSetup(): Promise<boolean> {
 		try {
 			const existingFiles: Array<string> = await this.findExistingCiFiles();
@@ -49,6 +70,12 @@ export class CiModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Installs and configures selected CI modules.
+	 * Guides the user through selecting and configuring CI modules.
+	 *
+	 * @returns Promise resolving to the module setup result
+	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
 			if (!(await this.shouldInstall())) {
@@ -98,6 +125,12 @@ export class CiModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Determines if the CI module should be installed.
+	 * Asks the user if they want to set up CI workflows.
+	 *
+	 * @returns Promise resolving to true if the module should be installed, false otherwise
+	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
 			return await this.CLI_INTERFACE_SERVICE.confirm("Would you like to set up CI workflows?");
@@ -108,6 +141,13 @@ export class CiModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Collects module-specific properties from the user.
+	 *
+	 * @param module - The CI module to collect properties for
+	 * @param savedProperties - Previously saved properties for this module
+	 * @returns Promise resolving to a record of collected properties
+	 */
 	private async collectModuleProperties(module: ECiModule, savedProperties: Record<string, any> = {}): Promise<Record<string, string>> {
 		const properties: Record<string, string> = {};
 
@@ -119,6 +159,12 @@ export class CiModuleService implements IModuleService {
 		return properties;
 	}
 
+	/**
+	 * Determines the type of CI module based on whether it's an NPM package.
+	 *
+	 * @param isSavedNpmPackage - Whether the package was previously saved as an NPM package
+	 * @returns Promise resolving to the determined module type
+	 */
 	private async determineModuleType(isSavedNpmPackage: boolean = false): Promise<ECiModuleType> {
 		const isConfirmedByDefault: boolean = isSavedNpmPackage ?? false;
 		const isNpmPackage: boolean = await this.CLI_INTERFACE_SERVICE.confirm("Is this package going to be published to NPM?", isConfirmedByDefault);
@@ -126,6 +172,12 @@ export class CiModuleService implements IModuleService {
 		return isNpmPackage ? ECiModuleType.NPM_ONLY : ECiModuleType.NON_NPM;
 	}
 
+	/**
+	 * Displays a summary of successful and failed CI module setups.
+	 *
+	 * @param successful - Array of successfully set up modules
+	 * @param failed - Array of modules that failed to set up
+	 */
 	private displaySetupSummary(successful: Array<{ module: ECiModule }>, failed: Array<{ error?: Error; module: ECiModule }>): void {
 		const summary: Array<string> = ["Successfully created configurations:", ...successful.map(({ module }: { module: ECiModule }) => `✓ ${CI_CONFIG[module].name}`)];
 
@@ -138,6 +190,12 @@ export class CiModuleService implements IModuleService {
 		this.CLI_INTERFACE_SERVICE.note("CI Setup Summary", summary.join("\n"));
 	}
 
+	/**
+	 * Extracts module-specific properties from a module configuration.
+	 *
+	 * @param moduleConfig - The module configuration object or boolean
+	 * @returns Record of module properties, or empty object if none found
+	 */
 	private extractModuleProperties(moduleConfig: boolean | Record<string, any> | undefined): Record<string, any> {
 		if (!moduleConfig) {
 			return {};
@@ -156,6 +214,11 @@ export class CiModuleService implements IModuleService {
 		return moduleConfig;
 	}
 
+	/**
+	 * Finds existing CI configuration files that might be overwritten.
+	 *
+	 * @returns Promise resolving to an array of file paths for existing CI configurations
+	 */
 	private async findExistingCiFiles(): Promise<Array<string>> {
 		if (!this.selectedProvider || !this.selectedModules || this.selectedModules.length === 0) {
 			return [];
@@ -175,6 +238,12 @@ export class CiModuleService implements IModuleService {
 		return existingFiles;
 	}
 
+	/**
+	 * Gets a human-readable description for a CI provider.
+	 *
+	 * @param provider - The CI provider to get a description for
+	 * @returns Description string for the provider
+	 */
 	private getProviderDescription(provider: ECiProvider): string {
 		const descriptions: Record<ECiProvider, string> = {
 			[ECiProvider.GITHUB]: "GitHub Actions - Cloud-based CI/CD",
@@ -183,6 +252,11 @@ export class CiModuleService implements IModuleService {
 		return descriptions[provider] || provider;
 	}
 
+	/**
+	 * Gets the saved CI configuration from the config file.
+	 *
+	 * @returns Promise resolving to the saved CI configuration or null if not found
+	 */
 	private async getSavedConfig(): Promise<{
 		isNpmPackage?: boolean;
 		moduleProperties?: Record<string, any>;
@@ -218,6 +292,13 @@ export class CiModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Selects compatible CI modules based on the module type and saved configuration.
+	 *
+	 * @param moduleType - The type of CI module (NPM or non-NPM)
+	 * @param savedModules - Previously saved modules
+	 * @returns Promise resolving to an array of selected CI module enum values
+	 */
 	private async selectCompatibleModules(moduleType: ECiModuleType, savedModules: Array<ECiModule>): Promise<Array<ECiModule>> {
 		const compatibleModules: Array<{ description: string; label: string; value: ECiModule }> = Object.entries(CI_CONFIG)
 			.filter(([, config]: [string, ICiConfig]) => {
@@ -235,6 +316,12 @@ export class CiModuleService implements IModuleService {
 		return await this.CLI_INTERFACE_SERVICE.multiselect<ECiModule>("Select the CI modules you want to set up:", compatibleModules, false, validSavedModules);
 	}
 
+	/**
+	 * Prompts the user to select a CI provider.
+	 *
+	 * @param savedProvider - Previously saved provider
+	 * @returns Promise resolving to the selected CI provider
+	 */
 	private async selectProvider(savedProvider?: ECiProvider): Promise<ECiProvider> {
 		const providers: Array<{
 			description: string;
@@ -251,6 +338,14 @@ export class CiModuleService implements IModuleService {
 		return await this.CLI_INTERFACE_SERVICE.select<ECiProvider>("Select CI provider:", providers, initialProvider);
 	}
 
+	/**
+	 * Sets up a specific CI module.
+	 * Creates necessary directories and configuration files.
+	 *
+	 * @param module - The CI module to set up
+	 * @param properties - Module-specific properties to use in configuration
+	 * @returns Promise resolving to an object indicating success or failure
+	 */
 	private async setupModule(module: ECiModule, properties: Record<string, any>): Promise<{ error?: Error; isSuccess: boolean; module: ECiModule }> {
 		try {
 			const config: ICiConfig = CI_CONFIG[module];
@@ -281,6 +376,13 @@ export class CiModuleService implements IModuleService {
 		}
 	}
 
+	/**
+	 * Sets up all selected CI modules.
+	 * Collects module properties and creates configuration files.
+	 *
+	 * @param savedProperties - Previously saved module properties
+	 * @returns Promise resolving to a record of module properties
+	 */
 	private async setupSelectedModules(savedProperties: Record<string, any> = {}): Promise<Record<string, any>> {
 		if (!this.selectedProvider) {
 			throw new Error("Provider not selected");
