@@ -140,9 +140,11 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @param mainBranch - The main branch for production releases
 	 * @param preReleaseBranch - Optional branch for pre-releases
 	 * @param preReleaseChannel - Optional channel name for pre-releases
+	 * @param isBackmergeEnabled - Optional flag to enable backmerge to development branch
+	 * @param developBranch - Optional development branch name for backmerge
 	 */
-	private async createConfigs(repositoryUrl: string, mainBranch: string, preReleaseBranch?: string, preReleaseChannel?: string): Promise<void> {
-		await this.FILE_SYSTEM_SERVICE.writeFile(SEMANTIC_RELEASE_CONFIG_FILE_NAME, SEMANTIC_RELEASE_CONFIG.template(repositoryUrl, mainBranch, preReleaseBranch, preReleaseChannel), "utf8");
+	private async createConfigs(repositoryUrl: string, mainBranch: string, preReleaseBranch?: string, preReleaseChannel?: string, isBackmergeEnabled: boolean = false, developBranch?: string): Promise<void> {
+		await this.FILE_SYSTEM_SERVICE.writeFile(SEMANTIC_RELEASE_CONFIG_FILE_NAME, SEMANTIC_RELEASE_CONFIG.template(repositoryUrl, mainBranch, preReleaseBranch, preReleaseChannel, isBackmergeEnabled, developBranch), "utf8");
 	}
 
 	/**
@@ -152,44 +154,32 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @param mainBranch - The main branch for production releases
 	 * @param preReleaseBranch - Optional branch for pre-releases
 	 * @param preReleaseChannel - Optional channel name for pre-releases
+	 * @param isBackmergeEnabled - Optional flag indicating if backmerge is enabled
+	 * @param developBranch - Optional development branch name for backmerge
 	 */
-	private displaySetupSummary(mainBranch: string, preReleaseBranch?: string, preReleaseChannel?: string): void {
+	private displaySetupSummary(mainBranch: string, preReleaseBranch?: string, preReleaseChannel?: string, isBackmergeEnabled: boolean = false, developBranch?: string): void {
 		const summary: Array<string> = ["Semantic Release configuration has been created.", "", "Release branches:", `- Main release branch: ${mainBranch}`];
 
 		if (preReleaseBranch && preReleaseChannel) {
 			summary.push(`- Pre-release branch: ${preReleaseBranch} (channel: ${preReleaseChannel})`);
 		}
 
-		summary.push(
-			"",
-			"Generated scripts:",
-			"- npm run semantic-release",
-			"- npm run release (alias)",
-			"- npm run ci (runs tests, build, and release)",
-			"",
-			"Configuration files:",
-			`- ${SEMANTIC_RELEASE_CONFIG_FILE_NAME}`,
-			"",
-			"Changelog location:",
-			"- docs/CHANGELOG.md",
-			"",
-			"Note: To use Semantic Release effectively, you should:",
-			"1. Configure CI/CD in your repository",
-			"2. Set up required access tokens (GITHUB_TOKEN, NPM_TOKEN)",
-			"3. Use conventional commits (works with the Commitlint setup)",
-		);
+		if (isBackmergeEnabled && developBranch) {
+			summary.push(`- Backmerge enabled: Changes from ${mainBranch} will be automatically merged to ${developBranch} after release`);
+		}
+
+		summary.push("", "Generated scripts:", "- npm run release", "", "Configuration files:", `- ${SEMANTIC_RELEASE_CONFIG_FILE_NAME}`, "", "Changelog location:", "- CHANGELOG.md", "", "Note: To use Semantic Release effectively, you should:", "1. Configure CI/CD in your repository", "2. Set up required access tokens (GITHUB_TOKEN, NPM_TOKEN)", "3. Use conventional commits (works with the Commitlint setup)");
 
 		this.CLI_INTERFACE_SERVICE.note("Semantic Release Setup", summary.join("\n"));
 	}
 
 	/**
 	 * Ensures the changelog directory exists.
-	 * Creates the docs directory if it doesn't exist.
+	 * Creates any necessary directories for changelog if they don't exist.
 	 */
 	private async ensureChangelogDirectory(): Promise<void> {
-		if (!(await this.FILE_SYSTEM_SERVICE.isPathExists("docs"))) {
-			await this.COMMAND_SERVICE.execute("mkdir -p docs");
-		}
+		// The changelog is now in the root directory, so we don't need to create any directories
+		// but we keep this method for future flexibility if needed
 	}
 
 	/**
@@ -206,11 +196,33 @@ export class SemanticReleaseModuleService implements IModuleService {
 			}
 		}
 
+		// Check for CHANGELOG.md in the root directory
+		if (await this.FILE_SYSTEM_SERVICE.isPathExists("CHANGELOG.md")) {
+			existingFiles.push("CHANGELOG.md");
+		}
+
+		// Also check for legacy docs/CHANGELOG.md
 		if (await this.FILE_SYSTEM_SERVICE.isPathExists("docs/CHANGELOG.md")) {
 			existingFiles.push("docs/CHANGELOG.md");
 		}
 
 		return existingFiles;
+	}
+
+	/**
+	 * Prompts the user for the development branch name for backmerge.
+	 *
+	 * @returns Promise resolving to the development branch name
+	 */
+	private async getDevelopBranch(): Promise<string> {
+		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
+		const initialBranch: string = (savedConfig?.developBranch as string) || "dev";
+
+		return await this.CLI_INTERFACE_SERVICE.text("Enter the name of your development branch for backmerge:", "dev", initialBranch, (value: string) => {
+			if (!value) {
+				return "Development branch name is required";
+			}
+		});
 	}
 
 	/**
@@ -340,6 +352,20 @@ export class SemanticReleaseModuleService implements IModuleService {
 	}
 
 	/**
+	 * Prompts the user if they want to enable backmerge to development branch.
+	 * Only applicable for the main branch.
+	 *
+	 * @param mainBranch - The main branch name
+	 * @returns Promise resolving to true if backmerge should be enabled, false otherwise
+	 */
+	private async isBackmergeEnabled(mainBranch: string): Promise<boolean> {
+		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
+		const isConfirmedByDefault: boolean = savedConfig?.isBackmergeEnabled === true;
+
+		return await this.CLI_INTERFACE_SERVICE.confirm(`Do you want to enable automatic backmerge from ${mainBranch} to development branch after release?`, isConfirmedByDefault);
+	}
+
+	/**
 	 * Prompts the user if they want to enable pre-release channels.
 	 *
 	 * @returns Promise resolving to true if pre-release should be enabled, false otherwise
@@ -356,11 +382,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * Adds scripts for running semantic-release and CI processes.
 	 */
 	private async setupScripts(): Promise<void> {
-		await this.PACKAGE_JSON_SERVICE.addScript("semantic-release", "semantic-release");
 		await this.PACKAGE_JSON_SERVICE.addScript("release", "semantic-release");
-
-		const ciScript: string = "npm run test && npm run build && npm run semantic-release";
-		await this.PACKAGE_JSON_SERVICE.addScript("ci", ciScript);
 	}
 
 	/**
@@ -394,14 +416,27 @@ export class SemanticReleaseModuleService implements IModuleService {
 				parameters.preReleaseChannel = preReleaseChannel;
 			}
 
+			// Backmerge configuration
+			let isBackmergeEnabled: boolean = false;
+			let developBranch: string | undefined = undefined;
+
+			// Only ask about backmerge if we're not in a pre-release branch
+			isBackmergeEnabled = await this.isBackmergeEnabled(mainBranch);
+			parameters.isBackmergeEnabled = isBackmergeEnabled;
+
+			if (isBackmergeEnabled) {
+				developBranch = await this.getDevelopBranch();
+				parameters.developBranch = developBranch;
+			}
+
 			this.CLI_INTERFACE_SERVICE.startSpinner("Setting up Semantic Release configuration...");
 			await this.PACKAGE_JSON_SERVICE.installPackages(SEMANTIC_RELEASE_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
-			await this.createConfigs(repositoryUrl, mainBranch, preReleaseBranch, preReleaseChannel);
+			await this.createConfigs(repositoryUrl, mainBranch, preReleaseBranch, preReleaseChannel, isBackmergeEnabled, developBranch);
 			await this.setupScripts();
 			await this.ensureChangelogDirectory();
 
 			this.CLI_INTERFACE_SERVICE.stopSpinner("Semantic Release configuration completed successfully!");
-			this.displaySetupSummary(mainBranch, preReleaseBranch, preReleaseChannel);
+			this.displaySetupSummary(mainBranch, preReleaseBranch, preReleaseChannel, isBackmergeEnabled, developBranch);
 
 			return parameters;
 		} catch (error) {

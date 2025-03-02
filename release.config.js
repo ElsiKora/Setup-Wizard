@@ -73,6 +73,14 @@ if (isPrereleaseBranch) {
 				message: "chore(release): ${nextRelease.version} [skip ci]",
 			},
 		],
+		[
+			"@saithodev/semantic-release-backmerge",
+			{
+				backmergeBranches: ["dev"],
+				backmergeStrategy: "rebase",
+				message: "chore(release): synchronization [skip ci]",
+			},
+		],
 	);
 }
 
