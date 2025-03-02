@@ -56,6 +56,7 @@ const config = {
 				},
 				preset: "conventionalcommits",
 				releaseRules: [
+					{ breaking: true, release: "major" },
 					{ release: "minor", type: "feat" },
 					{ release: "patch", type: "fix" },
 					{ release: "patch", type: "docs" },
