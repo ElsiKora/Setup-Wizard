@@ -4,6 +4,7 @@ import type { ICommandService } from "../interface/command-service.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
+import { EModule } from "../../domain/enum/module.enum";
 import { EPackageJsonDependencyType } from "../../domain/enum/package-json-dependency-type.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
 import { STYLELINT_CONFIG_CORE_DEPENDENCIES } from "../constant/stylelint-config-core-dependencies.constant";
@@ -13,6 +14,7 @@ import { STYLELINT_CONFIG_IGNORE_FILE_NAME } from "../constant/stylelint-config-
 import { STYLELINT_CONFIG_IGNORE_PATHS } from "../constant/stylelint-config-ignore-paths.constant";
 import { STYLELINT_CONFIG } from "../constant/stylelint-config.constant";
 
+import { ConfigService } from "./config.service";
 import { PackageJsonService } from "./package-json.service";
 
 /**
@@ -33,6 +35,9 @@ export class StylelintModuleService implements IModuleService {
 	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
 
+	/** Configuration service for managing app configuration */
+	private readonly CONFIG_SERVICE: ConfigService;
+
 	/**
 	 * Initializes a new instance of the StylelintModuleService.
 	 *
@@ -42,9 +47,9 @@ export class StylelintModuleService implements IModuleService {
 	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
-
 		this.COMMAND_SERVICE = new NodeCommandService();
 		this.PACKAGE_JSON_SERVICE = new PackageJsonService(fileSystemService, this.COMMAND_SERVICE);
+		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
 	}
 
 	/**
@@ -111,12 +116,13 @@ export class StylelintModuleService implements IModuleService {
 	/**
 	 * Determines if Stylelint should be installed.
 	 * Asks the user if they want to set up Stylelint for their project.
+	 * Uses the saved config value as default if it exists.
 	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Stylelint for your project?", true);
+			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Stylelint for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.STYLELINT));
 		} catch (error) {
 			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
 

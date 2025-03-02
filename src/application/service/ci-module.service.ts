@@ -2,7 +2,8 @@ import type { ICiConfigContent } from "../../domain/interface/ci-config-content.
 import type { ICiConfig } from "../../domain/interface/ci-config.interface";
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
-import type { IConfig } from "../interface/config.interface";
+import type { IConfigCi } from "../interface/config/ci.interface";
+import type { IConfigSemanticRelease } from "../interface/config/semantic-release.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
@@ -24,6 +25,9 @@ export class CiModuleService implements IModuleService {
 
 	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
+
+	/** Cached CI configuration */
+	private config: IConfigCi | null = null;
 
 	/** Configuration service for managing app configuration */
 	private readonly CONFIG_SERVICE: ConfigService;
@@ -78,20 +82,15 @@ export class CiModuleService implements IModuleService {
 	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
+			this.config = await this.CONFIG_SERVICE.getModuleConfig<IConfigCi>(EModule.CI);
+
 			if (!(await this.shouldInstall())) {
 				return { wasInstalled: false };
 			}
 
-			const savedConfig: {
-				isNpmPackage?: boolean;
-				moduleProperties?: Record<string, any>;
-				modules?: Array<ECiModule>;
-				provider?: ECiProvider;
-			} | null = await this.getSavedConfig();
-
-			const moduleType: ECiModuleType = await this.determineModuleType(savedConfig?.isNpmPackage);
-			this.selectedProvider = await this.selectProvider(savedConfig?.provider);
-			this.selectedModules = await this.selectCompatibleModules(moduleType, savedConfig?.modules ?? []);
+			const moduleType: ECiModuleType = await this.determineModuleType(this.config?.moduleProperties?.[ECiModule.RELEASE_NPM] === true);
+			this.selectedProvider = await this.selectProvider(this.config?.provider);
+			this.selectedModules = await this.selectCompatibleModules(moduleType, this.config?.modules ?? []);
 
 			if (this.selectedModules.length === 0) {
 				this.CLI_INTERFACE_SERVICE.warn("No CI modules selected.");
@@ -105,7 +104,7 @@ export class CiModuleService implements IModuleService {
 				return { wasInstalled: false };
 			}
 
-			const moduleProperties: Record<string, any> = await this.setupSelectedModules(savedConfig?.moduleProperties ?? {});
+			const moduleProperties: Record<string, any> = await this.setupSelectedModules(this.config?.moduleProperties ?? {});
 
 			const customProperties: Record<string, any> = {
 				isNpmPackage: moduleType === ECiModuleType.NPM_ONLY,
@@ -128,12 +127,13 @@ export class CiModuleService implements IModuleService {
 	/**
 	 * Determines if the CI module should be installed.
 	 * Asks the user if they want to set up CI workflows.
+	 * Uses the saved config value as default if it exists.
 	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Would you like to set up CI workflows?");
+			return await this.CLI_INTERFACE_SERVICE.confirm("Would you like to set up CI workflows?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.CI));
 		} catch (error) {
 			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
 
@@ -162,24 +162,24 @@ export class CiModuleService implements IModuleService {
 			let preReleaseBranchDefault: string = (savedProperties.preReleaseBranch as string) || "dev";
 
 			if (!savedProperties.mainBranch || !Object.prototype.hasOwnProperty.call(savedProperties, "isPrerelease")) {
-				const config: IConfig | null = await this.CONFIG_SERVICE.getModuleConfig(EModule.SEMANTIC_RELEASE);
+				// Semantic release config should already be loaded
+				const semanticReleaseConfig: IConfigSemanticRelease | null = await this.CONFIG_SERVICE.getModuleConfig<IConfigSemanticRelease>(EModule.SEMANTIC_RELEASE);
 
-				if (config) {
-					const semanticRelease: Record<string, any> = config as Record<string, any>;
+				if (semanticReleaseConfig) {
 					let usedSemanticReleaseConfig: boolean = false;
 
-					if (!savedProperties.mainBranch && semanticRelease.mainBranch) {
-						mainBranchDefault = semanticRelease.mainBranch as string;
+					if (!savedProperties.mainBranch && semanticReleaseConfig.mainBranch) {
+						mainBranchDefault = semanticReleaseConfig.mainBranch;
 						usedSemanticReleaseConfig = true;
 					}
 
-					if (!Object.prototype.hasOwnProperty.call(savedProperties, "isPrerelease") && Object.prototype.hasOwnProperty.call(semanticRelease, "isPrereleaseEnabled")) {
-						isPrereleaseDefault = semanticRelease.isPrereleaseEnabled as boolean;
+					if (!Object.prototype.hasOwnProperty.call(savedProperties, "isPrerelease") && Object.prototype.hasOwnProperty.call(semanticReleaseConfig, "isPrereleaseEnabled")) {
+						isPrereleaseDefault = semanticReleaseConfig.isPrereleaseEnabled ?? false;
 						usedSemanticReleaseConfig = true;
 					}
 
-					if (!savedProperties.preReleaseBranch && semanticRelease.preReleaseBranch) {
-						preReleaseBranchDefault = semanticRelease.preReleaseBranch as string;
+					if (!savedProperties.preReleaseBranch && semanticReleaseConfig.preReleaseBranch) {
+						preReleaseBranchDefault = semanticReleaseConfig.preReleaseBranch;
 						usedSemanticReleaseConfig = true;
 					}
 
@@ -295,46 +295,6 @@ export class CiModuleService implements IModuleService {
 		};
 
 		return descriptions[provider] || provider;
-	}
-
-	/**
-	 * Gets the saved CI configuration from the config file.
-	 *
-	 * @returns Promise resolving to the saved CI configuration or null if not found
-	 */
-	private async getSavedConfig(): Promise<{
-		isNpmPackage?: boolean;
-		moduleProperties?: Record<string, any>;
-		modules?: Array<ECiModule>;
-		provider?: ECiProvider;
-	} | null> {
-		try {
-			if (await this.CONFIG_SERVICE.exists()) {
-				const config: IConfig = await this.CONFIG_SERVICE.get();
-
-				if (config[EModule.CI]) {
-					const ciConfig: Record<string, any> = config[EModule.CI] as Record<string, any>;
-
-					if (ciConfig.moduleProperties) {
-						const standardizedProperties: Record<string, any> = {};
-
-						// eslint-disable-next-line @elsikora-typescript/no-unsafe-argument
-						for (const [moduleKey, moduleValue] of Object.entries(ciConfig.moduleProperties)) {
-							// @ts-ignore
-							standardizedProperties[moduleKey] = this.extractModuleProperties(moduleValue);
-						}
-
-						ciConfig.moduleProperties = standardizedProperties;
-					}
-
-					return ciConfig;
-				}
-			}
-
-			return null;
-		} catch {
-			return null;
-		}
 	}
 
 	/**

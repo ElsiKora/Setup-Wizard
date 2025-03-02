@@ -4,7 +4,7 @@ import type { IPackageJsonAuthor } from "../../domain/interface/package-json-aut
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
-import type { IConfig } from "../interface/config.interface";
+import type { IConfigLicense } from "../interface/config/license.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
@@ -37,6 +37,9 @@ export class LicenseModuleService implements IModuleService {
 
 	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
+
+	/** Cached License configuration */
+	private config: IConfigLicense | null = null;
 
 	/**
 	 * Initializes a new instance of the LicenseModuleService.
@@ -102,6 +105,8 @@ export class LicenseModuleService implements IModuleService {
 	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
+			this.config = await this.CONFIG_SERVICE.getModuleConfig<IConfigLicense>(EModule.LICENSE);
+
 			if (!(await this.shouldInstall())) {
 				return { wasInstalled: false };
 			}
@@ -110,9 +115,7 @@ export class LicenseModuleService implements IModuleService {
 				return { wasInstalled: false };
 			}
 
-			const savedConfig: { author?: string; license?: ELicense; year?: number } | null = await this.getSavedConfig();
-
-			const setupResult: { author?: string; error?: Error; isSuccess: boolean; license?: ELicense } = await this.generateNewLicense(savedConfig);
+			const setupResult: { author?: string; error?: Error; isSuccess: boolean; license?: ELicense } = await this.generateNewLicense(this.config);
 			this.displaySetupSummary(setupResult.isSuccess, setupResult.license, setupResult.author, setupResult.error);
 
 			if (setupResult.isSuccess && setupResult.license) {
@@ -137,12 +140,13 @@ export class LicenseModuleService implements IModuleService {
 	/**
 	 * Determines if the LICENSE module should be installed.
 	 * Asks the user if they want to generate a LICENSE file for their project.
+	 * Uses the saved config value as default if it exists.
 	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.cliInterfaceService.confirm("Do you want to generate LICENSE for your project?");
+			return await this.cliInterfaceService.confirm("Do you want to generate LICENSE for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.LICENSE));
 		} catch (error) {
 			this.cliInterfaceService.handleError("Failed to get user confirmation", error);
 
@@ -259,35 +263,6 @@ export class LicenseModuleService implements IModuleService {
 				error: error as Error,
 				isSuccess: false,
 			};
-		}
-	}
-
-	/**
-	 * Gets the saved license configuration from the config file.
-	 *
-	 * @returns Promise resolving to the saved license configuration or null if not found
-	 */
-	private async getSavedConfig(): Promise<{
-		author?: string;
-		license?: ELicense;
-		year?: number;
-	} | null> {
-		try {
-			if (await this.CONFIG_SERVICE.exists()) {
-				const config: IConfig = await this.CONFIG_SERVICE.get();
-
-				if (config[EModule.LICENSE]) {
-					return config[EModule.LICENSE] as {
-						author?: string;
-						license?: ELicense;
-						year?: number;
-					};
-				}
-			}
-
-			return null;
-		} catch {
-			return null;
 		}
 	}
 

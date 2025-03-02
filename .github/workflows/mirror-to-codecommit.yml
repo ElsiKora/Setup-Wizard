@@ -1,14 +1,13 @@
-name: Qodana Quality Scan
+name: Mirror to CodeCommit
 
 env:
-  NODE_VERSION: 20
   CHECKOUT_DEPTH: 0
 
 on: push
 
 jobs:
-  qodana_quality_scan:
-    name: Qodana Quality Scan
+  mirror_to_codecommit:
+    name: Mirror to CodeCommit
     runs-on: ubuntu-latest
 
     steps:
@@ -17,18 +16,9 @@ jobs:
         with:
           fetch-depth: ${{ env.CHECKOUT_DEPTH }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Mirror to CodeCommit
+        uses: pixta-dev/repository-mirroring-action@v1
         with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Build
-        run: npm run build
-
-      - name: Qodana Scan
-        uses: JetBrains/qodana-action@v2024.3
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+          target_repo_url: ${{ secrets.CODECOMMIT_SSH_REPOSITORY_URL }}
+          ssh_private_key: ${{ secrets.CODECOMMIT_SSH_PRIVATE_KEY }}
+          ssh_username: ${{ secrets.CODECOMMIT_SSH_PRIVATE_KEY_ID }}

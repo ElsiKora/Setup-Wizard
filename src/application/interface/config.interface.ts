@@ -1,57 +1,25 @@
-import type { ECiModule } from "../../domain/enum/ci-module.enum";
-import type { ECiProvider } from "../../domain/enum/ci-provider.enum";
-import type { EEslintFeature } from "../../domain/enum/eslint-feature.enum";
-import type { EIde } from "../../domain/enum/ide.enum";
-import type { ELicense } from "../../domain/enum/license.enum";
-import type { ELintStagedFeature } from "../../domain/enum/lint-staged-feature.enum";
 import type { EModule } from "../../domain/enum/module.enum";
 
+import type { IConfigCi } from "./config/ci.interface";
+import type { IConfigCommitlint } from "./config/commitlint.interface";
+import type { IConfigEslint } from "./config/eslint.interface";
+import type { IConfigGitignore } from "./config/gitignore.interface";
+import type { IConfigIde } from "./config/ide.interface";
+import type { IConfigLicense } from "./config/license.interface";
+import type { IConfigLintStaged } from "./config/lint-staged.interface";
+import type { IConfigPrettier } from "./config/prettier.interface";
+import type { IConfigSemanticRelease } from "./config/semantic-release.interface";
+import type { IConfigStylelint } from "./config/stylelint.interface";
+
 export interface IConfig {
-	[EModule.CI]?: {
-		isEnabled?: boolean;
-		moduleProperties?: Partial<
-			Record<
-				ECiModule,
-				| {
-						[propName: string]: any;
-						isEnabled?: boolean;
-				  }
-				| boolean
-			>
-		>;
-		modules?: Array<ECiModule>;
-		provider?: ECiProvider;
-	};
-	[EModule.COMMITLINT]?: boolean;
-	[EModule.ESLINT]?: {
-		features?: Array<EEslintFeature>;
-		isEnabled?: boolean;
-	};
-	[EModule.GITIGNORE]?: boolean;
-	[EModule.IDE]?: {
-		ides?: Array<EIde>;
-		isEnabled?: boolean;
-	};
-	[EModule.LICENSE]?: {
-		author?: string;
-		isEnabled?: boolean;
-		license?: ELicense;
-		year?: number;
-	};
-	[EModule.LINT_STAGED]?: {
-		features?: Array<ELintStagedFeature>;
-		isEnabled?: boolean;
-	};
-	[EModule.PRETTIER]?: boolean;
-	[EModule.SEMANTIC_RELEASE]?: {
-		developBranch?: string;
-		isBackmergeEnabled?: boolean;
-		isEnabled?: boolean;
-		isPrereleaseEnabled?: boolean;
-		mainBranch?: string;
-		preReleaseBranch?: string;
-		preReleaseChannel?: string;
-		repositoryUrl?: string;
-	};
-	[EModule.STYLELINT]?: boolean;
+	[EModule.CI]?: IConfigCi;
+	[EModule.COMMITLINT]?: IConfigCommitlint;
+	[EModule.ESLINT]?: IConfigEslint;
+	[EModule.GITIGNORE]?: IConfigGitignore;
+	[EModule.IDE]?: IConfigIde;
+	[EModule.LICENSE]?: IConfigLicense;
+	[EModule.LINT_STAGED]?: IConfigLintStaged;
+	[EModule.PRETTIER]?: IConfigPrettier;
+	[EModule.SEMANTIC_RELEASE]?: IConfigSemanticRelease;
+	[EModule.STYLELINT]?: IConfigStylelint;
 }
