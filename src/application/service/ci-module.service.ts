@@ -148,12 +148,57 @@ export class CiModuleService implements IModuleService {
 	 * @param savedProperties - Previously saved properties for this module
 	 * @returns Promise resolving to a record of collected properties
 	 */
-	private async collectModuleProperties(module: ECiModule, savedProperties: Record<string, any> = {}): Promise<Record<string, string>> {
-		const properties: Record<string, string> = {};
+	private async collectModuleProperties(module: ECiModule, savedProperties: Record<string, any> = {}): Promise<Record<string, any>> {
+		const properties: Record<string, any> = {};
 
 		if (module === ECiModule.DEPENDABOT) {
 			const defaultBranch: string = (savedProperties.devBranchName as string) || "dev";
 			properties.devBranchName = await this.CLI_INTERFACE_SERVICE.text("Enter the target branch for Dependabot updates:", "dev", defaultBranch);
+		}
+
+		if (module === ECiModule.RELEASE || module === ECiModule.RELEASE_NPM) {
+			let mainBranchDefault: string = (savedProperties.mainBranch as string) || "main";
+			let isPrereleaseDefault: boolean = (savedProperties.isPrerelease as boolean) ?? false;
+			let preReleaseBranchDefault: string = (savedProperties.preReleaseBranch as string) || "dev";
+
+			if (!savedProperties.mainBranch || !Object.prototype.hasOwnProperty.call(savedProperties, "isPrerelease")) {
+				const config: IConfig | null = await this.CONFIG_SERVICE.getModuleConfig(EModule.SEMANTIC_RELEASE);
+
+				if (config) {
+					const semanticRelease: Record<string, any> = config as Record<string, any>;
+					let usedSemanticReleaseConfig: boolean = false;
+
+					if (!savedProperties.mainBranch && semanticRelease.mainBranch) {
+						mainBranchDefault = semanticRelease.mainBranch as string;
+						usedSemanticReleaseConfig = true;
+					}
+
+					if (!Object.prototype.hasOwnProperty.call(savedProperties, "isPrerelease") && Object.prototype.hasOwnProperty.call(semanticRelease, "isPrereleaseEnabled")) {
+						isPrereleaseDefault = semanticRelease.isPrereleaseEnabled as boolean;
+						usedSemanticReleaseConfig = true;
+					}
+
+					if (!savedProperties.preReleaseBranch && semanticRelease.preReleaseBranch) {
+						preReleaseBranchDefault = semanticRelease.preReleaseBranch as string;
+						usedSemanticReleaseConfig = true;
+					}
+
+					if (usedSemanticReleaseConfig) {
+						this.CLI_INTERFACE_SERVICE.info("Found semantic-release configuration. Using its values as defaults for release CI setup.");
+					}
+				}
+			}
+
+			properties.mainBranch = await this.CLI_INTERFACE_SERVICE.text("Enter the name of your main release branch:", "main", mainBranchDefault);
+
+			const shouldEnablePrerelease: boolean = await this.CLI_INTERFACE_SERVICE.confirm("Do you want to configure CI for a pre-release branch?", isPrereleaseDefault);
+
+			if (shouldEnablePrerelease) {
+				properties.isPrerelease = true;
+				properties.preReleaseBranch = await this.CLI_INTERFACE_SERVICE.text("Enter the name of your pre-release branch:", "dev", preReleaseBranchDefault);
+			} else {
+				properties.isPrerelease = false;
+			}
 		}
 
 		return properties;
