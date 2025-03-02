@@ -1,4 +1,5 @@
 /* eslint-disable @elsikora-unicorn/prefer-module */
+import type { EModule } from "../../domain/enum/module.enum";
 import type { IConfig } from "../interface/config.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { TConfigModule } from "../type/config-module.type";
@@ -74,6 +75,28 @@ export class ConfigService {
 			console.error("Error reading config:", error);
 
 			return {} as IConfig;
+		}
+	}
+
+	/**
+	 * Gets the saved configuration for a specific module from the config file.
+	 *
+	 * @param module - The module to get configuration for
+	 * @returns Promise resolving to the module configuration or null if not found
+	 */
+	async getModuleConfig(module: EModule): Promise<null | Partial<IConfig>> {
+		try {
+			if (await this.exists()) {
+				const config: IConfig = await this.get();
+
+				if (config[module]) {
+					return config[module] as Record<string, any>;
+				}
+			}
+
+			return null;
+		} catch {
+			return null;
 		}
 	}
 

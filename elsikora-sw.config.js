@@ -3,11 +3,13 @@ export default {
 		isEnabled: true,
 		isNpmPackage: true,
 		moduleProperties: {
-			dependabot: {
-				devBranchName: "dev",
+			"release-npm": {
+				isPrerelease: true,
+				mainBranch: "main",
+				preReleaseBranch: "dev",
 			},
 		},
-		modules: ["codecommit-sync", "qodana", "dependabot", "snyk", "release-npm"],
+		modules: ["release-npm"],
 		provider: "GitHub",
 	},
 	commitlint: {

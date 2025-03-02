@@ -1,4 +1,5 @@
 /* eslint-disable @elsikora-typescript/no-unsafe-argument */
+/* eslint-disable @elsikora-typescript/no-unsafe-assignment */
 import type { ICiConfig } from "../interface/ci-config.interface";
 
 import { ECiModuleType } from "../enum/ci-module-type.enum";
@@ -17,17 +18,22 @@ export const CI_CONFIG: Record<ECiModule, ICiConfig> = {
 				filePath: ".github/workflows/mirror-to-codecommit.yml",
 				template: (properties: object = {}) => {
 					let content: string = `name: Mirror to CodeCommit
+
+env:
+  CHECKOUT_DEPTH: 0
+
 on: push
 
 jobs:
   mirror_to_codecommit:
     name: Mirror to CodeCommit
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: \${{ env.CHECKOUT_DEPTH }}
 
       - name: Mirror to CodeCommit
         uses: pixta-dev/repository-mirroring-action@v1
@@ -85,30 +91,40 @@ updates:
 				filePath: ".github/workflows/qodana-quality-scan.yml",
 				template: (properties: object = {}) => {
 					let content: string = `name: Qodana Quality Scan
+
+env:
+  NODE_VERSION: 20
+  CHECKOUT_DEPTH: 0
+
 on: push
 
 jobs:
-  qodana:
+  qodana_quality_scan:
     name: Qodana Quality Scan
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: \${{ env.CHECKOUT_DEPTH }}
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: \${{ env.NODE_VERSION }}
 
       - name: Install Dependencies
         run: npm install
 
+      - name: Build
+        run: npm run build
+
       - name: Qodana Scan
-        uses: JetBrains/qodana-action@v2023.3
+        uses: JetBrains/qodana-action@v2024.3
         env:
-          QODANA_TOKEN: \${{ secrets.QODANA_TOKEN }}`;
+          QODANA_TOKEN: \${{ secrets.QODANA_TOKEN }}
+`;
 
 					for (const [key, value] of Object.entries(properties)) {
 						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
@@ -127,34 +143,53 @@ jobs:
 			[ECiProvider.GITHUB]: {
 				filePath: ".github/workflows/release.yml",
 				template: (properties: object = {}) => {
-					let content: string = `name: Release
+					const mainBranch: string = (properties as Record<string, any>).mainBranch || "main";
+					const preReleaseBranch: string | undefined = (properties as Record<string, any>).preReleaseBranch;
+					const isPrerelease: boolean = (properties as Record<string, any>).isPrerelease || false;
+
+					const branches: Array<string> = [`- ${mainBranch}`];
+
+					if (isPrerelease && preReleaseBranch) {
+						branches.push(`- ${preReleaseBranch}`);
+					}
+
+					let content: string = `name: Release And Publish
+
+env:
+  NODE_VERSION: 20
+
 on:
   push:
     branches:
-      - main
+${branches.map((branch: string) => `      ${branch}`).join("\n")}
 
 jobs:
   release:
-    name: Release
+    name: Release And Publish
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: \${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: \${{ env.NODE_VERSION }}
 
       - name: Install dependencies
-        run: yarn install
+        run: npm install
+
+      - name: Build
+        run: npm run build
 
       - name: Release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release`;
+        run: npm run release`;
 
 					for (const [key, value] of Object.entries(properties)) {
 						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
@@ -173,35 +208,54 @@ jobs:
 			[ECiProvider.GITHUB]: {
 				filePath: ".github/workflows/release.yml",
 				template: (properties: object = {}) => {
+					const mainBranch: string = (properties as Record<string, any>).mainBranch || "main";
+					const preReleaseBranch: string | undefined = (properties as Record<string, any>).preReleaseBranch;
+					const isPrerelease: boolean = (properties as Record<string, any>).isPrerelease || false;
+
+					const branches: Array<string> = [`- ${mainBranch}`];
+
+					if (isPrerelease && preReleaseBranch) {
+						branches.push(`- ${preReleaseBranch}`);
+					}
+
 					let content: string = `name: Release And Publish
+
+env:
+  NODE_VERSION: 20
+
 on:
   push:
     branches:
-      - main
+${branches.map((branch: string) => `      ${branch}`).join("\n")}
 
 jobs:
   release:
-    name: Release
+    name: Release And Publish
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: \${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: \${{ env.NODE_VERSION }}
 
       - name: Install dependencies
-        run: yarn install
+        run: npm install
+
+      - name: Build
+        run: npm run build
 
       - name: Release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release`;
+        run: npm run release`;
 
 					for (const [key, value] of Object.entries(properties)) {
 						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
@@ -221,26 +275,30 @@ jobs:
 				filePath: ".github/workflows/snyk-security-scan.yml",
 				template: (properties: object = {}) => {
 					let content: string = `name: Snyk Security Scan
+
+env:
+  NODE_VERSION: 20
+  SNYK_GLOBAL_PACKAGES: snyk snyk-to-html
+
 on: push
 
 jobs:
-  build:
+  snyk_security_scan:
     name: Snyk Security Scan
-    environment: snyk-npm
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: \${{ env.NODE_VERSION }}
 
       - name: Setup Snyk
         run: |
-          npm install snyk -g
-          npm install snyk-to-html -g
+          npm install \${{ env.SNYK_GLOBAL_PACKAGES }} -g
           snyk auth \${{ secrets.SNYK_TOKEN }}
 
       - name: Install dependencies
