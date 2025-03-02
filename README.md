@@ -77,7 +77,7 @@ setup-wizard init --withNest
 ## Advanced Configuration
 
 ```javascript
-// elsikora-sw.config.js
+// ./elsikora/setup-wizard.config.js
 export default {
 	eslint: {
 		isEnabled: true,

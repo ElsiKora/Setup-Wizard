@@ -116,7 +116,7 @@ export class StylelintModuleService implements IModuleService {
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return !!(await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Stylelint for your project?", true));
+			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Stylelint for your project?", true);
 		} catch (error) {
 			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
 
