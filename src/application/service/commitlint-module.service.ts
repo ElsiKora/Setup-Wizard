@@ -188,10 +188,10 @@ export class CommitlintModuleService implements IModuleService {
 	 */
 	private async setupHusky(): Promise<void> {
 		// Initialize husky
-		await this.COMMAND_SERVICE.execute("npx husky install");
+		await this.COMMAND_SERVICE.execute("npx husky");
 
 		// Add prepare script if it doesn't exist
-		await this.PACKAGE_JSON_SERVICE.addScript("prepare", "husky install");
+		await this.PACKAGE_JSON_SERVICE.addScript("prepare", "husky");
 
 		// Create commit-msg hook
 		await this.COMMAND_SERVICE.execute("mkdir -p .husky");

@@ -237,9 +237,9 @@ export class LintStagedModuleService implements IModuleService {
 	 * Initializes Husky, adds prepare script, and creates pre-commit hook.
 	 */
 	private async setupHusky(): Promise<void> {
-		await this.COMMAND_SERVICE.execute("npx husky install");
+		await this.COMMAND_SERVICE.execute("npx husky");
 
-		await this.PACKAGE_JSON_SERVICE.addScript("prepare", "husky install");
+		await this.PACKAGE_JSON_SERVICE.addScript("prepare", "husky");
 
 		await this.COMMAND_SERVICE.execute("mkdir -p .husky");
 		await this.FILE_SYSTEM_SERVICE.writeFile(".husky/pre-commit", LINT_STAGED_CONFIG_HUSKY_PRE_COMMIT_SCRIPT, "utf8");

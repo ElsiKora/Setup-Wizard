@@ -39,12 +39,14 @@ export default {
 		isEnabled: false,
 	},
 	"semantic-release": {
-		isEnabled: false,
+		developBranch: "dev",
+		isBackmergeEnabled: true,
+		isEnabled: true,
 		isPrereleaseEnabled: true,
 		mainBranch: "main",
 		preReleaseBranch: "dev",
 		preReleaseChannel: "beta",
-		repositoryUrl: "https://github.com/test",
+		repositoryUrl: "https://github.com/ElsiKora/Setup-Wizard",
 	},
 	stylelint: {
 		isEnabled: false,

@@ -44,6 +44,8 @@ export interface IConfig {
 	};
 	[EModule.PRETTIER]?: boolean;
 	[EModule.SEMANTIC_RELEASE]?: {
+		developBranch?: string;
+		isBackmergeEnabled?: boolean;
 		isEnabled?: boolean;
 		isPrereleaseEnabled?: boolean;
 		mainBranch?: string;
