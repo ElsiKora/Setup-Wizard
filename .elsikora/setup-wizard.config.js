@@ -2,14 +2,8 @@ export default {
 	ci: {
 		isEnabled: true,
 		isNpmPackage: true,
-		moduleProperties: {
-			"release-npm": {
-				isPrerelease: true,
-				mainBranch: "main",
-				preReleaseBranch: "dev",
-			},
-		},
-		modules: ["release-npm"],
+		moduleProperties: {},
+		modules: ["codecommit-sync"],
 		provider: "GitHub",
 	},
 	commitlint: {
