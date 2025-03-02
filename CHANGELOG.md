@@ -1,3 +1,15 @@
+# [1.4.0](https://github.com/ElsiKora/Setup-Wizard/compare/v1.3.3...v1.4.0) (2025-03-02)
+
+
+### Features
+
+* **config:** refactor config handling and update setup paths ([2686a98](https://github.com/ElsiKora/Setup-Wizard/commit/2686a98edb85e9bf8ae7e72f06901feb5474478e))
+
+
+### BREAKING CHANGES
+
+* **config:** config for app now stored .elsikora/setup-wizard.js
+
 ## [1.3.3](https://github.com/ElsiKora/Setup-Wizard/compare/v1.3.2...v1.3.3) (2025-03-02)
 
 ## [1.3.2](https://github.com/ElsiKora/Setup-Wizard/compare/v1.3.1...v1.3.2) (2025-03-02)
