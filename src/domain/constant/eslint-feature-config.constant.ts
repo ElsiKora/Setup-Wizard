@@ -2,6 +2,8 @@ import type { IEslintFeatureConfig } from "../interface/eslint-feature-config.in
 
 import { EEslintFeature } from "../enum/eslint-feature.enum";
 
+const a: number = 5;
+
 export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig> = {
 	[EEslintFeature.CHECK_FILE]: {
 		configFlag: "withCheckFile",
@@ -17,7 +19,7 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 	[EEslintFeature.JSON]: {
 		configFlag: "withJson",
 		description: "JSON files support",
-		packages: ["eslint-plugin-jsonc"],
+		packages: [],
 	},
 	[EEslintFeature.NEST]: {
 		configFlag: "withNest",
@@ -35,18 +37,18 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 	[EEslintFeature.PACKAGE_JSON]: {
 		configFlag: "withPackageJson",
 		description: "package.json linting",
-		packages: ["eslint-plugin-package-json"],
+		packages: [],
 	},
 	[EEslintFeature.PERFECTIONIST]: {
 		configFlag: "withPerfectionist",
 		description: "Code organization rules",
-		packages: ["eslint-plugin-perfectionist"],
+		packages: [],
 	},
 	[EEslintFeature.PRETTIER]: {
 		configFlag: "withPrettier",
 		description: "Prettier integration",
 		detect: ["prettier"],
-		packages: ["eslint-plugin-prettier", "eslint-config-prettier", "prettier"],
+		packages: [],
 	},
 	[EEslintFeature.REACT]: {
 		configFlag: "withReact",
@@ -57,23 +59,23 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 	[EEslintFeature.REGEXP]: {
 		configFlag: "withRegexp",
 		description: "RegExp linting",
-		packages: ["eslint-plugin-regexp"],
+		packages: [""],
 	},
 	[EEslintFeature.SONAR]: {
 		configFlag: "withSonar",
 		description: "SonarJS code quality rules",
-		packages: ["eslint-plugin-sonarjs"],
+		packages: [""],
 	},
 	[EEslintFeature.STYLISTIC]: {
 		configFlag: "withStylistic",
 		description: "Stylistic rules",
-		packages: ["@stylistic/eslint-plugin"],
+		packages: [""],
 	},
 	[EEslintFeature.TAILWIND_CSS]: {
 		configFlag: "withTailwindCss",
 		description: "Tailwind CSS support",
 		detect: ["tailwindcss"],
-		packages: ["eslint-plugin-tailwindcss"],
+		packages: [""],
 	},
 	[EEslintFeature.TYPEORM]: {
 		configFlag: "withTypeorm",
@@ -87,16 +89,16 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 		description: "TypeScript support",
 		detect: ["typescript", "@types/node"],
 		isRequiresTypescript: true,
-		packages: ["typescript", "@typescript-eslint/parser", "@typescript-eslint/eslint-plugin", "typescript-eslint"],
+		packages: [],
 	},
 	[EEslintFeature.UNICORN]: {
 		configFlag: "withUnicorn",
 		description: "Unicorn rules",
-		packages: ["eslint-plugin-unicorn"],
+		packages: [],
 	},
 	[EEslintFeature.YAML]: {
 		configFlag: "withYaml",
 		description: "YAML files support",
-		packages: ["eslint-plugin-yml"],
+		packages: [],
 	},
 };
