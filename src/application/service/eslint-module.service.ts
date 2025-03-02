@@ -6,7 +6,7 @@ import type { TPackageJsonScripts } from "../../domain/type/package-json-scripts
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
-import type { IConfig } from "../interface/config.interface";
+import type { IConfigEslint } from "../interface/config/eslint.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
@@ -46,6 +46,9 @@ export class EslintModuleService implements IModuleService {
 
 	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
+
+	/** Cached ESLint configuration */
+	private config: IConfigEslint | null = null;
 
 	/** Configuration service for managing app settings */
 	private readonly CONFIG_SERVICE: ConfigService;
@@ -165,6 +168,8 @@ export class EslintModuleService implements IModuleService {
 	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
+			this.config = await this.CONFIG_SERVICE.getModuleConfig<IConfigEslint>(EModule.ESLINT);
+
 			if (!(await this.shouldInstall())) {
 				return { wasInstalled: false };
 			}
@@ -179,8 +184,7 @@ export class EslintModuleService implements IModuleService {
 
 			await this.detectFrameworks();
 
-			const savedConfig: { features?: Array<EEslintFeature> } | null = await this.getSavedConfig();
-			const savedFeatures: Array<EEslintFeature> = savedConfig?.features ?? [];
+			const savedFeatures: Array<EEslintFeature> = this.config?.features ?? [];
 
 			this.selectedFeatures = await this.selectFeatures(savedFeatures);
 
@@ -212,12 +216,13 @@ export class EslintModuleService implements IModuleService {
 	/**
 	 * Determines if ESLint should be installed.
 	 * Asks the user if they want to set up ESLint for their project.
+	 * Uses the saved config value as default if it exists.
 	 *
 	 * @returns Promise resolving to true if ESLint should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up ESLint for your project?", true);
+			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up ESLint for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.ESLINT));
 		} catch (error) {
 			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
 
@@ -401,27 +406,6 @@ export class EslintModuleService implements IModuleService {
 	 */
 	private getIgnorePatterns(): Array<string> {
 		return [...this.FRAMEWORK_SERVICE.getIgnorePatterns(this.detectedFrameworks), ...ESLINT_CONFIG_IGNORE_PATHS];
-	}
-
-	/**
-	 * Gets the saved ESLint configuration from the config file.
-	 *
-	 * @returns Promise resolving to the saved ESLint configuration or null if not found
-	 */
-	private async getSavedConfig(): Promise<{ features?: Array<EEslintFeature> } | null> {
-		try {
-			if (await this.CONFIG_SERVICE.exists()) {
-				const config: IConfig = await this.CONFIG_SERVICE.get();
-
-				if (config[EModule.ESLINT]) {
-					return config[EModule.ESLINT] as { features?: Array<EEslintFeature> };
-				}
-			}
-
-			return null;
-		} catch {
-			return null;
-		}
 	}
 
 	/**

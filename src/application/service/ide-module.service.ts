@@ -2,7 +2,7 @@ import type { IIdeConfigContent } from "../../domain/interface/ide-config-conten
 import type { IIdeConfig } from "../../domain/interface/ide-config.interface";
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
-import type { IConfig } from "../interface/config.interface";
+import type { IConfigIde } from "../interface/config/ide.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
@@ -23,6 +23,9 @@ export class IdeModuleService implements IModuleService {
 
 	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
+
+	/** Cached IDE configuration */
+	private config: IConfigIde | null = null;
 
 	/** Configuration service for managing app configuration */
 	private readonly CONFIG_SERVICE: ConfigService;
@@ -68,13 +71,13 @@ export class IdeModuleService implements IModuleService {
 	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
+			this.config = await this.CONFIG_SERVICE.getModuleConfig<IConfigIde>(EModule.IDE);
+
 			if (!(await this.shouldInstall())) {
 				return { wasInstalled: false };
 			}
 
-			const savedConfig: { ides?: Array<EIde> } | null = await this.getSavedConfig();
-
-			this.selectedIdes = await this.selectIdes(savedConfig?.ides ?? []);
+			this.selectedIdes = await this.selectIdes(this.config?.ides ?? []);
 
 			if (this.selectedIdes.length === 0) {
 				this.CLI_INTERFACE_SERVICE.warn("No IDEs selected.");
@@ -106,11 +109,12 @@ export class IdeModuleService implements IModuleService {
 	/**
 	 * Determines if IDE configuration should be installed.
 	 * Asks the user if they want to set up IDE configurations for their project.
+	 * Uses the saved config value as default if it exists.
 	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
-		return await this.CLI_INTERFACE_SERVICE.confirm("Would you like to set up ESLint and Prettier configurations for your code editors?", true);
+		return await this.CLI_INTERFACE_SERVICE.confirm("Would you like to set up ESLint and Prettier configurations for your code editors?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.IDE));
 	}
 
 	/**
@@ -155,27 +159,6 @@ export class IdeModuleService implements IModuleService {
 		}
 
 		return existingFiles;
-	}
-
-	/**
-	 * Gets the saved IDE configuration from the config file.
-	 *
-	 * @returns Promise resolving to the saved IDE configuration or null if not found
-	 */
-	private async getSavedConfig(): Promise<{ ides?: Array<EIde> } | null> {
-		try {
-			if (await this.CONFIG_SERVICE.exists()) {
-				const config: IConfig = await this.CONFIG_SERVICE.get();
-
-				if (config[EModule.IDE]) {
-					return config[EModule.IDE] as { ides?: Array<EIde> };
-				}
-			}
-
-			return null;
-		} catch {
-			return null;
-		}
 	}
 
 	/**

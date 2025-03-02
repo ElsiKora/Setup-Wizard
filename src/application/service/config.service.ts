@@ -84,13 +84,13 @@ export class ConfigService {
 	 * @param module - The module to get configuration for
 	 * @returns Promise resolving to the module configuration or null if not found
 	 */
-	async getModuleConfig(module: EModule): Promise<null | Partial<IConfig>> {
+	async getModuleConfig<T>(module: EModule): Promise<null | T> {
 		try {
 			if (await this.exists()) {
 				const config: IConfig = await this.get();
 
 				if (config[module]) {
-					return config[module] as Record<string, any>;
+					return config[module] as T;
 				}
 			}
 
@@ -110,6 +110,33 @@ export class ConfigService {
 		const config: IConfig = await this.get();
 
 		return config[property];
+	}
+
+	/**
+	 * Checks if a specific module is enabled in the configuration.
+	 * A module is considered enabled if its configuration exists and has isEnabled=true,
+	 * or if the module configuration is a boolean value of true.
+	 *
+	 * @param module - The module to check
+	 * @returns Promise resolving to true if the module is enabled, false otherwise
+	 */
+	async isModuleEnabled(module: EModule): Promise<boolean> {
+		try {
+			if (await this.exists()) {
+				const config: IConfig = await this.get();
+				const moduleConfig: { isEnabled?: boolean } | undefined = config[module];
+
+				if (!moduleConfig) {
+					return false;
+				}
+
+				return moduleConfig.isEnabled !== false;
+			}
+
+			return false;
+		} catch {
+			return false;
+		}
 	}
 
 	/**
