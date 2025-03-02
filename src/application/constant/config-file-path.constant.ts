@@ -1,1 +1,1 @@
-export const CONFIG_FILE_PATH: string = "elsikora-sw.config.js";
+export const CONFIG_FILE_PATH: string = "./.elsikora/setup-wizard.config.js";
