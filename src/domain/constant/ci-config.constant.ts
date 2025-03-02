@@ -1,4 +1,5 @@
 /* eslint-disable @elsikora-typescript/no-unsafe-argument */
+/* eslint-disable @elsikora-typescript/no-unsafe-assignment */
 import type { ICiConfig } from "../interface/ci-config.interface";
 
 import { ECiModuleType } from "../enum/ci-module-type.enum";
@@ -142,34 +143,53 @@ jobs:
 			[ECiProvider.GITHUB]: {
 				filePath: ".github/workflows/release.yml",
 				template: (properties: object = {}) => {
-					let content: string = `name: Release
+					const mainBranch: string = (properties as Record<string, any>).mainBranch || "main";
+					const preReleaseBranch: string | undefined = (properties as Record<string, any>).preReleaseBranch;
+					const isPrerelease: boolean = (properties as Record<string, any>).isPrerelease || false;
+
+					const branches: Array<string> = [`- ${mainBranch}`];
+
+					if (isPrerelease && preReleaseBranch) {
+						branches.push(`- ${preReleaseBranch}`);
+					}
+
+					let content: string = `name: Release And Publish
+
+env:
+  NODE_VERSION: 20
+
 on:
   push:
     branches:
-      - main
+${branches.map((branch: string) => `      ${branch}`).join("\n")}
 
 jobs:
   release:
-    name: Release
+    name: Release And Publish
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: \${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: \${{ env.NODE_VERSION }}
 
       - name: Install dependencies
-        run: yarn install
+        run: npm install
+
+      - name: Build
+        run: npm run build
 
       - name: Release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release`;
+        run: npm run release`;
 
 					for (const [key, value] of Object.entries(properties)) {
 						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
@@ -188,35 +208,54 @@ jobs:
 			[ECiProvider.GITHUB]: {
 				filePath: ".github/workflows/release.yml",
 				template: (properties: object = {}) => {
+					const mainBranch: string = (properties as Record<string, any>).mainBranch || "main";
+					const preReleaseBranch: string | undefined = (properties as Record<string, any>).preReleaseBranch;
+					const isPrerelease: boolean = (properties as Record<string, any>).isPrerelease || false;
+
+					const branches: Array<string> = [`- ${mainBranch}`];
+
+					if (isPrerelease && preReleaseBranch) {
+						branches.push(`- ${preReleaseBranch}`);
+					}
+
 					let content: string = `name: Release And Publish
+
+env:
+  NODE_VERSION: 20
+
 on:
   push:
     branches:
-      - main
+${branches.map((branch: string) => `      ${branch}`).join("\n")}
 
 jobs:
   release:
-    name: Release
+    name: Release And Publish
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: \${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: \${{ env.NODE_VERSION }}
 
       - name: Install dependencies
-        run: yarn install
+        run: npm install
+
+      - name: Build
+        run: npm run build
 
       - name: Release
         env:
           GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: \${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release`;
+        run: npm run release`;
 
 					for (const [key, value] of Object.entries(properties)) {
 						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
