@@ -1,3 +1,20 @@
+# [2.0.0](https://github.com/ElsiKora/Setup-Wizard/compare/v1.4.0...v2.0.0) (2025-03-02)
+
+
+### Continuous Integration
+
+* **ci:** refactor CI setup and add major release rule ([0535403](https://github.com/ElsiKora/Setup-Wizard/commit/05354030ee718a18dc70947dd4143f5e82ce95e6))
+
+
+### Features
+
+* **global:** refactor module configuration and caching logic ([4bf017c](https://github.com/ElsiKora/Setup-Wizard/commit/4bf017c7d9e31a2f3a10311ffa70e8a4d41c5133))
+
+
+### BREAKING CHANGES
+
+* **ci:** need to update major version
+
 # [1.4.0](https://github.com/ElsiKora/Setup-Wizard/compare/v1.3.3...v1.4.0) (2025-03-02)
 
 
