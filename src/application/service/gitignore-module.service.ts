@@ -4,6 +4,9 @@ import type { IFileSystemService } from "../interface/file-system-service.interf
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
 import { GITIGNORE_CONFIG } from "../../domain/constant/gitignore-config.constant";
+import { EModule } from "../../domain/enum/module.enum";
+
+import { ConfigService } from "./config.service";
 
 /**
  * Service for setting up and managing .gitignore file.
@@ -17,6 +20,9 @@ export class GitignoreModuleService implements IModuleService {
 	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
+	/** Configuration service for managing app configuration */
+	private readonly CONFIG_SERVICE: ConfigService;
+
 	/**
 	 * Initializes a new instance of the GitignoreModuleService.
 	 *
@@ -26,6 +32,7 @@ export class GitignoreModuleService implements IModuleService {
 	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
+		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
 	}
 
 	/**
@@ -97,12 +104,13 @@ export class GitignoreModuleService implements IModuleService {
 	/**
 	 * Determines if .gitignore should be installed.
 	 * Asks the user if they want to generate a .gitignore file.
+	 * Uses the saved config value as default if it exists.
 	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to generate .gitignore file for your project?");
+			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to generate .gitignore file for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.GITIGNORE));
 		} catch (error) {
 			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
 

@@ -2,7 +2,7 @@ import type { IPackageJson } from "../../domain/interface/package-json.interface
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
-import type { IConfig } from "../interface/config.interface";
+import type { IConfigSemanticRelease } from "../interface/config/semantic-release.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
@@ -37,6 +37,9 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
+
+	/** Cached semantic-release configuration */
+	private config: IConfigSemanticRelease | null = null;
 
 	/**
 	 * Initializes a new instance of the SemanticReleaseModuleService.
@@ -95,6 +98,8 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
+			this.config = await this.CONFIG_SERVICE.getModuleConfig<IConfigSemanticRelease>(EModule.SEMANTIC_RELEASE);
+
 			if (!(await this.shouldInstall())) {
 				return { wasInstalled: false };
 			}
@@ -119,12 +124,13 @@ export class SemanticReleaseModuleService implements IModuleService {
 	/**
 	 * Determines if semantic-release should be installed.
 	 * Asks the user if they want to set up automated versioning and publishing.
+	 * Uses the saved config value as default if it exists.
 	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Semantic Release for automated versioning and publishing?", true);
+			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Semantic Release for automated versioning and publishing?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.SEMANTIC_RELEASE));
 		} catch (error) {
 			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
 
@@ -215,8 +221,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @returns Promise resolving to the development branch name
 	 */
 	private async getDevelopBranch(): Promise<string> {
-		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
-		const initialBranch: string = (savedConfig?.developBranch as string) || "dev";
+		const initialBranch: string = this.config?.developBranch ?? "dev";
 
 		return await this.CLI_INTERFACE_SERVICE.text("Enter the name of your development branch for backmerge:", "dev", initialBranch, (value: string) => {
 			if (!value) {
@@ -231,8 +236,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @returns Promise resolving to the main branch name
 	 */
 	private async getMainBranch(): Promise<string> {
-		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
-		const initialBranch: string = (savedConfig?.mainBranch as string) || "main";
+		const initialBranch: string = this.config?.mainBranch ?? "main";
 
 		return await this.CLI_INTERFACE_SERVICE.text("Enter the name of your main release branch:", "main", initialBranch, (value: string) => {
 			if (!value) {
@@ -247,8 +251,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @returns Promise resolving to the pre-release branch name
 	 */
 	private async getPreReleaseBranch(): Promise<string> {
-		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
-		const initialBranch: string = (savedConfig?.preReleaseBranch as string) || "dev";
+		const initialBranch: string = this.config?.preReleaseBranch ?? "dev";
 
 		return await this.CLI_INTERFACE_SERVICE.text("Enter the name of your pre-release branch:", "dev", initialBranch, (value: string) => {
 			if (!value) {
@@ -263,8 +266,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @returns Promise resolving to the pre-release channel name
 	 */
 	private async getPreReleaseChannel(): Promise<string> {
-		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
-		const initialChannel: string = (savedConfig?.preReleaseChannel as string) || "beta";
+		const initialChannel: string = this.config?.preReleaseChannel ?? "beta";
 
 		return await this.CLI_INTERFACE_SERVICE.text("Enter the pre-release channel name (e.g., beta, alpha, next):", "beta", initialChannel, (value: string) => {
 			if (!value) {
@@ -280,8 +282,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @returns Promise resolving to the repository URL
 	 */
 	private async getRepositoryUrl(): Promise<string> {
-		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
-		let savedRepoUrl: string = (savedConfig?.repositoryUrl as string) || "";
+		let savedRepoUrl: string = this.config?.repositoryUrl ?? "";
 
 		if (!savedRepoUrl) {
 			const packageJson: IPackageJson = await this.PACKAGE_JSON_SERVICE.get();
@@ -331,27 +332,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 	}
 
 	/**
-	 * Gets the saved semantic-release configuration from the config file.
-	 *
-	 * @returns Promise resolving to the saved configuration or null if not found
-	 */
-	private async getSavedConfig(): Promise<null | Record<string, any>> {
-		try {
-			if (await this.CONFIG_SERVICE.exists()) {
-				const config: IConfig = await this.CONFIG_SERVICE.get();
-
-				if (config[EModule.SEMANTIC_RELEASE]) {
-					return config[EModule.SEMANTIC_RELEASE] as unknown as Record<string, string>;
-				}
-			}
-
-			return null;
-		} catch {
-			return null;
-		}
-	}
-
-	/**
 	 * Prompts the user if they want to enable backmerge to development branch.
 	 * Only applicable for the main branch.
 	 *
@@ -359,8 +339,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @returns Promise resolving to true if backmerge should be enabled, false otherwise
 	 */
 	private async isBackmergeEnabled(mainBranch: string): Promise<boolean> {
-		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
-		const isConfirmedByDefault: boolean = savedConfig?.isBackmergeEnabled === true;
+		const isConfirmedByDefault: boolean = this.config?.isBackmergeEnabled === true;
 
 		return await this.CLI_INTERFACE_SERVICE.confirm(`Do you want to enable automatic backmerge from ${mainBranch} to development branch after release?`, isConfirmedByDefault);
 	}
@@ -371,8 +350,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @returns Promise resolving to true if pre-release should be enabled, false otherwise
 	 */
 	private async isPrereleaseEnabledChannel(): Promise<boolean> {
-		const savedConfig: null | Record<string, any> = await this.getSavedConfig();
-		const isConfirmedByDefault: boolean = savedConfig?.isPrereleaseEnabled === true;
+		const isConfirmedByDefault: boolean = this.config?.isPrereleaseEnabled === true;
 
 		return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to configure a pre-release channel for development branches?", isConfirmedByDefault);
 	}

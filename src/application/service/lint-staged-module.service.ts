@@ -4,7 +4,7 @@ import type { IPackageJson } from "../../domain/interface/package-json.interface
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
-import type { IConfig } from "../interface/config.interface";
+import type { IConfigLintStaged } from "../interface/config/lint-staged.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
@@ -38,6 +38,9 @@ export class LintStagedModuleService implements IModuleService {
 
 	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
+
+	/** Cached lint-staged configuration */
+	private config: IConfigLintStaged | null = null;
 
 	/** Configuration service for managing app configuration */
 	private readonly CONFIG_SERVICE: ConfigService;
@@ -110,6 +113,8 @@ export class LintStagedModuleService implements IModuleService {
 	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
+			this.config = await this.CONFIG_SERVICE.getModuleConfig<IConfigLintStaged>(EModule.LINT_STAGED);
+
 			if (!(await this.shouldInstall())) {
 				return { wasInstalled: false };
 			}
@@ -118,8 +123,7 @@ export class LintStagedModuleService implements IModuleService {
 				return { wasInstalled: false };
 			}
 
-			const savedConfig: { features?: Array<ELintStagedFeature> } | null = await this.getSavedConfig();
-			const savedFeatures: Array<ELintStagedFeature> = savedConfig?.features ?? [];
+			const savedFeatures: Array<ELintStagedFeature> = this.config?.features ?? [];
 
 			await this.setupLintStaged(savedFeatures);
 
@@ -139,12 +143,13 @@ export class LintStagedModuleService implements IModuleService {
 	/**
 	 * Determines if lint-staged should be installed.
 	 * Asks the user if they want to set up lint-staged with Husky pre-commit hooks.
+	 * Uses the saved config value as default if it exists.
 	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up lint-staged with Husky pre-commit hooks?", true);
+			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up lint-staged with Husky pre-commit hooks?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.LINT_STAGED));
 		} catch (error) {
 			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
 
@@ -209,27 +214,6 @@ export class LintStagedModuleService implements IModuleService {
 		}
 
 		return existingFiles;
-	}
-
-	/**
-	 * Gets the saved lint-staged configuration from the config file.
-	 *
-	 * @returns Promise resolving to the saved lint-staged configuration or null if not found
-	 */
-	private async getSavedConfig(): Promise<{ features?: Array<ELintStagedFeature> } | null> {
-		try {
-			if (await this.CONFIG_SERVICE.exists()) {
-				const config: IConfig = await this.CONFIG_SERVICE.get();
-
-				if (config[EModule.LINT_STAGED]) {
-					return config[EModule.LINT_STAGED] as { features?: Array<ELintStagedFeature> };
-				}
-			}
-
-			return null;
-		} catch {
-			return null;
-		}
 	}
 
 	/**

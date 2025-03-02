@@ -4,6 +4,7 @@ import type { ICommandService } from "../interface/command-service.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
+import { EModule } from "../../domain/enum/module.enum";
 import { EPackageJsonDependencyType } from "../../domain/enum/package-json-dependency-type.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
 import { PRETTIER_CONFIG_CORE_DEPENDENCIES } from "../constant/prettier-config-core-dependencies.constant";
@@ -13,6 +14,7 @@ import { PRETTIER_CONFIG_IGNORE_FILE_NAME } from "../constant/prettier-config-ig
 import { PRETTIER_CONFIG_IGNORE_PATHS } from "../constant/prettier-config-ignore-paths.constant";
 import { PRETTIER_CONFIG } from "../constant/prettier-config.constant";
 
+import { ConfigService } from "./config.service";
 import { PackageJsonService } from "./package-json.service";
 
 /**
@@ -33,6 +35,9 @@ export class PrettierModuleService implements IModuleService {
 	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
 
+	/** Configuration service for managing app configuration */
+	private readonly CONFIG_SERVICE: ConfigService;
+
 	/**
 	 * Initializes a new instance of the PrettierModuleService.
 	 *
@@ -44,6 +49,7 @@ export class PrettierModuleService implements IModuleService {
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
 		this.COMMAND_SERVICE = new NodeCommandService();
 		this.PACKAGE_JSON_SERVICE = new PackageJsonService(fileSystemService, this.COMMAND_SERVICE);
+		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
 	}
 
 	/**
@@ -110,12 +116,13 @@ export class PrettierModuleService implements IModuleService {
 	/**
 	 * Determines if Prettier should be installed.
 	 * Asks the user if they want to set up Prettier for their project.
+	 * Uses the saved config value as default if it exists.
 	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Prettier for your project?", true);
+			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Prettier for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.PRETTIER));
 		} catch (error) {
 			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
 
