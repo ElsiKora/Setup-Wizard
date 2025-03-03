@@ -169,9 +169,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Disable hooks
-  		run: git config --local core.hooksPath /dev/null
-  
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -237,9 +234,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Disable hooks
-  		run: git config --local core.hooksPath /dev/null
-  		
       - name: Checkout
         uses: actions/checkout@v4
         with:
