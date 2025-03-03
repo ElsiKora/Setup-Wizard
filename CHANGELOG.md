@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/ElsiKora/Setup-Wizard/compare/v2.0.0...v2.0.1) (2025-03-03)
+
+
+### Bug Fixes
+
+* **eslint-config.constant.ts:** refactor ESLint config export logic ([0356871](https://github.com/ElsiKora/Setup-Wizard/commit/03568714c14be6d5f4dc57b5be983fd0876ac562))
+
 # [2.0.0](https://github.com/ElsiKora/Setup-Wizard/compare/v1.4.0...v2.0.0) (2025-03-02)
 
 
