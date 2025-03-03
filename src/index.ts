@@ -1,11 +1,10 @@
 import { Command } from "commander";
 
-import { CommandFactory } from "../infrastructure/factory/command.factory";
-import { ClackCliInterface } from "../infrastructure/service/clack-cli-interface.service";
-import { NodeFileSystemService } from "../infrastructure/service/node-file-system.service";
-
-import { AnalyzeCommandRegistrar } from "./registrar/analyze.registrar";
-import { InitCommandRegistrar } from "./registrar/init.registrar";
+import { CommandFactory } from "./infrastructure/factory/command.factory";
+import { ClackCliInterface } from "./infrastructure/service/clack-cli-interface.service";
+import { NodeFileSystemService } from "./infrastructure/service/node-file-system.service";
+import { AnalyzeCommandRegistrar } from "./presentation/registrar/analyze.registrar";
+import { InitCommandRegistrar } from "./presentation/registrar/init.registrar";
 
 const program: Command = new Command();
 

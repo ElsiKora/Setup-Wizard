@@ -7,7 +7,7 @@ export default {
 		provider: "GitHub",
 	},
 	commitlint: {
-		isEnabled: false,
+		isEnabled: true,
 	},
 	eslint: {
 		isEnabled: false,

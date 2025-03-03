@@ -86,7 +86,6 @@ export default {
 	rules: {
 		"body-full-stop": [2, "always", "."],
 		"body-leading-blank": [2, "always"],
-		"body-max-length": [0, "always", 1000],
 		"body-max-line-length": [2, "always", 100],
 		"footer-leading-blank": [2, "always"],
 		"footer-max-line-length": [2, "always", 100],

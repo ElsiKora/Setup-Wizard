@@ -14,7 +14,7 @@ export default {
 	/**
 	 * Entry point for the application.
 	 */
-	input: "src/presentation/index.ts",
+	input: "src/index.ts",
 
 	/**
 	 * Output configuration.
