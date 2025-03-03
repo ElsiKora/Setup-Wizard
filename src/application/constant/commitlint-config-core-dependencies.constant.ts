@@ -1,1 +1,1 @@
-export const COMMITLINT_CONFIG_CORE_DEPENDENCIES: Array<string> = ["@commitlint/cli", "@commitlint/config-conventional", "@commitlint/cz-commitlint", "commitizen", "conventional-changelog-conventionalcommits", "husky"];
+export const COMMITLINT_CONFIG_CORE_DEPENDENCIES: Array<string> = ["@commitlint/cli", "@commitlint/config-conventional", "@elsikora/commitizen-plugin-commitlint-ai", "commitizen", "conventional-changelog-conventionalcommits", "husky"];

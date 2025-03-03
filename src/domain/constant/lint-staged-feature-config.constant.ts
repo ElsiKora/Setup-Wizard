@@ -4,7 +4,7 @@ import { ELintStagedFeature } from "../enum/lint-staged-feature.enum";
 
 export const LINT_STAGED_FEATURE_CONFIG: Record<ELintStagedFeature, ILintStagedFeatureConfig> = {
 	[ELintStagedFeature.ESLINT]: {
-		fileExtensions: ["js", "jsx", "mjs", "cjs", "ts", "tsx", "json", "jsonc", "yml", "yaml", "md", "mdx"],
+		fileExtensions: ["js", "jsx", "mjs", "cjs", "ts", "tsx", "json", "jsonc", "yml", "yaml"],
 		label: "ESLint - JavaScript/TypeScript linter",
 		requiredPackages: ["eslint"],
 	},

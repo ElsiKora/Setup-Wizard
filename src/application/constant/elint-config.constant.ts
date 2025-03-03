@@ -34,9 +34,9 @@ const config = {
   ignores: ${JSON.stringify(ignores, null, 2)}
 };
 
-export default [...config,
+export default [config,
 ...(await createConfig({
 ${featureConfig}
-})]);`;
+}))];`;
 	},
 };
