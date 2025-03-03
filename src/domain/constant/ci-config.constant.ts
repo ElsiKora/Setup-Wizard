@@ -169,15 +169,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Disable hooks
-  		run: git config --local core.hooksPath /dev/null
-  
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: \${{ secrets.GITHUB_TOKEN }}
 
+	  - name: Disable hooks
+  		run: git config --local core.hooksPath /dev/null
+  		
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -237,15 +237,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Disable hooks
-  		run: git config --local core.hooksPath /dev/null
-  		
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: \${{ secrets.GITHUB_TOKEN }}
 
+      - name: Disable hooks
+  		run: git config --local core.hooksPath /dev/null
+  		
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
