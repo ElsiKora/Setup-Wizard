@@ -175,9 +175,6 @@ jobs:
           fetch-depth: 0
           token: \${{ secrets.GITHUB_TOKEN }}
 
-	  - name: Disable hooks
-  		run: git config --local core.hooksPath /dev/null
-  		
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -243,9 +240,6 @@ jobs:
           fetch-depth: 0
           token: \${{ secrets.GITHUB_TOKEN }}
 
-      - name: Disable hooks
-  		run: git config --local core.hooksPath /dev/null
-  		
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:

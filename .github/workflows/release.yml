@@ -21,9 +21,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Disable Husky hooks
-        run: echo "HUSKY_SKIP_HOOKS=1" >> $GITHUB_ENV
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
