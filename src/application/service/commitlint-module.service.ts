@@ -226,7 +226,7 @@ export class CommitlintModuleService implements IModuleService {
 			packageJson.config = {};
 		}
 		packageJson.config.commitizen = {
-			path: "@commitlint/cz-commitlint",
+			path: "@elsikora/commitizen-plugin-commitlint-ai",
 		};
 
 		await this.PACKAGE_JSON_SERVICE.set(packageJson);
