@@ -11,6 +11,7 @@ import { NodeCommandService } from "../../infrastructure/service/node-command.se
 import { COMMITLINT_CONFIG_CORE_DEPENDENCIES } from "../constant/commitlint-config-core-dependencies.constant";
 import { COMMITLINT_CONFIG_FILE_NAMES } from "../constant/commitlint-config-file-names.constant";
 import { COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT } from "../constant/commitlint-config-husky-commit-msg-script.constant";
+import { COMMITLINT_CONFIG_HUSKY_PRE_PUSH_SCRIPT } from "../constant/commitlint-config-husky-pre-push-script.constant";
 import { COMMITLINT_CONFIG } from "../constant/commitlint-config.constant";
 
 import { ConfigService } from "./config.service";
@@ -140,7 +141,7 @@ export class CommitlintModuleService implements IModuleService {
 	 * Displays a summary of the setup results.
 	 */
 	private displaySetupSummary(): void {
-		const summary: Array<string> = ["Commitlint and Commitizen configuration has been created.", "", "Generated scripts:", "- npm run commit (for commitizen)", "", "Configuration files:", "- commitlint.config.js", "- .husky/commit-msg", "", "Husky git hooks have been set up to validate your commits.", "Use 'npm run commit' to create commits using the interactive commitizen interface."];
+		const summary: Array<string> = ["Commitlint and Commitizen configuration has been created.", "", "Generated scripts:", "- npm run commit (for commitizen)", "", "Configuration files:", "- commitlint.config.js", "- .husky/commit-msg", "- .husky/pre-push", "", "Husky git hooks have been set up to validate your commits and branch names.", "Use 'npm run commit' to create commits using the interactive commitizen interface."];
 
 		this.CLI_INTERFACE_SERVICE.note("Commitlint Setup", summary.join("\n"));
 	}
@@ -161,6 +162,10 @@ export class CommitlintModuleService implements IModuleService {
 
 		if (await this.FILE_SYSTEM_SERVICE.isPathExists(".husky/commit-msg")) {
 			existingFiles.push(".husky/commit-msg");
+		}
+
+		if (await this.FILE_SYSTEM_SERVICE.isPathExists(".husky/pre-push")) {
+			existingFiles.push(".husky/pre-push");
 		}
 
 		return existingFiles;
@@ -191,7 +196,7 @@ export class CommitlintModuleService implements IModuleService {
 
 	/**
 	 * Sets up Husky git hooks.
-	 * Initializes Husky, adds prepare script, and creates commit-msg hook.
+	 * Initializes Husky, adds prepare script, and creates commit-msg and pre-push hooks.
 	 */
 	private async setupHusky(): Promise<void> {
 		// Initialize husky
@@ -200,10 +205,15 @@ export class CommitlintModuleService implements IModuleService {
 		// Add prepare script if it doesn't exist
 		await this.PACKAGE_JSON_SERVICE.addScript("prepare", "husky");
 
-		// Create commit-msg hook
 		await this.COMMAND_SERVICE.execute("mkdir -p .husky");
+
+		// Create commit-msg hook
 		await this.FILE_SYSTEM_SERVICE.writeFile(".husky/commit-msg", COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT, "utf8");
 		await this.COMMAND_SERVICE.execute("chmod +x .husky/commit-msg");
+
+		// Create pre-push hook
+		await this.FILE_SYSTEM_SERVICE.writeFile(".husky/pre-push", COMMITLINT_CONFIG_HUSKY_PRE_PUSH_SCRIPT, "utf8");
+		await this.COMMAND_SERVICE.execute("chmod +x .husky/pre-push");
 	}
 
 	/**
