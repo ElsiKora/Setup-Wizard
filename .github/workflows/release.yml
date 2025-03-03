@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Disable hooks
-      - run: git config --local core.hooksPath /dev/null
+        run: git config --local core.hooksPath /dev/null
 
       - name: Checkout
         uses: actions/checkout@v4
