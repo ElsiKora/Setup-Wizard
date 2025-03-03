@@ -42,7 +42,7 @@ export const LINT_STAGED_CONFIG: {
         });
 
         if (eslintFiles.length > 0) {
-          commands.push(\`eslint --fix --max-warnings=0 \${eslintFiles.join(" ")}\`);
+          commands.push(\`eslint --fix --max-warnings=0 --no-ignore \${eslintFiles.join(" ")}\`);
         }`);
 		}
 
