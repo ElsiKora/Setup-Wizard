@@ -1,3 +1,15 @@
+# [2.1.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.0.1...v2.1.0) (2025-03-03)
+
+
+### Bug Fixes
+
+* **ci:** correct indentation in release workflow ([9a28927](https://github.com/ElsiKora/Setup-Wizard/commit/9a28927c850cc09a15dc38185e3e1f7407f362ed))
+
+
+### Features
+
+* **commitlint:** add branch name linting to pre-push hook ([2538c28](https://github.com/ElsiKora/Setup-Wizard/commit/2538c281964d77478f0f42aafd15997a89e30f31))
+
 ## [2.0.1](https://github.com/ElsiKora/Setup-Wizard/compare/v2.0.0...v2.0.1) (2025-03-03)
 
 
