@@ -38,4 +38,5 @@ export const ESLINT_CONFIG_IGNORE_PATHS: Array<string> = [
 	"__tests__",
 	"test",
 	"tests",
+	".rollup.cache",
 ];

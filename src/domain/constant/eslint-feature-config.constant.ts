@@ -8,7 +8,7 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 	[EEslintFeature.CHECK_FILE]: {
 		configFlag: "withCheckFile",
 		description: "File naming rules",
-		packages: ["eslint-plugin-check-file"],
+		packages: [],
 	},
 	[EEslintFeature.JAVASCRIPT]: {
 		configFlag: "withJavascript",

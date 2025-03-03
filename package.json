@@ -36,7 +36,7 @@
 	},
 	"config": {
 		"commitizen": {
-			"path": "@commitlint/cz-commitlint"
+			"path": "@elsikora/commitizen-plugin-commitlint-ai"
 		}
 	},
 	"dependencies": {
@@ -48,6 +48,7 @@
 		"@commitlint/config-conventional": "^19.7.1",
 		"@commitlint/cz-commitlint": "^19.6.1",
 		"@commitlint/types": "^19.5.0",
+		"@elsikora/commitizen-plugin-commitlint-ai": "^1.0.0",
 		"@elsikora/eslint-config": "^3.3.4",
 		"@rollup/plugin-typescript": "^12.1.2",
 		"@saithodev/semantic-release-backmerge": "^4.0.1",
