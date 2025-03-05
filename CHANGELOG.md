@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.1.2...v2.2.0) (2025-03-05)
+
+
+### Features
+
+* **cli:** replace clack with prompts and add new eslint features ([844f9fd](https://github.com/ElsiKora/Setup-Wizard/commit/844f9fdfc1bf95b47085ae2365e8b2c5ff82c009))
+
 ## [2.1.2](https://github.com/ElsiKora/Setup-Wizard/compare/v2.1.1...v2.1.2) (2025-03-03)
 
 
