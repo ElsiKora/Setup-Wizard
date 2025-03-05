@@ -36,7 +36,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Prompts the user with a yes/no confirmation question.
-	 *
 	 * @param message - The question to ask the user
 	 * @param isConfirmedByDefault - Whether "Yes" should be the default option
 	 * @returns Promise resolving to true for "Yes" and false for "No"
@@ -61,7 +60,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays an error message in red.
-	 *
 	 * @param message - The error message to display
 	 */
 	error(message: string): void {
@@ -70,7 +68,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Prompts the user to select multiple options from grouped choices.
-	 *
 	 * @param message - The prompt message to display
 	 * @param options - Record of group names to arrays of selection options
 	 * @param isRequired - Whether at least one selection is required
@@ -111,7 +108,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Handles and displays an error with optional error details.
-	 *
 	 * @param message - The error message to display
 	 * @param error - The error object with details
 	 */
@@ -122,7 +118,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays an informational message in blue.
-	 *
 	 * @param message - The information message to display
 	 */
 	info(message: string): void {
@@ -131,7 +126,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a plain log message.
-	 *
 	 * @param message - The message to log
 	 */
 	log(message: string): void {
@@ -140,7 +134,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Prompts the user to select multiple options from choices.
-	 *
 	 * @param message - The prompt message to display
 	 * @param options - Array of selection options
 	 * @param isRequired - Whether at least one selection is required
@@ -176,7 +169,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a note with a bold title and message.
-	 *
 	 * @param title - The bold title of the note
 	 * @param message - The message content of the note
 	 */
@@ -187,7 +179,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Prompts the user to select a single option from choices.
-	 *
 	 * @param message - The prompt message to display
 	 * @param options - Array of selection options
 	 * @param initialValue - Pre-selected value
@@ -215,7 +206,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Starts a spinner with a message to indicate ongoing operation.
-	 *
 	 * @param message - The message to display alongside the spinner
 	 */
 	startSpinner(message: string): void {
@@ -224,7 +214,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Stops the spinner and optionally displays a completion message.
-	 *
 	 * @param message - Optional message to display after stopping the spinner
 	 */
 	stopSpinner(message?: string): void {
@@ -237,7 +226,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a success message in green.
-	 *
 	 * @param message - The success message to display
 	 */
 	success(message: string): void {
@@ -246,7 +234,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Prompts the user for text input.
-	 *
 	 * @param message - The prompt message to display
 	 * @param placeholder - Optional placeholder text
 	 * @param initialValue - Optional initial value for the input
@@ -285,7 +272,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a warning message in yellow.
-	 *
 	 * @param message - The warning message to display
 	 */
 	warn(message: string): void {

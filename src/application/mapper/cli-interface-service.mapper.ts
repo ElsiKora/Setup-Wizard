@@ -9,7 +9,6 @@ import type { ILicenseConfig } from "../../domain/interface/license-config.inter
 export const CliInterfaceServiceMapper: {
 	/**
 	 * Converts license configurations to select options for CLI interface.
-	 *
 	 * @param properties - Record of license types to license configurations
 	 * @returns Array of select options formatted for CLI interface
 	 */
@@ -18,7 +17,6 @@ export const CliInterfaceServiceMapper: {
 	/**
 	 * Converts license configurations to select options for CLI interface.
 	 * Formats each license as an option with name and value for display in selection prompts.
-	 *
 	 * @param properties - Record of license types to license configurations
 	 * @returns Array of select options formatted for CLI interface
 	 */

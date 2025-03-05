@@ -1,7 +1,8 @@
-/* eslint-disable @elsikora-unicorn/no-process-exit,elsikora-node/no-process-exit */
+/* eslint-disable @elsikora-typescript/no-unsafe-call,@elsikora-typescript/naming-convention,elsikora-node/no-process-exit,@elsikora-unicorn/no-process-exit,@elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-assignment */
 import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
 import type { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
 
+// @ts-ignore
 import { confirm, groupMultiselect, isCancel, log, multiselect, note, select, spinner, text } from "@clack/prompts";
 
 /**
@@ -21,14 +22,12 @@ export class ClackCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a confirmation prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param isConfirmedByDefault - The default value for the confirmation, defaults to false
 	 * @returns Promise that resolves to the user's response (true for confirmed, false for declined)
 	 */
 	async confirm(message: string, isConfirmedByDefault: boolean = false): Promise<boolean> {
 		const isConfirmed: boolean = (await confirm({
-			// eslint-disable-next-line @elsikora-typescript/naming-convention
 			initialValue: isConfirmedByDefault,
 			message,
 		})) as boolean;
@@ -43,7 +42,6 @@ export class ClackCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays an error message to the user.
-	 *
 	 * @param message - The error message to display
 	 */
 	error(message: string): void {
@@ -52,7 +50,6 @@ export class ClackCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a grouped multi-select prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param options - Record of groups and their options
 	 * @param isRequired - Whether a selection is required, defaults to false
@@ -64,7 +61,7 @@ export class ClackCliInterface implements ICliInterfaceService {
 			initialValues,
 			message: `${message} (space to select)`,
 			options,
-			// eslint-disable-next-line @elsikora-typescript/naming-convention
+
 			required: isRequired,
 		})) as Array<T>;
 
@@ -78,7 +75,6 @@ export class ClackCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Handles and displays an error message with additional error details.
-	 *
 	 * @param message - The error message to display
 	 * @param error - The error object or details
 	 */
@@ -89,7 +85,6 @@ export class ClackCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays an informational message to the user.
-	 *
 	 * @param message - The info message to display
 	 */
 	info(message: string): void {
@@ -98,7 +93,6 @@ export class ClackCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a standard message to the user.
-	 *
 	 * @param message - The message to display
 	 */
 	log(message: string): void {
@@ -107,7 +101,6 @@ export class ClackCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a multi-select prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param options - Array of options to select from
 	 * @param isRequired - Whether a selection is required, defaults to false
@@ -119,7 +112,7 @@ export class ClackCliInterface implements ICliInterfaceService {
 			initialValues,
 			message: `${message} (space to select)`,
 			options,
-			// eslint-disable-next-line @elsikora-typescript/naming-convention
+
 			required: isRequired,
 		})) as Array<T>;
 
@@ -133,7 +126,6 @@ export class ClackCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a note to the user with a title and message.
-	 *
 	 * @param title - The title of the note
 	 * @param message - The message content of the note
 	 */
@@ -143,7 +135,6 @@ export class ClackCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a single select prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param options - Array of options to select from
 	 * @param initialValue - Initial selected value
@@ -167,37 +158,30 @@ export class ClackCliInterface implements ICliInterfaceService {
 	/**
 	 * Starts a spinner with the specified message.
 	 * Stops any existing spinner first.
-	 *
 	 * @param message - The message to display while the spinner is active
 	 */
 	startSpinner(message: string): void {
-		// eslint-disable-next-line @elsikora-typescript/no-unsafe-member-access
 		if (typeof this.spinner?.stop === "function") {
-			// eslint-disable-next-line @elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-call
 			this.spinner.stop();
 		}
 
 		this.spinner = spinner();
-		// eslint-disable-next-line @elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-call
+
 		this.spinner.start(message);
 	}
 
 	/**
 	 * Stops the current spinner with an optional completion message.
-	 *
 	 * @param message - Optional message to display when the spinner stops
 	 */
 	stopSpinner(message?: string): void {
-		// eslint-disable-next-line @elsikora-typescript/no-unsafe-member-access
 		if (typeof this.spinner?.stop === "function") {
-			// eslint-disable-next-line @elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-call
 			this.spinner.stop(message);
 		}
 	}
 
 	/**
 	 * Displays a success message to the user.
-	 *
 	 * @param message - The success message to display
 	 */
 	success(message: string): void {
@@ -206,7 +190,6 @@ export class ClackCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a text input prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param placeholder - Optional placeholder text for the input field
 	 * @param initialValue - Optional initial value for the input field
@@ -231,7 +214,6 @@ export class ClackCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a warning message to the user.
-	 *
 	 * @param message - The warning message to display
 	 */
 	warn(message: string): void {

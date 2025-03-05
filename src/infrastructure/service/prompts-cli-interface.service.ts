@@ -33,7 +33,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a confirmation prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param isConfirmedByDefault - The default value for the confirmation, defaults to false
 	 * @returns Promise that resolves to the user's response (true for confirmed, false for declined)
@@ -63,7 +62,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays an error message to the user.
-	 *
 	 * @param message - The error message to display
 	 */
 	error(message: string): void {
@@ -72,7 +70,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a grouped multi-select prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param options - Record of groups and their options
 	 * @param isRequired - Whether a selection is required, defaults to false
@@ -119,7 +116,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Handles and displays an error message with additional error details.
-	 *
 	 * @param message - The error message to display
 	 * @param error - The error object or details
 	 */
@@ -130,7 +126,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays an informational message to the user.
-	 *
 	 * @param message - The info message to display
 	 */
 	info(message: string): void {
@@ -139,7 +134,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a standard message to the user.
-	 *
 	 * @param message - The message to display
 	 */
 	log(message: string): void {
@@ -148,7 +142,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a multi-select prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param options - Array of options to select from
 	 * @param isRequired - Whether a selection is required, defaults to false
@@ -189,18 +182,43 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a note to the user with a title and message.
-	 *
 	 * @param title - The title of the note
 	 * @param message - The message content of the note
 	 */
 	note(title: string, message: string): void {
-		console.log(chalk.bold(title));
-		console.log(message);
+		const lines: Array<string> = message.split("\n");
+
+		// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+		const width: number = Math.max(title.length, ...lines.map((line: string) => line.length)) + 4; // Add padding
+
+		const top: string = `┌${"─".repeat(width)}┐`;
+		const bottom: string = `└${"─".repeat(width)}┘`;
+
+		// Create middle lines with padding
+		// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+		const paddedTitle: string = ` ${title.padEnd(width - 2)} `;
+		// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+		const paddedLines: Array<string> = lines.map((line: string) => ` ${line.padEnd(width - 2)} `);
+
+		// Log the note box with styling
+		console.log(chalk.dim(top));
+		console.log(chalk.dim("│") + chalk.bold(paddedTitle) + chalk.dim("│"));
+
+		if (lines.length > 0) {
+			// Add a separator line
+			console.log(chalk.dim(`├${"─".repeat(width)}┤`));
+
+			// Add message content
+			for (const line of paddedLines) {
+				console.log(chalk.dim("│") + chalk.dim(line) + chalk.dim("│"));
+			}
+		}
+
+		console.log(chalk.dim(bottom));
 	}
 
 	/**
 	 * Displays a single select prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param options - Array of options to select from
 	 * @param initialValue - Initial selected value
@@ -238,7 +256,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	/**
 	 * Starts a spinner with the specified message.
 	 * Stops any existing spinner first.
-	 *
 	 * @param message - The message to display while the spinner is active
 	 */
 	startSpinner(message: string): void {
@@ -249,7 +266,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Stops the current spinner with an optional completion message.
-	 *
 	 * @param message - Optional message to display when the spinner stops
 	 */
 	stopSpinner(message?: string): void {
@@ -263,7 +279,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a success message to the user.
-	 *
 	 * @param message - The success message to display
 	 */
 	success(message: string): void {
@@ -272,7 +287,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a text input prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param placeholder - Optional placeholder text for the input field
 	 * @param initialValue - Optional initial value for the input field
@@ -319,7 +333,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 	/**
 	 * Displays a warning message to the user.
-	 *
 	 * @param message - The warning message to display
 	 */
 	warn(message: string): void {

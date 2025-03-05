@@ -30,7 +30,6 @@ export class InitCommand implements ICommand {
 
 	/**
 	 * Initializes a new instance of the InitCommand.
-	 *
 	 * @param properties - Properties defining which modules to install
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
@@ -46,7 +45,6 @@ export class InitCommand implements ICommand {
 	 * Executes the initialization command.
 	 * Reads existing configuration if available, determines which modules to install,
 	 * installs selected modules, and updates the configuration.
-	 *
 	 * @returns Promise that resolves when execution is complete
 	 */
 	async execute(): Promise<void> {

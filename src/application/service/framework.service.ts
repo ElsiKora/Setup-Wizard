@@ -21,7 +21,6 @@ export class FrameworkService {
 
 	/**
 	 * Initializes a new instance of the FrameworkService.
-	 *
 	 * @param fileSystemService - Service for file system operations
 	 * @param packageJsonService - Service for managing package.json
 	 */
@@ -33,7 +32,6 @@ export class FrameworkService {
 	/**
 	 * Detects frameworks used in the current project.
 	 * Checks for framework indicators like specific files or dependencies.
-	 *
 	 * @returns Promise resolving to an array of detected framework configurations
 	 */
 	async detect(): Promise<Array<IFrameworkConfig>> {
@@ -52,7 +50,6 @@ export class FrameworkService {
 
 	/**
 	 * Extracts and returns unique ESLint features from a list of frameworks.
-	 *
 	 * @param frameworks - Array of framework configurations
 	 * @returns Array of unique ESLint features from all frameworks
 	 */
@@ -62,7 +59,6 @@ export class FrameworkService {
 
 	/**
 	 * Gets ignore patterns for linting based on framework configurations.
-	 *
 	 * @param frameworks - Array of framework configurations
 	 * @returns Array of file patterns to ignore during linting
 	 */
@@ -73,7 +69,6 @@ export class FrameworkService {
 	/**
 	 * Gets paths to lint based on framework configurations.
 	 * Currently returns the root directory, but could be extended to use framework-specific paths.
-	 *
 	 * @param frameworks - Array of framework configurations
 	 * @returns Array of paths to lint
 	 */
@@ -84,7 +79,6 @@ export class FrameworkService {
 
 	/**
 	 * Checks if framework-specific files exist in the project.
-	 *
 	 * @param config - Framework configuration to check
 	 * @returns Promise resolving to true if any framework-specific files are found
 	 */
@@ -102,7 +96,6 @@ export class FrameworkService {
 
 	/**
 	 * Checks if framework-specific packages are installed in the project.
-	 *
 	 * @param config - Framework configuration to check
 	 * @returns Promise resolving to true if any framework-specific packages are found
 	 */
@@ -124,7 +117,6 @@ export class FrameworkService {
 
 	/**
 	 * Determines if a framework is used in the project by checking files and packages.
-	 *
 	 * @param config - Framework configuration to check
 	 * @returns Promise resolving to true if the framework is detected
 	 */

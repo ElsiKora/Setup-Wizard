@@ -10,7 +10,6 @@ import { ESLINT_FEATURE_CONFIG } from "../../domain/constant/eslint-feature-conf
 export const ESLINT_CONFIG: {
 	/**
 	 * Generates an ESLint configuration file content.
-	 *
 	 * @param ignores - Array of file patterns to ignore in linting
 	 * @param features - Array of ESLint features to enable
 	 * @returns String content for the ESLint configuration file
@@ -20,7 +19,6 @@ export const ESLINT_CONFIG: {
 	/**
 	 * Generates an ESLint configuration file content.
 	 * Creates a configuration file that uses @elsikora/eslint-config with the specified features.
-	 *
 	 * @param ignores - Array of file patterns to ignore in linting
 	 * @param features - Array of ESLint features to enable
 	 * @returns String content for the ESLint configuration file

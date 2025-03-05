@@ -22,7 +22,6 @@ export class InitCommandRegistrar implements ICommandRegistrar {
 
 	/**
 	 * Initializes a new instance of the InitCommandRegistrar.
-	 *
 	 * @param program - The Commander program to attach the command to
 	 * @param commandFactory - Factory for creating command instances
 	 */
@@ -34,7 +33,6 @@ export class InitCommandRegistrar implements ICommandRegistrar {
 	/**
 	 * Configures and registers the 'init' command.
 	 * Sets up command description, options, and action handler.
-	 *
 	 * @returns The configured Commander command instance
 	 */
 	execute(): Command {

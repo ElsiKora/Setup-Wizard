@@ -40,7 +40,6 @@ export class CiModuleService implements IModuleService {
 
 	/**
 	 * Initializes a new instance of the CiModuleService.
-	 *
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 */
@@ -53,7 +52,6 @@ export class CiModuleService implements IModuleService {
 	/**
 	 * Handles existing CI setup files.
 	 * Checks for existing CI configuration files and asks for user confirmation if found.
-	 *
 	 * @returns Promise resolving to true if setup should proceed, false otherwise
 	 */
 	async handleExistingSetup(): Promise<boolean> {
@@ -77,7 +75,6 @@ export class CiModuleService implements IModuleService {
 	/**
 	 * Installs and configures selected CI modules.
 	 * Guides the user through selecting and configuring CI modules.
-	 *
 	 * @returns Promise resolving to the module setup result
 	 */
 	async install(): Promise<IModuleSetupResult> {
@@ -128,7 +125,6 @@ export class CiModuleService implements IModuleService {
 	 * Determines if the CI module should be installed.
 	 * Asks the user if they want to set up CI workflows.
 	 * Uses the saved config value as default if it exists.
-	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
@@ -143,7 +139,6 @@ export class CiModuleService implements IModuleService {
 
 	/**
 	 * Collects module-specific properties from the user.
-	 *
 	 * @param module - The CI module to collect properties for
 	 * @param savedProperties - Previously saved properties for this module
 	 * @returns Promise resolving to a record of collected properties
@@ -206,7 +201,6 @@ export class CiModuleService implements IModuleService {
 
 	/**
 	 * Determines the type of CI module based on whether it's an NPM package.
-	 *
 	 * @param isSavedNpmPackage - Whether the package was previously saved as an NPM package
 	 * @returns Promise resolving to the determined module type
 	 */
@@ -219,7 +213,6 @@ export class CiModuleService implements IModuleService {
 
 	/**
 	 * Displays a summary of successful and failed CI module setups.
-	 *
 	 * @param successful - Array of successfully set up modules
 	 * @param failed - Array of modules that failed to set up
 	 */
@@ -237,7 +230,6 @@ export class CiModuleService implements IModuleService {
 
 	/**
 	 * Extracts module-specific properties from a module configuration.
-	 *
 	 * @param moduleConfig - The module configuration object or boolean
 	 * @returns Record of module properties, or empty object if none found
 	 */
@@ -261,7 +253,6 @@ export class CiModuleService implements IModuleService {
 
 	/**
 	 * Finds existing CI configuration files that might be overwritten.
-	 *
 	 * @returns Promise resolving to an array of file paths for existing CI configurations
 	 */
 	private async findExistingCiFiles(): Promise<Array<string>> {
@@ -285,7 +276,6 @@ export class CiModuleService implements IModuleService {
 
 	/**
 	 * Gets a human-readable description for a CI provider.
-	 *
 	 * @param provider - The CI provider to get a description for
 	 * @returns Description string for the provider
 	 */
@@ -299,7 +289,6 @@ export class CiModuleService implements IModuleService {
 
 	/**
 	 * Selects compatible CI modules based on the module type and saved configuration.
-	 *
 	 * @param moduleType - The type of CI module (NPM or non-NPM)
 	 * @param savedModules - Previously saved modules
 	 * @returns Promise resolving to an array of selected CI module enum values
@@ -323,7 +312,6 @@ export class CiModuleService implements IModuleService {
 
 	/**
 	 * Prompts the user to select a CI provider.
-	 *
 	 * @param savedProvider - Previously saved provider
 	 * @returns Promise resolving to the selected CI provider
 	 */
@@ -346,7 +334,6 @@ export class CiModuleService implements IModuleService {
 	/**
 	 * Sets up a specific CI module.
 	 * Creates necessary directories and configuration files.
-	 *
 	 * @param module - The CI module to set up
 	 * @param properties - Module-specific properties to use in configuration
 	 * @returns Promise resolving to an object indicating success or failure
@@ -384,7 +371,6 @@ export class CiModuleService implements IModuleService {
 	/**
 	 * Sets up all selected CI modules.
 	 * Collects module properties and creates configuration files.
-	 *
 	 * @param savedProperties - Previously saved module properties
 	 * @returns Promise resolving to a record of module properties
 	 */
