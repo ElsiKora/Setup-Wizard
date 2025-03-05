@@ -64,7 +64,6 @@ export class EslintModuleService implements IModuleService {
 
 	/**
 	 * Initializes a new instance of the EslintModuleService.
-	 *
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 */
@@ -80,7 +79,6 @@ export class EslintModuleService implements IModuleService {
 	/**
 	 * Checks if the installed ESLint version meets the minimum requirements.
 	 * Offers to update ESLint if the version is too old.
-	 *
 	 * @returns Promise resolving to true if ESLint version is acceptable, false otherwise
 	 */
 	async checkEslintVersion(): Promise<boolean> {
@@ -123,7 +121,6 @@ export class EslintModuleService implements IModuleService {
 	/**
 	 * Handles existing ESLint setup.
 	 * Checks for existing configuration and asks if user wants to remove it.
-	 *
 	 * @returns Promise resolving to true if setup should proceed, false otherwise
 	 */
 	async handleExistingSetup(): Promise<boolean> {
@@ -163,7 +160,6 @@ export class EslintModuleService implements IModuleService {
 	/**
 	 * Installs and configures ESLint.
 	 * Guides the user through the setup process including feature selection.
-	 *
 	 * @returns Promise resolving to the module setup result
 	 */
 	async install(): Promise<IModuleSetupResult> {
@@ -217,7 +213,6 @@ export class EslintModuleService implements IModuleService {
 	 * Determines if ESLint should be installed.
 	 * Asks the user if they want to set up ESLint for their project.
 	 * Uses the saved config value as default if it exists.
-	 *
 	 * @returns Promise resolving to true if ESLint should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
@@ -232,7 +227,6 @@ export class EslintModuleService implements IModuleService {
 
 	/**
 	 * Collects all required npm dependencies for selected ESLint features.
-	 *
 	 * @returns Array of package names to install
 	 */
 	private collectDependencies(): Array<string> {
@@ -285,7 +279,6 @@ export class EslintModuleService implements IModuleService {
 	/**
 	 * Detects ESLint features that should be installed based on project dependencies.
 	 * Examines package.json and detected frameworks to determine appropriate features.
-	 *
 	 * @returns Promise resolving to an array of detected ESLint features
 	 */
 	private async detectInstalledFeatures(): Promise<Array<EEslintFeature>> {
@@ -348,7 +341,6 @@ export class EslintModuleService implements IModuleService {
 
 	/**
 	 * Finds existing ESLint configuration files.
-	 *
 	 * @returns Promise resolving to an array of file paths for existing configuration files
 	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {
@@ -366,7 +358,6 @@ export class EslintModuleService implements IModuleService {
 	/**
 	 * Generates the ESLint command for linting.
 	 * Creates a command string targeting appropriate directories based on detected frameworks.
-	 *
 	 * @returns The eslint command string
 	 */
 	private generateLintCommand(): string {
@@ -378,7 +369,6 @@ export class EslintModuleService implements IModuleService {
 	/**
 	 * Generates the ESLint command for fixing linting issues.
 	 * Creates a command string with the --fix flag targeting appropriate directories.
-	 *
 	 * @returns The eslint fix command string
 	 */
 	private generateLintFixCommand(): string {
@@ -389,7 +379,6 @@ export class EslintModuleService implements IModuleService {
 
 	/**
 	 * Generates the list of paths to ignore in the ESLint configuration.
-	 *
 	 * @returns Array of ignore patterns for ESLint
 	 */
 	private generateLintIgnorePaths(): Array<string> {
@@ -401,7 +390,6 @@ export class EslintModuleService implements IModuleService {
 	/**
 	 * Gets the patterns of files and directories to ignore during linting.
 	 * Combines framework-specific ignore patterns with general ones.
-	 *
 	 * @returns Array of ignore patterns
 	 */
 	private getIgnorePatterns(): Array<string> {
@@ -411,7 +399,6 @@ export class EslintModuleService implements IModuleService {
 	/**
 	 * Prompts the user to select which ESLint features to enable.
 	 * Presents detected features and saved features as initial selections.
-	 *
 	 * @param savedFeatures - Previously saved ESLint features
 	 * @returns Promise resolving to an array of selected ESLint features
 	 */
@@ -502,7 +489,6 @@ export class EslintModuleService implements IModuleService {
 	/**
 	 * Validates if the selected features are compatible with the detected frameworks.
 	 * Checks if TypeScript features are selected only when TypeScript is detected.
-	 *
 	 * @returns Boolean indicating whether the feature selection is valid
 	 */
 	private validateFeatureSelection(): boolean {

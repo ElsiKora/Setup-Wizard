@@ -40,7 +40,6 @@ export class StylelintModuleService implements IModuleService {
 
 	/**
 	 * Initializes a new instance of the StylelintModuleService.
-	 *
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 */
@@ -55,7 +54,6 @@ export class StylelintModuleService implements IModuleService {
 	/**
 	 * Handles existing Stylelint setup.
 	 * Checks for existing configuration files and asks if user wants to remove them.
-	 *
 	 * @returns Promise resolving to true if setup should proceed, false otherwise
 	 */
 	async handleExistingSetup(): Promise<boolean> {
@@ -90,7 +88,6 @@ export class StylelintModuleService implements IModuleService {
 	/**
 	 * Installs and configures Stylelint.
 	 * Sets up configuration files and npm scripts for CSS/SCSS linting.
-	 *
 	 * @returns Promise resolving to the module setup result
 	 */
 	async install(): Promise<IModuleSetupResult> {
@@ -117,7 +114,6 @@ export class StylelintModuleService implements IModuleService {
 	 * Determines if Stylelint should be installed.
 	 * Asks the user if they want to set up Stylelint for their project.
 	 * Uses the saved config value as default if it exists.
-	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
@@ -152,7 +148,6 @@ export class StylelintModuleService implements IModuleService {
 
 	/**
 	 * Finds existing Stylelint configuration files.
-	 *
 	 * @returns Promise resolving to an array of file paths for existing configuration files
 	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {

@@ -40,7 +40,6 @@ export class PrettierModuleService implements IModuleService {
 
 	/**
 	 * Initializes a new instance of the PrettierModuleService.
-	 *
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 */
@@ -55,7 +54,6 @@ export class PrettierModuleService implements IModuleService {
 	/**
 	 * Handles existing Prettier setup.
 	 * Checks for existing configuration files and asks if user wants to remove them.
-	 *
 	 * @returns Promise resolving to true if setup should proceed, false otherwise
 	 */
 	async handleExistingSetup(): Promise<boolean> {
@@ -90,7 +88,6 @@ export class PrettierModuleService implements IModuleService {
 	/**
 	 * Installs and configures Prettier.
 	 * Sets up configuration files and npm scripts for code formatting.
-	 *
 	 * @returns Promise resolving to the module setup result
 	 */
 	async install(): Promise<IModuleSetupResult> {
@@ -117,7 +114,6 @@ export class PrettierModuleService implements IModuleService {
 	 * Determines if Prettier should be installed.
 	 * Asks the user if they want to set up Prettier for their project.
 	 * Uses the saved config value as default if it exists.
-	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
@@ -152,7 +148,6 @@ export class PrettierModuleService implements IModuleService {
 
 	/**
 	 * Finds existing Prettier configuration files.
-	 *
 	 * @returns Promise resolving to an array of file paths for existing configuration files
 	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {

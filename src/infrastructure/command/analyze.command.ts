@@ -25,7 +25,6 @@ export class AnalyzeCommand implements ICommand {
 
 	/**
 	 * Initializes a new instance of the AnalyzeCommand.
-	 *
 	 * @param properties - Properties defining command behavior
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
@@ -39,7 +38,6 @@ export class AnalyzeCommand implements ICommand {
 	/**
 	 * Executes the analyze command.
 	 * Clears the console and prompts the user to confirm project analysis.
-	 *
 	 * @returns Promise that resolves when execution is complete
 	 */
 	async execute(): Promise<void> {

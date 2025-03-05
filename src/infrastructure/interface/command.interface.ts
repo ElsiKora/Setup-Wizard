@@ -13,7 +13,6 @@ export interface ICommand {
 
 	/**
 	 * Executes the command.
-	 *
 	 * @returns Promise that resolves when the command has completed execution
 	 */
 	execute(): Promise<void>;

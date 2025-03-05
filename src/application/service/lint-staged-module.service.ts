@@ -50,7 +50,6 @@ export class LintStagedModuleService implements IModuleService {
 
 	/**
 	 * Initializes a new instance of the LintStagedModuleService.
-	 *
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 */
@@ -65,7 +64,6 @@ export class LintStagedModuleService implements IModuleService {
 	/**
 	 * Handles existing lint-staged setup.
 	 * Checks for existing configuration files and asks if user wants to remove them.
-	 *
 	 * @returns Promise resolving to true if setup should proceed, false otherwise
 	 */
 	async handleExistingSetup(): Promise<boolean> {
@@ -108,7 +106,6 @@ export class LintStagedModuleService implements IModuleService {
 	/**
 	 * Installs and configures lint-staged.
 	 * Guides the user through selecting linting tools and setting up git hooks.
-	 *
 	 * @returns Promise resolving to the module setup result
 	 */
 	async install(): Promise<IModuleSetupResult> {
@@ -144,7 +141,6 @@ export class LintStagedModuleService implements IModuleService {
 	 * Determines if lint-staged should be installed.
 	 * Asks the user if they want to set up lint-staged with Husky pre-commit hooks.
 	 * Uses the saved config value as default if it exists.
-	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
@@ -159,7 +155,6 @@ export class LintStagedModuleService implements IModuleService {
 
 	/**
 	 * Creates the lint-staged configuration file.
-	 *
 	 * @param selectedFeatures - Array of selected lint-staged features
 	 */
 	private async createConfigs(selectedFeatures: Array<ELintStagedFeature>): Promise<void> {
@@ -170,7 +165,6 @@ export class LintStagedModuleService implements IModuleService {
 	/**
 	 * Displays a summary of the lint-staged setup results.
 	 * Lists selected linting tools and required packages.
-	 *
 	 * @param selectedFeatures - Array of selected lint-staged features
 	 */
 	private displaySetupSummary(selectedFeatures: Array<ELintStagedFeature>): void {
@@ -197,7 +191,6 @@ export class LintStagedModuleService implements IModuleService {
 
 	/**
 	 * Finds existing lint-staged configuration files.
-	 *
 	 * @returns Promise resolving to an array of file paths for existing configuration files
 	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {
@@ -233,7 +226,6 @@ export class LintStagedModuleService implements IModuleService {
 	/**
 	 * Sets up lint-staged configuration.
 	 * Guides the user through selecting linting tools and creates necessary config files.
-	 *
 	 * @param savedFeatures - Previously saved lint-staged features
 	 */
 	private async setupLintStaged(savedFeatures: Array<ELintStagedFeature> = []): Promise<void> {

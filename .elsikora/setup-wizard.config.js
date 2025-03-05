@@ -10,10 +10,11 @@ export default {
 		isEnabled: true,
 	},
 	eslint: {
-		isEnabled: false,
+		features: ["sonar", "unicorn", "perfectionist", "jsdoc", "javascript", "typescript", "json", "yaml", "checkFile", "packageJson", "markdown", "node", "regexp", "prettier", "stylistic"],
+		isEnabled: true,
 	},
 	gitignore: {
-		isEnabled: false,
+		isEnabled: true,
 	},
 	ide: {
 		ides: ["vs-code", "intellij-idea"],

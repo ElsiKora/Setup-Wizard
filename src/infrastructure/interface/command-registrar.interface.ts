@@ -12,7 +12,6 @@ export interface ICommandRegistrar {
 
 	/**
 	 * Executes the command registrar, setting up all commands and starting the CLI.
-	 *
 	 * @returns The configured Commander command instance
 	 */
 	execute(): Command;

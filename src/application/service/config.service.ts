@@ -13,14 +13,12 @@ import { CONFIG_FILE_PATH } from "../constant/config-file-path.constant";
 export class ConfigService {
 	/**
 	 * Initializes a new instance of the ConfigService.
-	 *
 	 * @param fileSystemService - Service for file system operations
 	 */
 	constructor(private readonly fileSystemService: IFileSystemService) {}
 
 	/**
 	 * Checks if the configuration file exists.
-	 *
 	 * @returns Promise resolving to true if the configuration file exists, false otherwise
 	 */
 	public async exists(): Promise<boolean> {
@@ -30,7 +28,6 @@ export class ConfigService {
 	/**
 	 * Retrieves the current configuration.
 	 * Attempts to load configuration from file, with fallbacks for different scenarios.
-	 *
 	 * @returns Promise resolving to the configuration object
 	 */
 	public async get(): Promise<IConfig> {
@@ -80,7 +77,6 @@ export class ConfigService {
 
 	/**
 	 * Gets the saved configuration for a specific module from the config file.
-	 *
 	 * @param module - The module to get configuration for
 	 * @returns Promise resolving to the module configuration or null if not found
 	 */
@@ -102,7 +98,6 @@ export class ConfigService {
 
 	/**
 	 * Gets a specific property from the configuration.
-	 *
 	 * @param property - The property key to retrieve
 	 * @returns Promise resolving to the value of the specified property
 	 */
@@ -116,7 +111,6 @@ export class ConfigService {
 	 * Checks if a specific module is enabled in the configuration.
 	 * A module is considered enabled if its configuration exists and has isEnabled=true,
 	 * or if the module configuration is a boolean value of true.
-	 *
 	 * @param module - The module to check
 	 * @returns Promise resolving to true if the module is enabled, false otherwise
 	 */
@@ -141,7 +135,6 @@ export class ConfigService {
 
 	/**
 	 * Merges partial configuration with the existing configuration.
-	 *
 	 * @param partial - Partial configuration to merge
 	 * @returns Promise that resolves when the merged configuration is saved
 	 */
@@ -158,7 +151,6 @@ export class ConfigService {
 
 	/**
 	 * Saves the entire configuration.
-	 *
 	 * @param config - The complete configuration to save
 	 * @returns Promise that resolves when the configuration is saved
 	 */
@@ -169,7 +161,6 @@ export class ConfigService {
 
 	/**
 	 * Sets a specific property in the configuration.
-	 *
 	 * @param property - The property key to set
 	 * @param value - The value to assign to the property
 	 * @returns Promise that resolves when the updated configuration is saved
@@ -182,7 +173,6 @@ export class ConfigService {
 
 	/**
 	 * Determines if a JavaScript object key needs quotes when serialized.
-	 *
 	 * @param key - The object key to check
 	 * @returns True if the key needs quotes in JavaScript object notation, false otherwise
 	 */
@@ -196,7 +186,6 @@ export class ConfigService {
 
 	/**
 	 * Converts an object to a formatted JavaScript string representation.
-	 *
 	 * @param object - The object to convert to a string
 	 * @param indent - Current indentation level (used for recursive calls)
 	 * @returns A string representation of the object in JavaScript syntax

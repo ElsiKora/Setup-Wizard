@@ -12,7 +12,6 @@ export interface ICliInterfaceService {
 
 	/**
 	 * Displays a confirmation prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param isConfirmedByDefault - The default value for the confirmation, defaults to false
 	 * @returns Promise that resolves to the user's response (true for confirmed, false for declined)
@@ -21,14 +20,12 @@ export interface ICliInterfaceService {
 
 	/**
 	 * Displays an error message to the user.
-	 *
 	 * @param message - The error message to display
 	 */
 	error(message: string): void;
 
 	/**
 	 * Displays a grouped multi-select prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param options - Record of groups and their options
 	 * @param isRequired - Whether a selection is required, defaults to false
@@ -39,7 +36,6 @@ export interface ICliInterfaceService {
 
 	/**
 	 * Handles and displays an error message with additional error details.
-	 *
 	 * @param message - The error message to display
 	 * @param error - The error object or details
 	 */
@@ -47,21 +43,18 @@ export interface ICliInterfaceService {
 
 	/**
 	 * Displays an informational message to the user.
-	 *
 	 * @param message - The info message to display
 	 */
 	info(message: string): void;
 
 	/**
 	 * Displays a standard message to the user.
-	 *
 	 * @param message - The message to display
 	 */
 	log(message: string): void;
 
 	/**
 	 * Displays a multi-select prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param options - Array of options to select from
 	 * @param isRequired - Whether a selection is required, defaults to false
@@ -72,7 +65,6 @@ export interface ICliInterfaceService {
 
 	/**
 	 * Displays a note to the user with a title and message.
-	 *
 	 * @param title - The title of the note
 	 * @param message - The message content of the note
 	 */
@@ -80,7 +72,6 @@ export interface ICliInterfaceService {
 
 	/**
 	 * Displays a single select prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param options - Array of options to select from
 	 * @param initialValue - Initial selected value
@@ -90,28 +81,24 @@ export interface ICliInterfaceService {
 
 	/**
 	 * Starts a spinner with the specified message.
-	 *
 	 * @param message - The message to display while the spinner is active
 	 */
 	startSpinner(message: string): void;
 
 	/**
 	 * Stops the current spinner with an optional completion message.
-	 *
 	 * @param message - Optional message to display when the spinner stops
 	 */
 	stopSpinner(message?: string): void;
 
 	/**
 	 * Displays a success message to the user.
-	 *
 	 * @param message - The success message to display
 	 */
 	success(message: string): void;
 
 	/**
 	 * Displays a text input prompt to the user.
-	 *
 	 * @param message - The message to display to the user
 	 * @param placeholder - Optional placeholder text for the input field
 	 * @param initialValue - Optional initial value for the input field
@@ -122,7 +109,6 @@ export interface ICliInterfaceService {
 
 	/**
 	 * Displays a warning message to the user.
-	 *
 	 * @param message - The warning message to display
 	 */
 	warn(message: string): void;
