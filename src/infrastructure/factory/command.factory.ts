@@ -21,7 +21,6 @@ export class CommandFactory implements ICommandFactory {
 
 	/**
 	 * Initializes a new instance of the CommandFactory.
-	 *
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 */
@@ -32,7 +31,6 @@ export class CommandFactory implements ICommandFactory {
 
 	/**
 	 * Creates a command instance of the specified type.
-	 *
 	 * @param name - The enum value representing the command to create
 	 * @param options - Command-specific options and arguments
 	 * @returns An instance of the specified command

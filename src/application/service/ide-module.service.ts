@@ -35,7 +35,6 @@ export class IdeModuleService implements IModuleService {
 
 	/**
 	 * Initializes a new instance of the IdeModuleService.
-	 *
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 */
@@ -48,7 +47,6 @@ export class IdeModuleService implements IModuleService {
 	/**
 	 * Handles existing IDE configuration setup.
 	 * Checks for existing configuration files and asks for user confirmation if found.
-	 *
 	 * @returns Promise resolving to true if setup should proceed, false otherwise
 	 */
 	async handleExistingSetup(): Promise<boolean> {
@@ -66,7 +64,6 @@ export class IdeModuleService implements IModuleService {
 	/**
 	 * Installs and configures IDE-specific settings.
 	 * Guides the user through selecting IDEs and generating configuration files.
-	 *
 	 * @returns Promise resolving to the module setup result
 	 */
 	async install(): Promise<IModuleSetupResult> {
@@ -110,7 +107,6 @@ export class IdeModuleService implements IModuleService {
 	 * Determines if IDE configuration should be installed.
 	 * Asks the user if they want to set up IDE configurations for their project.
 	 * Uses the saved config value as default if it exists.
-	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
@@ -119,7 +115,6 @@ export class IdeModuleService implements IModuleService {
 
 	/**
 	 * Displays a summary of successful and failed IDE configuration setups.
-	 *
 	 * @param successful - Array of successfully set up IDE configurations
 	 * @param failed - Array of IDE configurations that failed to set up
 	 */
@@ -142,7 +137,6 @@ export class IdeModuleService implements IModuleService {
 
 	/**
 	 * Finds existing IDE configuration files that might be overwritten.
-	 *
 	 * @returns Promise resolving to an array of file paths for existing configuration files
 	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {
@@ -163,7 +157,6 @@ export class IdeModuleService implements IModuleService {
 
 	/**
 	 * Prompts the user to select which IDEs they want to configure.
-	 *
 	 * @param savedIdes - Previously saved IDE selections
 	 * @returns Promise resolving to an array of selected IDE enum values
 	 */
@@ -184,7 +177,6 @@ export class IdeModuleService implements IModuleService {
 	/**
 	 * Sets up configuration for a specific IDE.
 	 * Creates necessary directories and configuration files.
-	 *
 	 * @param ide - The IDE to set up configuration for
 	 * @returns Promise resolving to an object indicating success or failure with optional error
 	 */

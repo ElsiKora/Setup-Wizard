@@ -16,7 +16,6 @@ export class NodeCommandService implements ICommandService {
 
 	/**
 	 * Executes a shell command.
-	 *
 	 * @param command - The shell command to execute
 	 * @returns Promise that resolves when the command completes successfully
 	 * @throws Will throw an error if the command execution fails

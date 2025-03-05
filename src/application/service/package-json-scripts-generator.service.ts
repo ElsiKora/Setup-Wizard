@@ -13,7 +13,6 @@ export class PackageJsonScriptsGeneratorService {
 	/**
 	 * Generates lint-related npm scripts based on detected frameworks.
 	 * Creates appropriate scripts for linting, fixing, watching, and type checking.
-	 *
 	 * @param frameworks - Array of detected frameworks in the project
 	 * @param customPaths - Array of custom file paths to lint if no frameworks are detected
 	 * @returns Object containing generated npm scripts
@@ -37,7 +36,6 @@ export class PackageJsonScriptsGeneratorService {
 	 * Adds framework-specific lint scripts based on detected frameworks.
 	 * Includes watch scripts for supported frameworks, TypeScript type checking,
 	 * and test linting where appropriate.
-	 *
 	 * @param scripts - Base scripts object to add framework-specific scripts to
 	 * @param frameworks - Array of detected frameworks in the project
 	 * @returns Extended scripts object with framework-specific lint scripts

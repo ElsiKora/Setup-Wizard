@@ -19,7 +19,6 @@ export class PackageJsonService {
 
 	/**
 	 * Initializes a new instance of the PackageJsonService.
-	 *
 	 * @param fileSystemService - Service for file system operations
 	 * @param commandService - Service for executing commands
 	 */
@@ -33,7 +32,6 @@ export class PackageJsonService {
 
 	/**
 	 * Adds a dependency to the package.json file.
-	 *
 	 * @param name - The name of the dependency
 	 * @param version - The version string of the dependency
 	 * @param type - The type of dependency (prod, dev, peer, etc.), defaults to PROD
@@ -55,7 +53,6 @@ export class PackageJsonService {
 
 	/**
 	 * Adds a script to the package.json file.
-	 *
 	 * @param name - The name of the script
 	 * @param command - The command to execute for the script
 	 * @returns Promise that resolves when the script is added
@@ -69,7 +66,6 @@ export class PackageJsonService {
 
 	/**
 	 * Checks if the package.json file exists.
-	 *
 	 * @returns Promise that resolves to true if the file exists, false otherwise
 	 */
 	async exists(): Promise<boolean> {
@@ -78,7 +74,6 @@ export class PackageJsonService {
 
 	/**
 	 * Gets the contents of the package.json file.
-	 *
 	 * @returns Promise that resolves to the parsed package.json contents
 	 */
 	async get(): Promise<IPackageJson> {
@@ -89,7 +84,6 @@ export class PackageJsonService {
 
 	/**
 	 * Gets the dependencies of a specified type from the package.json file.
-	 *
 	 * @param type - The type of dependencies to get, defaults to PROD
 	 * @returns Promise that resolves to a record of dependency names and versions
 	 */
@@ -109,7 +103,6 @@ export class PackageJsonService {
 	/**
 	 * Gets detailed version information for an installed dependency.
 	 * Parses the version string to extract version parts and flags.
-	 *
 	 * @param name - The name of the dependency
 	 * @param type - The type of dependency to check, defaults to ANY
 	 * @returns Promise that resolves to detailed version information or undefined if not found
@@ -196,7 +189,6 @@ export class PackageJsonService {
 
 	/**
 	 * Gets a specific property from the package.json file.
-	 *
 	 * @param property - The property key to get
 	 * @returns Promise that resolves to the property value
 	 */
@@ -208,7 +200,6 @@ export class PackageJsonService {
 
 	/**
 	 * Installs packages using npm.
-	 *
 	 * @param packages - The package(s) to install (string or array of strings)
 	 * @param version - Optional version to install (only works with single package)
 	 * @param type - The type of dependency to install as, defaults to PROD
@@ -231,7 +222,6 @@ export class PackageJsonService {
 
 	/**
 	 * Checks if a dependency exists in the package.json file.
-	 *
 	 * @param name - The name of the dependency to check
 	 * @param type - The type of dependency to check, defaults to ANY
 	 * @returns Promise that resolves to true if the dependency exists, false otherwise
@@ -252,7 +242,6 @@ export class PackageJsonService {
 
 	/**
 	 * Merges partial package.json data with the existing file.
-	 *
 	 * @param partial - The partial package.json data to merge
 	 * @returns Promise that resolves when the merge is complete
 	 */
@@ -264,7 +253,6 @@ export class PackageJsonService {
 
 	/**
 	 * Removes a dependency from the package.json file.
-	 *
 	 * @param name - The name of the dependency to remove
 	 * @param type - The type of dependency to remove, defaults to PROD
 	 * @returns Promise that resolves when the dependency is removed
@@ -300,7 +288,6 @@ export class PackageJsonService {
 
 	/**
 	 * Removes a script from the package.json file.
-	 *
 	 * @param name - The name of the script to remove
 	 * @returns Promise that resolves when the script is removed
 	 */
@@ -316,7 +303,6 @@ export class PackageJsonService {
 
 	/**
 	 * Writes the package.json file with the provided content.
-	 *
 	 * @param packageJson - The package.json content to write
 	 * @returns Promise that resolves when the file is written
 	 */
@@ -327,7 +313,6 @@ export class PackageJsonService {
 
 	/**
 	 * Sets a specific property in the package.json file.
-	 *
 	 * @param property - The property key to set
 	 * @param value - The value to set for the property
 	 * @returns Promise that resolves when the property is set
@@ -340,7 +325,6 @@ export class PackageJsonService {
 
 	/**
 	 * Uninstalls packages using npm.
-	 *
 	 * @param packages - The package(s) to uninstall (string or array of strings)
 	 * @returns Promise that resolves when uninstallation is complete
 	 */
@@ -352,7 +336,6 @@ export class PackageJsonService {
 
 	/**
 	 * Validates the package.json file for required fields.
-	 *
 	 * @returns Promise that resolves to an array of missing field names
 	 */
 	async validate(): Promise<Array<string>> {
@@ -365,7 +348,6 @@ export class PackageJsonService {
 
 	/**
 	 * Gets the npm flag for a dependency type.
-	 *
 	 * @param type - The type of dependency
 	 * @returns The corresponding npm flag string
 	 */

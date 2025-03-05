@@ -8,7 +8,6 @@ import { ELintStagedFeature } from "../../domain/enum/lint-staged-feature.enum";
 export const LINT_STAGED_CONFIG: {
 	/**
 	 * Generates a lint-staged configuration file content.
-	 *
 	 * @param features - Array of lint-staged features to enable
 	 * @returns String content for the lint-staged configuration file
 	 */
@@ -18,7 +17,6 @@ export const LINT_STAGED_CONFIG: {
 	 * Generates a lint-staged configuration file content.
 	 * Creates a JavaScript configuration file that dynamically applies linting tools
 	 * based on file extensions and enabled features.
-	 *
 	 * @param features - Array of lint-staged features to enable
 	 * @returns String content for the lint-staged configuration file
 	 */

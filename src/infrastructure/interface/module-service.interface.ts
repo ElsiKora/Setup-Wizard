@@ -19,7 +19,6 @@ export interface IModuleService {
 
 	/**
 	 * Handles the case when the module is already installed.
-	 *
 	 * @returns Promise that resolves to true if the existing setup was handled successfully,
 	 *          false if it should be reinstalled or reconfigured
 	 */
@@ -27,14 +26,12 @@ export interface IModuleService {
 
 	/**
 	 * Installs and configures the module.
-	 *
 	 * @returns Promise that resolves to the module setup result containing configuration details
 	 */
 	install(): Promise<IModuleSetupResult>;
 
 	/**
 	 * Determines whether the module should be installed.
-	 *
 	 * @returns Promise that resolves to true if the module should be installed, false otherwise
 	 */
 	shouldInstall(): Promise<boolean>;

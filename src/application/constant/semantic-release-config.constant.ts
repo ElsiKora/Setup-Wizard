@@ -5,7 +5,6 @@
 export const SEMANTIC_RELEASE_CONFIG: {
 	/**
 	 * Generates a semantic-release configuration file content.
-	 *
 	 * @param repositoryUrl - The URL of the git repository
 	 * @param mainBranch - The main branch name for production releases
 	 * @param preReleaseBranch - Optional branch name for pre-releases
@@ -19,7 +18,6 @@ export const SEMANTIC_RELEASE_CONFIG: {
 	/**
 	 * Generates a semantic-release configuration file content.
 	 * Creates a configuration with release rules, plugin configurations, and branch settings.
-	 *
 	 * @param repositoryUrl - The URL of the git repository
 	 * @param mainBranch - The main branch name for production releases
 	 * @param preReleaseBranch - Optional branch name for pre-releases

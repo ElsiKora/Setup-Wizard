@@ -10,7 +10,6 @@ import { COMMAND_FLAG_CONFIG } from "../constant/command-flag-config.constant";
 export const CommandOptionsMapper: {
 	/**
 	 * Converts command-line flags to module enable status properties.
-	 *
 	 * @param properties - Record of flag names to boolean values
 	 * @returns Object with module keys mapped to their enabled status
 	 */
@@ -19,7 +18,6 @@ export const CommandOptionsMapper: {
 	/**
 	 * Converts command-line flags to module enable status properties.
 	 * Maps each flag to its corresponding module and sets the enable status.
-	 *
 	 * @param properties - Record of flag names to boolean values
 	 * @returns Object with module keys mapped to their enabled status
 	 */

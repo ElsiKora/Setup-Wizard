@@ -43,7 +43,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 	/**
 	 * Initializes a new instance of the SemanticReleaseModuleService.
-	 *
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 */
@@ -58,7 +57,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 	/**
 	 * Handles existing semantic-release setup.
 	 * Checks for existing configuration files and asks if user wants to remove them.
-	 *
 	 * @returns Promise resolving to true if setup should proceed, false otherwise
 	 */
 	async handleExistingSetup(): Promise<boolean> {
@@ -93,7 +91,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 	/**
 	 * Installs and configures semantic-release.
 	 * Guides the user through setting up automated versioning and publishing.
-	 *
 	 * @returns Promise resolving to the module setup result
 	 */
 	async install(): Promise<IModuleSetupResult> {
@@ -125,7 +122,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * Determines if semantic-release should be installed.
 	 * Asks the user if they want to set up automated versioning and publishing.
 	 * Uses the saved config value as default if it exists.
-	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
@@ -141,7 +137,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 	/**
 	 * Creates semantic-release configuration files.
 	 * Generates the config file with repository URL and branch settings.
-	 *
 	 * @param repositoryUrl - The repository URL for semantic-release
 	 * @param mainBranch - The main branch for production releases
 	 * @param preReleaseBranch - Optional branch for pre-releases
@@ -156,7 +151,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 	/**
 	 * Displays a summary of the semantic-release setup results.
 	 * Lists configured branches, scripts, and usage instructions.
-	 *
 	 * @param mainBranch - The main branch for production releases
 	 * @param preReleaseBranch - Optional branch for pre-releases
 	 * @param preReleaseChannel - Optional channel name for pre-releases
@@ -190,7 +184,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 	/**
 	 * Finds existing semantic-release configuration files.
-	 *
 	 * @returns Promise resolving to an array of file paths for existing configuration files
 	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {
@@ -217,7 +210,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 	/**
 	 * Prompts the user for the development branch name for backmerge.
-	 *
 	 * @returns Promise resolving to the development branch name
 	 */
 	private async getDevelopBranch(): Promise<string> {
@@ -232,7 +224,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 	/**
 	 * Prompts the user for the main release branch name.
-	 *
 	 * @returns Promise resolving to the main branch name
 	 */
 	private async getMainBranch(): Promise<string> {
@@ -247,7 +238,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 	/**
 	 * Prompts the user for the pre-release branch name.
-	 *
 	 * @returns Promise resolving to the pre-release branch name
 	 */
 	private async getPreReleaseBranch(): Promise<string> {
@@ -262,7 +252,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 	/**
 	 * Prompts the user for the pre-release channel name.
-	 *
 	 * @returns Promise resolving to the pre-release channel name
 	 */
 	private async getPreReleaseChannel(): Promise<string> {
@@ -278,7 +267,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 	/**
 	 * Gets the repository URL for semantic-release.
 	 * Attempts to detect URL from package.json before prompting the user.
-	 *
 	 * @returns Promise resolving to the repository URL
 	 */
 	private async getRepositoryUrl(): Promise<string> {
@@ -334,7 +322,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 	/**
 	 * Prompts the user if they want to enable backmerge to development branch.
 	 * Only applicable for the main branch.
-	 *
 	 * @param mainBranch - The main branch name
 	 * @returns Promise resolving to true if backmerge should be enabled, false otherwise
 	 */
@@ -346,7 +333,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 	/**
 	 * Prompts the user if they want to enable pre-release channels.
-	 *
 	 * @returns Promise resolving to true if pre-release should be enabled, false otherwise
 	 */
 	private async isPrereleaseEnabledChannel(): Promise<boolean> {
@@ -367,7 +353,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * Sets up semantic-release configuration.
 	 * Collects user input, installs dependencies, creates config files,
 	 * and sets up scripts.
-	 *
 	 * @returns Promise resolving to an object containing setup parameters
 	 */
 	private async setupSemanticRelease(): Promise<Record<string, string>> {

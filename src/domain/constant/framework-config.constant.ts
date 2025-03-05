@@ -8,7 +8,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.ADONIS]: {
 		description: "AdonisJS Node.js framework project",
 		displayName: "AdonisJS",
-		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT, EEslintFeature.PERFECTIONIST],
 		fileIndicators: [".adonisrc.json"],
 		ignorePath: {
 			directories: [],
@@ -24,7 +24,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.ALPINE]: {
 		description: "Alpine.js lightweight frontend framework",
 		displayName: "Alpine.js",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.CSS],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -37,11 +37,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// Angular
 	[EFramework.ANGULAR]: {
 		description: "Angular framework project",
 		displayName: "Angular",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.SONAR, EEslintFeature.STYLISTIC],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.SONAR, EEslintFeature.STYLISTIC, EEslintFeature.CSS],
 		fileIndicators: ["angular.json", ".angular-cli.json", "angular-cli.json"],
 		ignorePath: {
 			directories: [".angular"],
@@ -58,7 +57,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.ANTD]: {
 		description: "Ant Design React UI library project",
 		displayName: "Ant Design",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.CSS],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -71,13 +70,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// ------------------
-	// API/GraphQL
-	// ------------------
 	[EFramework.APOLLO]: {
 		description: "Apollo GraphQL client/server project",
 		displayName: "Apollo",
-		features: [EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.NODE],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -90,11 +86,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// Astro
 	[EFramework.ASTRO]: {
 		description: "Astro static site generator",
 		displayName: "Astro",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.TAILWIND_CSS, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.TAILWIND_CSS, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.MARKDOWN],
 		fileIndicators: ["astro.config.mjs", "astro.config.ts"],
 		ignorePath: {
 			directories: [".astro"],
@@ -111,7 +106,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.BABEL]: {
 		description: "Babel compiler configuration",
 		displayName: "Babel",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSON],
 		fileIndicators: ["babel.config.js", ".babelrc"],
 		ignorePath: {
 			directories: [],
@@ -127,7 +122,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.BACKBONE]: {
 		description: "Backbone.js framework project",
 		displayName: "Backbone.js",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.CSS],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -143,7 +138,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.BLITZ]: {
 		description: "Blitz.js full-stack React framework",
 		displayName: "Blitz.js",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.NODE],
 		fileIndicators: ["blitz.config.js", "blitz.config.ts"],
 		ignorePath: {
 			directories: [".blitz"],
@@ -153,14 +148,13 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		name: EFramework.BLITZ,
 		packageIndicators: {
 			dependencies: ["blitz"],
-			either: ["react", "react-dom"],
 		},
 	},
 
 	[EFramework.BOOTSTRAP]: {
 		description: "Bootstrap UI library project",
 		displayName: "Bootstrap",
-		features: [EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.CSS, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -176,7 +170,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.CAPACITOR]: {
 		description: "Capacitor mobile application framework",
 		displayName: "Capacitor",
-		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT, EEslintFeature.JSON, EEslintFeature.PRETTIER],
 		fileIndicators: ["capacitor.config.json", "capacitor.config.ts"],
 		ignorePath: {
 			directories: ["android", "ios"],
@@ -192,7 +186,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.CHAKRA_UI]: {
 		description: "Chakra UI React component library",
 		displayName: "Chakra UI",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -208,7 +202,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.CYPRESS]: {
 		description: "Cypress end-to-end testing framework",
 		displayName: "Cypress",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSON],
 		fileIndicators: ["cypress.config.js", "cypress.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -224,7 +218,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.DIRECTUS]: {
 		description: "Directus headless CMS project",
 		displayName: "Directus",
-		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSON],
 		fileIndicators: ["directus.config.js", "directus-extension.json"],
 		ignorePath: {
 			directories: [],
@@ -240,7 +234,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.DRIZZLE]: {
 		description: "Drizzle ORM for TypeScript",
 		displayName: "Drizzle ORM",
-		features: [EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.NODE, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -253,11 +247,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// Electron
 	[EFramework.ELECTRON]: {
 		description: "Electron desktop application framework",
 		displayName: "Electron",
-		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JAVASCRIPT, EEslintFeature.CSS],
 		fileIndicators: ["electron.config.js", "electron-builder.yml", "electron-builder.json"],
 		ignorePath: {
 			directories: ["release"],
@@ -274,7 +267,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.ELEVENTY]: {
 		description: "Eleventy static site generator",
 		displayName: "Eleventy",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.MARKDOWN, EEslintFeature.CSS],
 		fileIndicators: [".eleventy.js", "eleventy.config.js"],
 		ignorePath: {
 			directories: ["_site"],
@@ -290,7 +283,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.EMBER]: {
 		description: "Ember.js framework project",
 		displayName: "Ember.js",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.CSS, EEslintFeature.JSX],
 		fileIndicators: ["ember-cli-build.js", ".ember-cli"],
 		ignorePath: {
 			directories: ["tmp"],
@@ -306,7 +299,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.ESBUILD]: {
 		description: "esbuild bundler project",
 		displayName: "esbuild",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSON, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -322,7 +315,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.ESLINT]: {
 		description: "ESLint configuration",
 		displayName: "ESLint",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSON],
 		fileIndicators: [".eslintrc", ".eslintrc.js", ".eslintrc.json"],
 		ignorePath: {
 			directories: [],
@@ -338,7 +331,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.EXPO]: {
 		description: "Expo framework for React Native apps",
 		displayName: "Expo",
-		features: [EEslintFeature.REACT, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.REACT, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.TYPESCRIPT],
 		fileIndicators: ["app.json", "app.config.js"],
 		ignorePath: {
 			directories: ["ios", "android"],
@@ -348,15 +341,13 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		name: EFramework.EXPO,
 		packageIndicators: {
 			dependencies: ["expo"],
-			either: ["react", "react-native"],
 		},
 	},
 
-	// Express.js
 	[EFramework.EXPRESS]: {
 		description: "Express.js Node.js framework project",
 		displayName: "Express.js",
-		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.PERFECTIONIST, EEslintFeature.SONAR],
+		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.PERFECTIONIST, EEslintFeature.SONAR, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -370,11 +361,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// Fastify
 	[EFramework.FASTIFY]: {
 		description: "Fastify Node.js framework project",
 		displayName: "Fastify",
-		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT, EEslintFeature.PERFECTIONIST],
+		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT, EEslintFeature.PERFECTIONIST, EEslintFeature.PRETTIER, EEslintFeature.SONAR],
 		fileIndicators: ["fastify.config.js", "fastify.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -391,7 +381,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.FEATHERS]: {
 		description: "Feathers Node.js framework project",
 		displayName: "Feathers",
-		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: ["feathers-cli.json"],
 		ignorePath: {
 			directories: [],
@@ -407,7 +397,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.FLUTTER]: {
 		description: "Flutter cross-platform framework (Dart)",
 		displayName: "Flutter",
-		features: [EEslintFeature.PRETTIER],
+		features: [EEslintFeature.PRETTIER, EEslintFeature.YAML],
 		fileIndicators: ["pubspec.yaml"],
 		ignorePath: {
 			directories: [".dart_tool"],
@@ -424,7 +414,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.FRESH]: {
 		description: "Fresh full-stack framework for Deno",
 		displayName: "Fresh (Deno)",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS],
 		fileIndicators: ["fresh.config.ts"],
 		ignorePath: {
 			directories: [".git", ".vscode"],
@@ -435,13 +425,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		packageIndicators: {},
 	},
 
-	// -------------------------------
-	// Meta-frameworks
-	// -------------------------------
 	[EFramework.GATSBY]: {
 		description: "Gatsby React-based static site generator",
 		displayName: "Gatsby",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.MARKDOWN],
 		fileIndicators: ["gatsby-config.js", "gatsby-config.ts", "gatsby-node.js", "gatsby-node.ts"],
 		ignorePath: {
 			directories: ["public", ".cache"],
@@ -451,14 +438,13 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		name: EFramework.GATSBY,
 		packageIndicators: {
 			dependencies: ["gatsby"],
-			either: ["react", "react-dom"],
 		},
 	},
 
 	[EFramework.GRAPHQL]: {
 		description: "Generic GraphQL usage (apollo, graphql.js, etc.)",
 		displayName: "GraphQL",
-		features: [EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.NODE, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -474,7 +460,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.GRIDSOME]: {
 		description: "Gridsome Vue.js static site generator",
 		displayName: "Gridsome",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.CSS, EEslintFeature.JSX],
 		fileIndicators: ["gridsome.config.js", "gridsome.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -487,13 +473,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// -------------------------------
-	// Backend frameworks
-	// -------------------------------
 	[EFramework.HAPI]: {
 		description: "hapi Node.js framework project",
 		displayName: "hapi",
-		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -509,7 +492,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.IONIC]: {
 		description: "Ionic mobile & desktop framework project",
 		displayName: "Ionic",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.CSS, EEslintFeature.JSX],
 		fileIndicators: ["ionic.config.json"],
 		ignorePath: {
 			directories: ["www"],
@@ -526,7 +509,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.JASMINE]: {
 		description: "Jasmine testing framework",
 		displayName: "Jasmine",
-		features: [EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: ["jasmine.json"],
 		ignorePath: {
 			directories: [],
@@ -539,13 +522,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// --------------------
-	// Testing frameworks
-	// --------------------
 	[EFramework.JEST]: {
 		description: "Jest testing framework config",
 		displayName: "Jest",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSON],
 		fileIndicators: ["jest.config.js", "jest.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -561,7 +541,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.JOTAI]: {
 		description: "Jotai atomic state management for React",
 		displayName: "Jotai",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -577,7 +557,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.KARMA]: {
 		description: "Karma test runner",
 		displayName: "Karma",
-		features: [EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: ["karma.conf.js"],
 		ignorePath: {
 			directories: [],
@@ -593,7 +573,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.KEYSTONE]: {
 		description: "Keystone.js headless CMS framework",
 		displayName: "Keystone",
-		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: ["keystone.ts", "keystone.js"],
 		ignorePath: {
 			directories: [".keystone"],
@@ -606,11 +586,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// Koa
 	[EFramework.KOA]: {
 		description: "Koa Node.js framework project",
 		displayName: "Koa",
-		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.PERFECTIONIST],
+		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.PERFECTIONIST, EEslintFeature.PRETTIER, EEslintFeature.TYPESCRIPT],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -627,7 +606,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.LESS]: {
 		description: "Less CSS preprocessor configuration",
 		displayName: "Less",
-		features: [],
+		features: [EEslintFeature.CSS],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -643,7 +622,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.LIT]: {
 		description: "Lit library project for web components",
 		displayName: "Lit",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.CSS, EEslintFeature.JSX],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -659,7 +638,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.LOOPBACK]: {
 		description: "LoopBack Node.js framework project",
 		displayName: "LoopBack",
-		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: ["loopback.json"],
 		ignorePath: {
 			directories: [],
@@ -675,7 +654,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.MARKO]: {
 		description: "Marko UI framework project",
 		displayName: "Marko",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS],
 		fileIndicators: ["marko-cli.json"],
 		ignorePath: {
 			directories: [],
@@ -688,13 +667,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// -------------------------
-	// UI Component Libraries
-	// -------------------------
 	[EFramework.MATERIAL_UI]: {
 		description: "Material-UI React UI library project",
 		displayName: "Material-UI (MUI)",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -710,7 +686,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.MEDUSA]: {
 		description: "Medusa JS eCommerce backend framework",
 		displayName: "Medusa",
-		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: ["medusa-config.js", "medusa-config.ts"],
 		ignorePath: {
 			directories: [],
@@ -726,7 +702,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.METEOR]: {
 		description: "Meteor full-stack JS framework project",
 		displayName: "Meteor",
-		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.CSS],
 		fileIndicators: [".meteor/release"],
 		ignorePath: {
 			directories: ["public"],
@@ -742,7 +718,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.MITHRIL]: {
 		description: "Mithril.js framework project",
 		displayName: "Mithril.js",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -758,7 +734,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.MOBX]: {
 		description: "MobX state management for JavaScript/React",
 		displayName: "MobX",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -774,7 +750,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.MOCHA]: {
 		description: "Mocha testing framework",
 		displayName: "Mocha",
-		features: [EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSON],
 		fileIndicators: [".mocharc.js", ".mocharc.json"],
 		ignorePath: {
 			directories: [],
@@ -790,7 +766,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.MONGOOSE]: {
 		description: "Mongoose ODM for MongoDB",
 		displayName: "Mongoose",
-		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -806,7 +782,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.NATIVESCRIPT]: {
 		description: "NativeScript cross-platform framework",
 		displayName: "NativeScript",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS],
 		fileIndicators: ["nativescript.config.ts", "nativescript.config.js"],
 		ignorePath: {
 			directories: [],
@@ -819,11 +795,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// NestJS
 	[EFramework.NEST]: {
 		description: "NestJS framework project",
 		displayName: "NestJS",
-		features: [EEslintFeature.NEST, EEslintFeature.TYPESCRIPT, EEslintFeature.PERFECTIONIST, EEslintFeature.SONAR],
+		features: [EEslintFeature.NEST, EEslintFeature.TYPESCRIPT, EEslintFeature.PERFECTIONIST, EEslintFeature.SONAR, EEslintFeature.PRETTIER],
 		fileIndicators: ["nest-cli.json", ".nest-cli.json"],
 		ignorePath: {
 			directories: [],
@@ -838,11 +813,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// Next.js
 	[EFramework.NEXT]: {
 		description: "Next.js React framework project",
 		displayName: "Next.js",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.TAILWIND_CSS, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.TAILWIND_CSS, EEslintFeature.PRETTIER, EEslintFeature.NEXT, EEslintFeature.JSX, EEslintFeature.CSS],
 		fileIndicators: ["next.config.js", "next.config.mjs", "next.config.ts"],
 		ignorePath: {
 			directories: [".next"],
@@ -853,14 +827,13 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		name: EFramework.NEXT,
 		packageIndicators: {
 			dependencies: ["next"],
-			either: ["react", "react-dom"],
 		},
 	},
 
 	[EFramework.NIGHTWATCH]: {
 		description: "Nightwatch.js end-to-end testing framework",
 		displayName: "Nightwatch",
-		features: [EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSON],
 		fileIndicators: ["nightwatch.conf.js"],
 		ignorePath: {
 			directories: [],
@@ -873,7 +846,6 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// Generic project
 	[EFramework.NONE]: {
 		description: "No specific framework detected",
 		displayName: "Generic Project",
@@ -887,11 +859,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		packageIndicators: {},
 	},
 
-	// Nuxt.js
 	[EFramework.NUXT]: {
 		description: "Nuxt.js Vue framework project",
 		displayName: "Nuxt.js",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.TAILWIND_CSS],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.TAILWIND_CSS, EEslintFeature.JSX, EEslintFeature.CSS],
 		fileIndicators: ["nuxt.config.js", "nuxt.config.ts"],
 		ignorePath: {
 			directories: [".nuxt"],
@@ -908,7 +879,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.PARCEL]: {
 		description: "Parcel bundler project",
 		displayName: "Parcel",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSON, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -924,7 +895,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.PINIA]: {
 		description: "Pinia state management for Vue",
 		displayName: "Pinia",
-		features: [EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -940,7 +911,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.PLAYWRIGHT]: {
 		description: "Playwright end-to-end testing framework",
 		displayName: "Playwright",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSON],
 		fileIndicators: ["playwright.config.js", "playwright.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -956,7 +927,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.POLYMER]: {
 		description: "Polymer library project",
 		displayName: "Polymer",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS],
 		fileIndicators: ["polymer.json"],
 		ignorePath: {
 			directories: [],
@@ -972,7 +943,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.POSTCSS]: {
 		description: "PostCSS configuration project",
 		displayName: "PostCSS",
-		features: [],
+		features: [EEslintFeature.CSS, EEslintFeature.PRETTIER],
 		fileIndicators: ["postcss.config.js"],
 		ignorePath: {
 			directories: [],
@@ -988,7 +959,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.PREACT]: {
 		description: "Preact lightweight React alternative",
 		displayName: "Preact",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS],
 		fileIndicators: ["preact.config.js"],
 		ignorePath: {
 			directories: [],
@@ -1001,9 +972,6 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// --------------------
-	// Development Tools
-	// --------------------
 	[EFramework.PRETTIER]: {
 		description: "Prettier code formatter configuration",
 		displayName: "Prettier",
@@ -1020,13 +988,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// ----------------
-	// Server Side
-	// ----------------
 	[EFramework.PRISMA]: {
 		description: "Prisma ORM configuration",
 		displayName: "Prisma",
-		features: [EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.NODE, EEslintFeature.PRETTIER],
 		fileIndicators: ["prisma/schema.prisma"],
 		ignorePath: {
 			directories: [],
@@ -1043,7 +1008,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.PUPPETEER]: {
 		description: "Puppeteer testing / automation tool",
 		displayName: "Puppeteer",
-		features: [EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSON],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1059,7 +1024,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.QWIK]: {
 		description: "Qwik resumable frontend framework project",
 		displayName: "Qwik",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.JAVASCRIPT],
 		fileIndicators: ["qwik.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -1072,11 +1037,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// React
 	[EFramework.REACT]: {
 		description: "React library project",
 		displayName: "React",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.TAILWIND_CSS, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.TAILWIND_CSS, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS],
 		fileIndicators: ["src/App.jsx", "src/App.tsx"],
 		ignorePath: {
 			directories: [],
@@ -1092,7 +1056,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.REACT_NATIVE]: {
 		description: "React Native mobile application project",
 		displayName: "React Native",
-		features: [EEslintFeature.REACT, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.REACT, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.TYPESCRIPT],
 		fileIndicators: [],
 		ignorePath: {
 			directories: ["android", "ios"],
@@ -1102,14 +1066,13 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		name: EFramework.REACT_NATIVE,
 		packageIndicators: {
 			dependencies: ["react-native"],
-			either: ["react"],
 		},
 	},
 
 	[EFramework.RECOIL]: {
 		description: "Recoil state management for React",
 		displayName: "Recoil",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1122,13 +1085,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// ------------------
-	// State Management
-	// ------------------
 	[EFramework.REDUX]: {
 		description: "Redux state management for React",
 		displayName: "Redux",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1142,13 +1102,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// --------------------
-	// Full-stack frameworks
-	// --------------------
 	[EFramework.REDWOOD]: {
 		description: "RedwoodJS full-stack framework project",
 		displayName: "RedwoodJS",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.NODE],
 		fileIndicators: ["redwood.toml"],
 		ignorePath: {
 			directories: [],
@@ -1164,7 +1121,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.RELAY]: {
 		description: "Relay GraphQL client for React",
 		displayName: "Relay",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1177,11 +1134,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// Remix
 	[EFramework.REMIX]: {
 		description: "Remix React framework project",
 		displayName: "Remix",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.TAILWIND_CSS],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.TAILWIND_CSS, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.PRETTIER],
 		fileIndicators: ["remix.config.js", "remix.config.ts", "app/root.tsx"],
 		ignorePath: {
 			directories: ["public/build"],
@@ -1197,7 +1153,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.RESTIFY]: {
 		description: "Restify Node.js framework project",
 		displayName: "Restify",
-		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1213,7 +1169,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.ROLLUP]: {
 		description: "Rollup bundler project",
 		displayName: "Rollup",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSON, EEslintFeature.PRETTIER],
 		fileIndicators: ["rollup.config.js", "rollup.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -1229,7 +1185,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.SAILS]: {
 		description: "Sails.js MVC Node.js framework project",
 		displayName: "Sails.js",
-		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: ["sails.config.js"],
 		ignorePath: {
 			directories: ["views"],
@@ -1245,7 +1201,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.SASS]: {
 		description: "Sass/SCSS preprocessor configuration",
 		displayName: "Sass/SCSS",
-		features: [],
+		features: [EEslintFeature.CSS, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1261,7 +1217,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.SEQUELIZE]: {
 		description: "Sequelize ORM configuration",
 		displayName: "Sequelize",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.NODE, EEslintFeature.PRETTIER],
 		fileIndicators: ["sequelize.config.js", ".sequelizerc"],
 		ignorePath: {
 			directories: [],
@@ -1277,7 +1233,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.SNOWPACK]: {
 		description: "Snowpack build tool project",
 		displayName: "Snowpack",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSON, EEslintFeature.PRETTIER],
 		fileIndicators: ["snowpack.config.js", "snowpack.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -1290,13 +1246,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// -----------------------------
-	// Frontend frameworks/libraries
-	// -----------------------------
 	[EFramework.SOLID]: {
 		description: "Solid.js frontend library project",
 		displayName: "Solid.js",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.JAVASCRIPT],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1312,7 +1265,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.STORYBOOK]: {
 		description: "Storybook UI component explorer",
 		displayName: "Storybook",
-		features: [EEslintFeature.REACT, EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.PRETTIER],
 		fileIndicators: [".storybook/main.js", ".storybook/main.ts"],
 		ignorePath: {
 			directories: [],
@@ -1328,7 +1281,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.STRAPI]: {
 		description: "Strapi Headless CMS framework project",
 		displayName: "Strapi",
-		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1344,7 +1297,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.STYLED_COMPONENTS]: {
 		description: "Styled Components for React",
 		displayName: "Styled Components",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1357,11 +1310,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// Svelte
 	[EFramework.SVELTE]: {
 		description: "Svelte framework project",
 		displayName: "Svelte",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.TAILWIND_CSS],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.TAILWIND_CSS, EEslintFeature.CSS, EEslintFeature.JAVASCRIPT],
 		fileIndicators: ["svelte.config.js"],
 		ignorePath: {
 			directories: [".svelte-kit"],
@@ -1378,7 +1330,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.SVELTEKIT]: {
 		description: "SvelteKit meta-framework project",
 		displayName: "SvelteKit",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.TAILWIND_CSS],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.TAILWIND_CSS, EEslintFeature.CSS, EEslintFeature.JAVASCRIPT],
 		fileIndicators: ["svelte.config.js", "svelte.config.ts"],
 		ignorePath: {
 			directories: [".svelte-kit"],
@@ -1394,7 +1346,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.SWR]: {
 		description: "SWR React hooks library for data fetching",
 		displayName: "SWR",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1410,7 +1362,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.TAILWIND]: {
 		description: "Tailwind CSS setup project",
 		displayName: "Tailwind CSS",
-		features: [EEslintFeature.TAILWIND_CSS],
+		features: [EEslintFeature.TAILWIND_CSS, EEslintFeature.CSS, EEslintFeature.PRETTIER],
 		fileIndicators: ["tailwind.config.js", "tailwind.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -1426,7 +1378,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.TANSTACK_QUERY]: {
 		description: "TanStack React Query for data fetching",
 		displayName: "TanStack Query (React Query)",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1439,13 +1391,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// --------------------
-	// Desktop / Mobile
-	// --------------------
 	[EFramework.TAURI]: {
 		description: "Tauri desktop application framework",
 		displayName: "Tauri",
-		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.NODE, EEslintFeature.TYPESCRIPT, EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: ["tauri.conf.json"],
 		ignorePath: {
 			directories: ["src-tauri"],
@@ -1461,7 +1410,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.TRPC]: {
 		description: "tRPC end-to-end typesafe API",
 		displayName: "tRPC",
-		features: [EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.NODE, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1477,7 +1426,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.TURBOPACK]: {
 		description: "Turbopack (experimental bundler by Vercel)",
 		displayName: "Turbopack",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSON, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1493,7 +1442,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.TYPEORM]: {
 		description: "TypeORM configuration",
 		displayName: "TypeORM",
-		features: [EEslintFeature.TYPEORM, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.TYPEORM, EEslintFeature.TYPESCRIPT, EEslintFeature.NODE, EEslintFeature.PRETTIER],
 		fileIndicators: ["ormconfig.json", "ormconfig.js", "ormconfig.ts"],
 		ignorePath: {
 			directories: [],
@@ -1509,7 +1458,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.TYPESCRIPT]: {
 		description: "TypeScript configuration project",
 		displayName: "TypeScript",
-		features: [EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: ["tsconfig.json"],
 		ignorePath: {
 			directories: [],
@@ -1525,7 +1474,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.VITE]: {
 		description: "Vite frontend build tool / dev server project",
 		displayName: "Vite",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSON, EEslintFeature.CSS],
 		fileIndicators: ["vite.config.js", "vite.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -1541,7 +1490,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.VITEST]: {
 		description: "Vitest testing framework for Vite",
 		displayName: "Vitest",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSON],
 		fileIndicators: ["vitest.config.js", "vitest.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -1554,11 +1503,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// Vue.js
 	[EFramework.VUE]: {
 		description: "Vue.js framework project",
 		displayName: "Vue.js",
-		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.TAILWIND_CSS],
+		features: [EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER, EEslintFeature.TAILWIND_CSS, EEslintFeature.JSX, EEslintFeature.CSS, EEslintFeature.JAVASCRIPT],
 		fileIndicators: ["vue.config.js", ".vuerc"],
 		ignorePath: {
 			directories: [],
@@ -1575,7 +1523,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.WEBDRIVERIO]: {
 		description: "WebdriverIO end-to-end testing framework",
 		displayName: "WebdriverIO",
-		features: [EEslintFeature.JAVASCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.PRETTIER, EEslintFeature.JSON],
 		fileIndicators: ["wdio.conf.js"],
 		ignorePath: {
 			directories: [],
@@ -1588,13 +1536,10 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
-	// ------------------
-	// Build Tools
-	// ------------------
 	[EFramework.WEBPACK]: {
 		description: "Webpack bundler project",
 		displayName: "Webpack",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSON, EEslintFeature.PRETTIER],
 		fileIndicators: ["webpack.config.js", "webpack.config.ts"],
 		ignorePath: {
 			directories: [],
@@ -1610,7 +1555,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.XSTATE]: {
 		description: "XState state machines for JS/TS",
 		displayName: "XState",
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1626,7 +1571,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.ZUSTAND]: {
 		description: "Zustand state management for React",
 		displayName: "Zustand",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.PRETTIER],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],

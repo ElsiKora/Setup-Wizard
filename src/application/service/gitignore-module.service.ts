@@ -25,7 +25,6 @@ export class GitignoreModuleService implements IModuleService {
 
 	/**
 	 * Initializes a new instance of the GitignoreModuleService.
-	 *
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 */
@@ -38,7 +37,6 @@ export class GitignoreModuleService implements IModuleService {
 	/**
 	 * Handles existing .gitignore setup.
 	 * Checks for existing .gitignore file and asks if user wants to replace it.
-	 *
 	 * @returns Promise resolving to true if setup should proceed, false otherwise
 	 */
 	async handleExistingSetup(): Promise<boolean> {
@@ -77,7 +75,6 @@ export class GitignoreModuleService implements IModuleService {
 	/**
 	 * Installs and configures .gitignore.
 	 * Generates a new .gitignore file with common patterns.
-	 *
 	 * @returns Promise resolving to the module setup result
 	 */
 	async install(): Promise<IModuleSetupResult> {
@@ -105,7 +102,6 @@ export class GitignoreModuleService implements IModuleService {
 	 * Determines if .gitignore should be installed.
 	 * Asks the user if they want to generate a .gitignore file.
 	 * Uses the saved config value as default if it exists.
-	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
@@ -121,7 +117,6 @@ export class GitignoreModuleService implements IModuleService {
 	/**
 	 * Displays a summary of the setup results.
 	 * Lists what was included in the generated .gitignore file.
-	 *
 	 * @param isSuccess - Whether the setup was successful
 	 * @param error - Optional error if setup failed
 	 */
@@ -141,7 +136,6 @@ export class GitignoreModuleService implements IModuleService {
 
 	/**
 	 * Generates a new .gitignore file.
-	 *
 	 * @returns Promise resolving to an object indicating success or failure with optional error
 	 */
 	private async generateNewGitignore(): Promise<{ error?: Error; isSuccess: boolean }> {

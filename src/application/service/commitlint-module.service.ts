@@ -40,7 +40,6 @@ export class CommitlintModuleService implements IModuleService {
 
 	/**
 	 * Initializes a new instance of the CommitlintModuleService.
-	 *
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 */
@@ -55,7 +54,6 @@ export class CommitlintModuleService implements IModuleService {
 	/**
 	 * Handles existing Commitlint/Commitizen setup.
 	 * Checks for existing configuration files and asks if user wants to remove them.
-	 *
 	 * @returns Promise resolving to true if setup should proceed, false otherwise
 	 */
 	async handleExistingSetup(): Promise<boolean> {
@@ -90,7 +88,6 @@ export class CommitlintModuleService implements IModuleService {
 	/**
 	 * Installs and configures Commitlint and Commitizen.
 	 * Sets up configuration files, git hooks, and package.json scripts.
-	 *
 	 * @returns Promise resolving to the module setup result
 	 */
 	async install(): Promise<IModuleSetupResult> {
@@ -117,7 +114,6 @@ export class CommitlintModuleService implements IModuleService {
 	 * Determines if Commitlint/Commitizen should be installed.
 	 * Asks the user if they want to set up these tools for their project.
 	 * Uses the saved config value as default if it exists.
-	 *
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
@@ -148,7 +144,6 @@ export class CommitlintModuleService implements IModuleService {
 
 	/**
 	 * Finds existing Commitlint/Commitizen configuration files.
-	 *
 	 * @returns Promise resolving to an array of file paths for existing configuration files
 	 */
 	private async findExistingConfigFiles(): Promise<Array<string>> {

@@ -16,7 +16,6 @@ import type { IModuleSetupResult } from "../interface/module-setup-result.interf
 export const ConfigMapper: {
 	/**
 	 * Converts a configuration object to initialization command properties.
-	 *
 	 * @param config - The configuration object
 	 * @returns Command properties for initialization
 	 */
@@ -24,7 +23,6 @@ export const ConfigMapper: {
 
 	/**
 	 * Converts setup results to a configuration object.
-	 *
 	 * @param setupResults - Partial record of module setup results
 	 * @returns Configuration object
 	 */
@@ -33,7 +31,6 @@ export const ConfigMapper: {
 	/**
 	 * Converts a configuration object to initialization command properties.
 	 * Extracts the enabled status from complex configuration objects.
-	 *
 	 * @param config - The configuration object
 	 * @returns Command properties for initialization
 	 */
@@ -82,7 +79,6 @@ export const ConfigMapper: {
 	/**
 	 * Converts setup results to a configuration object.
 	 * Combines wasInstalled flag with custom properties into a configuration.
-	 *
 	 * @param setupResults - Partial record of module setup results
 	 * @returns Configuration object
 	 */

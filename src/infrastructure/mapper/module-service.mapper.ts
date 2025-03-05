@@ -27,7 +27,6 @@ export class ModuleServiceMapper {
 
 	/**
 	 * Initializes a new instance of the ModuleServiceMapper.
-	 *
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 */
@@ -39,7 +38,6 @@ export class ModuleServiceMapper {
 	/**
 	 * Gets a module service instance based on the specified module type.
 	 * Factory method that creates the appropriate service implementation.
-	 *
 	 * @param module - The module type enum value
 	 * @returns An implementation of IModuleService for the specified module
 	 * @throws Error if the module type is not supported

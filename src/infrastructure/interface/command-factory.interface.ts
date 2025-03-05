@@ -14,7 +14,6 @@ export interface ICommandFactory {
 
 	/**
 	 * Creates a command instance of the specified type.
-	 *
 	 * @param name - The enum value representing the command to create
 	 * @param options - Command-specific options and arguments
 	 * @returns An instance of the specified command
