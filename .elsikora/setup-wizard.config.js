@@ -10,7 +10,7 @@ export default {
 		isEnabled: true,
 	},
 	eslint: {
-		isEnabled: false,
+		isEnabled: true,
 	},
 	gitignore: {
 		isEnabled: false,

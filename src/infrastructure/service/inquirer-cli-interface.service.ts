@@ -7,7 +7,6 @@ import chalk from "chalk";
 // eslint-disable-next-line elsikora-node/no-extraneous-import
 import inquirer from "inquirer";
 // @ts-ignore
-// eslint-disable-next-line elsikora-node/no-extraneous-import
 import ora from "ora";
 
 /**
@@ -18,7 +17,7 @@ import ora from "ora";
 export class InquirerCliInterface implements ICliInterfaceService {
 	// @ts-ignore
 	/** Spinner for showing loading/processing states */
-	private readonly SPINNER: ora.Ora;
+	private readonly SPINNER: any;
 
 	/**
 	 * Initializes a new instance of the InquirerCliInterface.

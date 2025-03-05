@@ -10,15 +10,35 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 		description: "File naming rules",
 		packages: [],
 	},
+	[EEslintFeature.CSS]: {
+		configFlag: "withCss",
+		description: "CSS support",
+		packages: [],
+	},
 	[EEslintFeature.JAVASCRIPT]: {
 		configFlag: "withJavascript",
 		description: "JavaScript support",
 		isRequired: true,
 		packages: [],
 	},
+	[EEslintFeature.JSDOC]: {
+		configFlag: "withJsDoc",
+		description: "JSDoc support",
+		packages: [],
+	},
 	[EEslintFeature.JSON]: {
 		configFlag: "withJson",
 		description: "JSON files support",
+		packages: [],
+	},
+	[EEslintFeature.JSX]: {
+		configFlag: "withJsx",
+		description: "JSX support",
+		packages: ["eslint-plugin-jsx-a11y"],
+	},
+	[EEslintFeature.MARKDOWN]: {
+		configFlag: "withMarkdown",
+		description: "Markdown files support",
 		packages: [],
 	},
 	[EEslintFeature.NEST]: {
@@ -27,6 +47,12 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 		detect: ["@nestjs/core", "@nestjs/common"],
 		isRequiresTypescript: true,
 		packages: ["eslint-plugin-ng-module-sort", "@elsikora/eslint-plugin-nestjs-typed"],
+	},
+	[EEslintFeature.NEXT]: {
+		configFlag: "withNext",
+		description: "Next.js framework support",
+		detect: ["next", "next/types"],
+		packages: ["@next/eslint-plugin-next"],
 	},
 	[EEslintFeature.NODE]: {
 		configFlag: "withNode",
@@ -54,7 +80,7 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 		configFlag: "withReact",
 		description: "React framework support",
 		detect: ["react", "react-dom", "@types/react"],
-		packages: ["@eslint-react/eslint-plugin"],
+		packages: ["@eslint-react/eslint-plugin", "eslint-plugin-react"],
 	},
 	[EEslintFeature.REGEXP]: {
 		configFlag: "withRegexp",

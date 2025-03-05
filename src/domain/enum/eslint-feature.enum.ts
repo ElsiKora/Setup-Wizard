@@ -1,8 +1,13 @@
 export enum EEslintFeature {
 	CHECK_FILE = "checkFile",
+	CSS = "css",
 	JAVASCRIPT = "javascript",
+	JSDOC = "jsdoc",
 	JSON = "json",
+	JSX = "jsx",
+	MARKDOWN = "markdown",
 	NEST = "nest",
+	NEXT = "next",
 	NODE = "node",
 	PACKAGE_JSON = "packageJson",
 	PERFECTIONIST = "perfectionist",
