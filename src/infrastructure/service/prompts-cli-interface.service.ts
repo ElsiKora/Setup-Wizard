@@ -1,4 +1,4 @@
-/* eslint-disable @elsikora-sonar/no-duplicate-string,elsikora-node/no-process-exit,@elsikora-unicorn/no-process-exit */
+/* eslint-disable @elsikora/sonar/no-duplicate-string,@elsikora/unicorn/no-process-exit */
 import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
 import type { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
 
@@ -40,11 +40,13 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	async confirm(message: string, isConfirmedByDefault: boolean = false): Promise<boolean> {
 		try {
 			const response: prompts.Answers<string> = await prompts({
-				// eslint-disable-next-line @elsikora-typescript/naming-convention
+				active: "yes",
+				inactive: "no",
+				// eslint-disable-next-line @elsikora/typescript/naming-convention
 				initial: isConfirmedByDefault,
 				message,
 				name: "value",
-				type: "confirm",
+				type: "toggle",
 			});
 
 			if (response.value === undefined) {
@@ -83,7 +85,7 @@ export class PromptsCliInterface implements ICliInterfaceService {
 		for (const [group, groupOptions] of Object.entries(options)) {
 			for (const opt of groupOptions) {
 				choices.push({
-					// eslint-disable-next-line @elsikora-typescript/naming-convention
+					// eslint-disable-next-line @elsikora/typescript/naming-convention
 					selected: initialValues?.includes(opt.value) ?? false,
 					title: `${group}: ${opt.label}`,
 					value: opt.value,
@@ -94,7 +96,7 @@ export class PromptsCliInterface implements ICliInterfaceService {
 		try {
 			const response: prompts.Answers<string> = await prompts({
 				choices,
-				// eslint-disable-next-line @elsikora-typescript/naming-convention
+				// eslint-disable-next-line @elsikora/typescript/naming-convention
 				instructions: false,
 				message: `${message} (space to select)`,
 				min: isRequired ? 1 : undefined,
@@ -149,9 +151,9 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	 * @returns Promise that resolves to an array of selected values
 	 */
 	async multiselect<T>(message: string, options: Array<ICliInterfaceServiceSelectOptions>, isRequired: boolean = false, initialValues?: Array<string>): Promise<Array<T>> {
-		// eslint-disable-next-line @elsikora-typescript/naming-convention
+		// eslint-disable-next-line @elsikora/typescript/naming-convention
 		const choices: Array<{ selected: boolean; title: string; value: string }> = options.map((opt: ICliInterfaceServiceSelectOptions) => ({
-			// eslint-disable-next-line @elsikora-typescript/naming-convention
+			// eslint-disable-next-line @elsikora/typescript/naming-convention
 			selected: initialValues?.includes(opt.value) ?? false,
 			title: opt.label,
 			value: opt.value,
@@ -160,7 +162,7 @@ export class PromptsCliInterface implements ICliInterfaceService {
 		try {
 			const response: prompts.Answers<string> = await prompts({
 				choices,
-				// eslint-disable-next-line @elsikora-typescript/naming-convention
+				// eslint-disable-next-line @elsikora/typescript/naming-convention
 				instructions: false,
 				message: `${message} (space to select)`,
 				min: isRequired ? 1 : undefined,
@@ -170,6 +172,7 @@ export class PromptsCliInterface implements ICliInterfaceService {
 
 			if (response.values === undefined) {
 				this.error("Operation cancelled by user");
+
 				process.exit(0);
 			}
 
@@ -188,16 +191,16 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	note(title: string, message: string): void {
 		const lines: Array<string> = message.split("\n");
 
-		// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+		// eslint-disable-next-line @elsikora/typescript/no-magic-numbers
 		const width: number = Math.max(title.length, ...lines.map((line: string) => line.length)) + 4; // Add padding
 
 		const top: string = `┌${"─".repeat(width)}┐`;
 		const bottom: string = `└${"─".repeat(width)}┘`;
 
 		// Create middle lines with padding
-		// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+		// eslint-disable-next-line @elsikora/typescript/no-magic-numbers
 		const paddedTitle: string = ` ${title.padEnd(width - 2)} `;
-		// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+		// eslint-disable-next-line @elsikora/typescript/no-magic-numbers
 		const paddedLines: Array<string> = lines.map((line: string) => ` ${line.padEnd(width - 2)} `);
 
 		// Log the note box with styling
@@ -259,7 +262,7 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	 * @param message - The message to display while the spinner is active
 	 */
 	startSpinner(message: string): void {
-		// eslint-disable-next-line @elsikora-typescript/no-unsafe-call,@elsikora-typescript/no-unsafe-member-access
+		// eslint-disable-next-line @elsikora/typescript/no-unsafe-call,@elsikora/typescript/no-unsafe-member-access
 		this.spinner.stop();
 		this.spinner = ora(message).start();
 	}
@@ -269,7 +272,7 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	 * @param message - Optional message to display when the spinner stops
 	 */
 	stopSpinner(message?: string): void {
-		// eslint-disable-next-line @elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-call
+		// eslint-disable-next-line @elsikora/typescript/no-unsafe-member-access,@elsikora/typescript/no-unsafe-call
 		this.spinner.stop();
 
 		if (message) {
@@ -296,7 +299,7 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	async text(message: string, placeholder?: string, initialValue?: string, validate?: (value: string) => Error | string | undefined): Promise<string> {
 		// Convert the validate function to match prompts' expected format
 		const promptsValidate: ((value: string) => boolean | string) | undefined = validate
-			? // eslint-disable-next-line @elsikora-typescript/explicit-function-return-type
+			? // eslint-disable-next-line @elsikora/typescript/explicit-function-return-type
 				(value: string) => {
 					const result: Error | string | undefined = validate(value);
 

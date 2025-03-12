@@ -2,6 +2,7 @@ import type { ICiConfigContent } from "../../domain/interface/ci-config-content.
 import type { ICiConfig } from "../../domain/interface/ci-config.interface";
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
+import type { IConfigService } from "../interface/config-service.interface";
 import type { IConfigCi } from "../interface/config/ci.interface";
 import type { IConfigSemanticRelease } from "../interface/config/semantic-release.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
@@ -13,8 +14,6 @@ import { ECiModule } from "../../domain/enum/ci-module.enum";
 import { ECiProvider } from "../../domain/enum/ci-provider.enum";
 import { EModule } from "../../domain/enum/module.enum";
 
-import { ConfigService } from "./config.service";
-
 /**
  * Service for setting up and managing Continuous Integration (CI) modules.
  * Handles the selection, configuration, and setup of CI workflows for different providers.
@@ -23,14 +22,14 @@ export class CiModuleService implements IModuleService {
 	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** Configuration service for managing app configuration */
+	readonly CONFIG_SERVICE: IConfigService;
+
 	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
 	/** Cached CI configuration */
 	private config: IConfigCi | null = null;
-
-	/** Configuration service for managing app configuration */
-	private readonly CONFIG_SERVICE: ConfigService;
 
 	/** Selected CI modules to install */
 	private selectedModules: Array<ECiModule> = [];
@@ -42,11 +41,12 @@ export class CiModuleService implements IModuleService {
 	 * Initializes a new instance of the CiModuleService.
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
+	 * @param configService - Service for managing app configuration
 	 */
-	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
+	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService, configService: IConfigService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
-		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
+		this.CONFIG_SERVICE = configService;
 	}
 
 	/**
@@ -341,11 +341,11 @@ export class CiModuleService implements IModuleService {
 	private async setupModule(module: ECiModule, properties: Record<string, any>): Promise<{ error?: Error; isSuccess: boolean; module: ECiModule }> {
 		try {
 			const config: ICiConfig = CI_CONFIG[module];
-			// eslint-disable-next-line @elsikora-typescript/no-non-null-assertion
+			// eslint-disable-next-line @elsikora/typescript/no-non-null-assertion
 			const providerConfig: ICiConfigContent = config.content[this.selectedProvider!];
 
 			if (!providerConfig) {
-				// eslint-disable-next-line @elsikora-typescript/restrict-template-expressions
+				// eslint-disable-next-line @elsikora/typescript/restrict-template-expressions
 				throw new Error(`Provider ${this.selectedProvider} is not supported for ${config.name}`);
 			}
 
@@ -383,7 +383,7 @@ export class CiModuleService implements IModuleService {
 			const moduleProperties: Record<string, any> = {};
 
 			for (const module of this.selectedModules) {
-				// eslint-disable-next-line @elsikora-typescript/no-unsafe-argument
+				// eslint-disable-next-line @elsikora/typescript/no-unsafe-argument
 				const savedModuleProperties: Record<string, any> = this.extractModuleProperties(savedProperties[module]);
 				const properties: Record<string, string> = await this.collectModuleProperties(module, savedModuleProperties);
 
@@ -396,8 +396,8 @@ export class CiModuleService implements IModuleService {
 
 			const results: Array<Awaited<{ error?: Error; isSuccess: boolean; module: ECiModule }>> = await Promise.all(
 				this.selectedModules.map((module: ECiModule) => {
-					// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
-					const setupProperties: Record<string, any> = moduleProperties[module] || {};
+					// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
+					const setupProperties: Record<string, any> = moduleProperties[module] ?? {};
 
 					return this.setupModule(module, setupProperties);
 				}),

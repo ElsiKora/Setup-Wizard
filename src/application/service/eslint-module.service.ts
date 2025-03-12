@@ -6,6 +6,7 @@ import type { TPackageJsonScripts } from "../../domain/type/package-json-scripts
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
+import type { IConfigService } from "../interface/config-service.interface";
 import type { IConfigEslint } from "../interface/config/eslint.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
@@ -26,7 +27,6 @@ import { ESLINT_CONFIG_FILE_NAME } from "../constant/eslint-config-file-name.con
 import { ESLINT_CONFIG_FILE_NAMES } from "../constant/eslint-config-file-names.constant";
 import { ESLINT_CONFIG_IGNORE_PATHS } from "../constant/eslint-config-ignore-paths.constant";
 
-import { ConfigService } from "./config.service";
 import { FrameworkService } from "./framework.service";
 import { PackageJsonService } from "./package-json.service";
 
@@ -41,6 +41,9 @@ export class EslintModuleService implements IModuleService {
 	/** Command service for executing shell commands */
 	readonly COMMAND_SERVICE: ICommandService;
 
+	/** Configuration service for managing app settings */
+	readonly CONFIG_SERVICE: IConfigService;
+
 	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
@@ -49,9 +52,6 @@ export class EslintModuleService implements IModuleService {
 
 	/** Cached ESLint configuration */
 	private config: IConfigEslint | null = null;
-
-	/** Configuration service for managing app settings */
-	private readonly CONFIG_SERVICE: ConfigService;
 
 	/** Frameworks detected in the project */
 	private detectedFrameworks: Array<IFrameworkConfig> = [];
@@ -63,17 +63,18 @@ export class EslintModuleService implements IModuleService {
 	private selectedFeatures: Array<EEslintFeature> = [];
 
 	/**
-	 * Initializes a new instance of the EslintModuleService.
+	 * Initializes a new instance of the ESLintModuleService.
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
+	 * @param configService - Service for managing app configuration
 	 */
-	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
+	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService, configService: IConfigService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
-		this.COMMAND_SERVICE = new NodeCommandService();
+		this.COMMAND_SERVICE = new NodeCommandService(cliInterfaceService);
 		this.PACKAGE_JSON_SERVICE = new PackageJsonService(fileSystemService, this.COMMAND_SERVICE);
 		this.FRAMEWORK_SERVICE = new FrameworkService(fileSystemService, this.PACKAGE_JSON_SERVICE);
-		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
+		this.CONFIG_SERVICE = configService;
 	}
 
 	/**

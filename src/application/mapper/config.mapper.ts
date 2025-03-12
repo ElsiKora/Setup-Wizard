@@ -1,4 +1,4 @@
-/* eslint-disable @elsikora-typescript/no-unsafe-member-access */
+/* eslint-disable @elsikora/typescript/no-unsafe-member-access */
 import type { ECiModule } from "../../domain/enum/ci-module.enum";
 import type { ECiProvider } from "../../domain/enum/ci-provider.enum";
 import type { EEslintFeature } from "../../domain/enum/eslint-feature.enum";

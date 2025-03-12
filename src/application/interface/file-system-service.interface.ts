@@ -1,3 +1,5 @@
+import path from "node:path";
+
 /**
  * Interface for file system operations.
  * Provides methods for reading, writing, and managing files and directories.
@@ -20,6 +22,20 @@ export interface IFileSystemService {
 	deleteFile(path: string): Promise<void>;
 
 	/**
+	 * Gets the directory name from a file path.
+	 * @param filePath
+	 * @returns The directory name
+	 */
+	getDirectoryNameFromFilePath(filePath: string): string;
+
+	/**
+	 * Gets the extension from a file path.
+	 * @param filePath
+	 * @returns The file extension
+	 */
+	getExtensionFromFilePath(filePath: string): string;
+
+	/**
 	 * Checks if any of the provided paths exist and returns the first existing path.
 	 * @param paths - Array of paths to check
 	 * @returns Promise that resolves to the first existing path or undefined if none exist
@@ -39,6 +55,7 @@ export interface IFileSystemService {
 	 * @param encoding - The encoding to use when reading the file, defaults to "utf8"
 	 * @returns Promise that resolves to the file contents as a string
 	 */
+	// eslint-disable-next-line @elsikora/javascript/no-undef
 	readFile(path: string, encoding?: BufferEncoding): Promise<string>;
 
 	/**
@@ -48,5 +65,6 @@ export interface IFileSystemService {
 	 * @param encoding - The encoding to use when writing the file, defaults to "utf8"
 	 * @returns Promise that resolves when the file is written
 	 */
+	// eslint-disable-next-line @elsikora/javascript/no-undef
 	writeFile(path: string, content: string, encoding?: BufferEncoding): Promise<void>;
 }

@@ -10,7 +10,7 @@ export default {
 		isEnabled: true,
 	},
 	eslint: {
-		features: ["sonar", "unicorn", "perfectionist", "jsdoc", "javascript", "typescript", "json", "yaml", "checkFile", "packageJson", "markdown", "node", "regexp", "prettier", "stylistic"],
+		features: ["sonar", "unicorn", "perfectionist", "jsdoc", "javascript", "typescript", "jsx", "json", "yaml", "checkFile", "packageJson", "markdown", "react", "nest", "next", "tanstack", "storybook", "node", "regexp", "typeorm", "i18next", "tailwindCss", "prettier", "stylistic", "css", "fsd", "noSecrets"],
 		isEnabled: true,
 	},
 	gitignore: {

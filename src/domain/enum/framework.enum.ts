@@ -35,14 +35,15 @@ export enum EFramework {
 	GRAPHQL = "graphql",
 	GRIDSOME = "gridsome",
 	HAPI = "hapi",
+	I18NEXT = "i18next",
 	IONIC = "ionic",
 	JASMINE = "jasmine",
 	// Testing frameworks
 	JEST = "jest",
 	JOTAI = "jotai",
 	KARMA = "karma",
-	KEYSTONE = "keystone",
 
+	KEYSTONE = "keystone",
 	KOA = "koa",
 	LESS = "less",
 	LIT = "lit",
@@ -51,14 +52,14 @@ export enum EFramework {
 	// UI Component Libraries
 	MATERIAL_UI = "material-ui",
 	MEDUSA = "medusa",
-	METEOR = "meteor",
 
+	METEOR = "meteor",
 	MITHRIL = "mithril",
 	MOBX = "mobx",
 	MOCHA = "mocha",
 	MONGOOSE = "mongoose",
-	NATIVESCRIPT = "nativescript",
 
+	NATIVESCRIPT = "nativescript",
 	// Meta-frameworks
 	NEST = "nest",
 	NEXT = "next",
@@ -70,8 +71,8 @@ export enum EFramework {
 	PINIA = "pinia",
 	PLAYWRIGHT = "playwright",
 	POLYMER = "polymer",
-	POSTCSS = "postcss",
 
+	POSTCSS = "postcss",
 	PREACT = "preact",
 	// Development Tools
 	PRETTIER = "prettier",
@@ -80,8 +81,8 @@ export enum EFramework {
 	PUPPETEER = "puppeteer",
 	QWIK = "qwik",
 	REACT = "react",
-	REACT_NATIVE = "react-native",
 
+	REACT_NATIVE = "react-native",
 	RECOIL = "recoil",
 	// State Management
 	REDUX = "redux",
@@ -90,36 +91,37 @@ export enum EFramework {
 	RELAY = "relay",
 	REMIX = "remix",
 	RESTIFY = "restify",
-	ROLLUP = "rollup",
 
+	ROLLUP = "rollup",
 	SAILS = "sails",
 	SASS = "sass",
 	SEQUELIZE = "sequelize",
 	SNOWPACK = "snowpack",
 	SOLID = "solid",
-	STORYBOOK = "storybook",
 
+	STORYBOOK = "storybook",
 	STRAPI = "strapi",
 	STYLED_COMPONENTS = "styled-components",
 	SVELTE = "svelte",
 	SVELTEKIT = "sveltekit",
 	SWR = "swr",
-	TAILWIND = "tailwind",
 
+	TAILWIND = "tailwind",
 	TANSTACK_QUERY = "tanstack-query",
+	TANSTACK_ROUTER = "tanstack-router",
 	TAURI = "tauri",
 	TRPC = "trpc",
 	TURBOPACK = "turbopack",
 	TYPEORM = "typeorm",
 	TYPESCRIPT = "typescript",
-	VITE = "vite",
 
+	VITE = "vite",
 	VITEST = "vitest",
 	VUE = "vue",
 	WEBDRIVERIO = "webdriverio",
 	// Build Tools
 	WEBPACK = "webpack",
-	XSTATE = "xstate",
 
+	XSTATE = "xstate",
 	ZUSTAND = "zustand",
 }

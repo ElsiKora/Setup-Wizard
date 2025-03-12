@@ -15,6 +15,16 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 		description: "CSS support",
 		packages: [],
 	},
+	[EEslintFeature.FSD]: {
+		configFlag: "withFsd",
+		description: "File structure definition",
+		packages: ["@conarti/eslint-plugin-feature-sliced"],
+	},
+	[EEslintFeature.I18NEXT]: {
+		configFlag: "withI18next",
+		description: "i18next localization support",
+		packages: ["eslint-plugin-i18next"],
+	},
 	[EEslintFeature.JAVASCRIPT]: {
 		configFlag: "withJavascript",
 		description: "JavaScript support",
@@ -54,6 +64,11 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 		detect: ["next", "next/types"],
 		packages: ["@next/eslint-plugin-next"],
 	},
+	[EEslintFeature.NO_SECRETS]: {
+		configFlag: "withNoSecrets",
+		description: "Secrets detection",
+		packages: ["eslint-plugin-no-secrets"],
+	},
 	[EEslintFeature.NODE]: {
 		configFlag: "withNode",
 		description: "Node.js specific rules",
@@ -85,23 +100,33 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 	[EEslintFeature.REGEXP]: {
 		configFlag: "withRegexp",
 		description: "RegExp linting",
-		packages: [""],
+		packages: [],
 	},
 	[EEslintFeature.SONAR]: {
 		configFlag: "withSonar",
 		description: "SonarJS code quality rules",
-		packages: [""],
+		packages: [],
+	},
+	[EEslintFeature.STORYBOOK]: {
+		configFlag: "withStorybook",
+		description: "Storybook support",
+		packages: ["eslint-plugin-storybook"],
 	},
 	[EEslintFeature.STYLISTIC]: {
 		configFlag: "withStylistic",
 		description: "Stylistic rules",
-		packages: [""],
+		packages: [],
 	},
 	[EEslintFeature.TAILWIND_CSS]: {
 		configFlag: "withTailwindCss",
 		description: "Tailwind CSS support",
 		detect: ["tailwindcss"],
-		packages: [""],
+		packages: [],
+	},
+	[EEslintFeature.TANSTACK]: {
+		configFlag: "withTanstack",
+		description: "TanStack rules",
+		packages: ["@tanstack/eslint-plugin-router", "@tanstack/eslint-plugin-query"],
 	},
 	[EEslintFeature.TYPEORM]: {
 		configFlag: "withTypeorm",

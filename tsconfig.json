@@ -8,5 +8,5 @@
 		"resolveJsonModule": true,
 		"moduleResolution": "bundler"
 	},
-	"include": ["src/**/*", "bin/application/constant/lint-staged-config-file-names.constant.d.ts", "bin/application/constant/lint-staged-config-file-names.constant.d.ts"]
+	"include": ["src/**/*"]
 }

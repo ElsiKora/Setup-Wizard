@@ -31,11 +31,11 @@ export const LINT_STAGED_CONFIG: {
 		if (features.includes(ELintStagedFeature.ESLINT)) {
 			const extensions: Array<string> = LINT_STAGED_FEATURE_CONFIG[ELintStagedFeature.ESLINT].fileExtensions;
 			fileFilters.push(`
-        const eslintFiles = files.filter((file) => {
+        const eslintFiles = files.filter((fileName) => {
           const validExtensions = ${JSON.stringify(extensions)};
-          const fileExtension = file.split(".").pop();
+          const fileExtension = fileName.split(".").pop();
           const hasValidExtension = validExtensions.includes(fileExtension);
-          const hasNoExtension = !file.includes(".");
+          const hasNoExtension = !fileName.includes(".");
           return hasValidExtension && !hasNoExtension;
         });
 
@@ -47,9 +47,9 @@ export const LINT_STAGED_CONFIG: {
 		if (features.includes(ELintStagedFeature.STYLELINT)) {
 			const extensions: Array<string> = LINT_STAGED_FEATURE_CONFIG[ELintStagedFeature.STYLELINT].fileExtensions;
 			fileFilters.push(`
-        const styleFiles = files.filter((file) => {
+        const styleFiles = files.filter((fileName) => {
           const validExtensions = ${JSON.stringify(extensions)};
-          const fileExtension = file.split(".").pop();
+          const fileExtension = fileName.split(".").pop();
           return validExtensions.includes(fileExtension);
         });
 

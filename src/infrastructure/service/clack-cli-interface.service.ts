@@ -1,4 +1,4 @@
-/* eslint-disable @elsikora-typescript/no-unsafe-call,@elsikora-typescript/naming-convention,elsikora-node/no-process-exit,@elsikora-unicorn/no-process-exit,@elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-assignment */
+/* eslint-disable @elsikora/typescript/no-unsafe-call,@elsikora/typescript/naming-convention,@elsikora/unicorn/no-process-exit,@elsikora/typescript/no-unsafe-member-access,@elsikora/typescript/no-unsafe-assignment */
 import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
 import type { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
 
