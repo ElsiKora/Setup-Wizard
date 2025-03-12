@@ -10,6 +10,7 @@ export default [
 		withCheckFile: true,
 		withJavascript: true,
 		withJson: true,
+		withMarkdown: true,
 		withNode: true,
 		withNoSecrets: true,
 		withPackageJson: true,
