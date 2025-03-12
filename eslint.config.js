@@ -17,7 +17,6 @@ export default [
 		withPrettier: true,
 		withRegexp: true,
 		withSonar: true,
-		withStorybook: true,
 		withStylistic: true,
 		withTypescript: true,
 		withUnicorn: true,
