@@ -86,7 +86,7 @@ npx @elsikora/setup-wizard init --withEslint --withPrettier --withLintStaged
 
 Available flags:
 
-```
+```text
 -c, --withCommitlint     Add commitlint configuration
 -d, --withIde            Add IDE configuration
 -e, --withEslint         Add ESLint configuration

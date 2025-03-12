@@ -2,6 +2,7 @@ import type { IPackageJson } from "../../domain/interface/package-json.interface
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
+import type { IConfigService } from "../interface/config-service.interface";
 import type { IConfigSemanticRelease } from "../interface/config/semantic-release.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
@@ -14,7 +15,6 @@ import { SEMANTIC_RELEASE_CONFIG_FILE_NAME } from "../constant/semantic-release-
 import { SEMANTIC_RELEASE_CONFIG_FILE_NAMES } from "../constant/semantic-release-config-file-names.constant";
 import { SEMANTIC_RELEASE_CONFIG } from "../constant/semantic-release-config.constant";
 
-import { ConfigService } from "./config.service";
 import { PackageJsonService } from "./package-json.service";
 
 /**
@@ -30,7 +30,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	readonly COMMAND_SERVICE: ICommandService;
 
 	/** Configuration service for managing app configuration */
-	readonly CONFIG_SERVICE: ConfigService;
+	readonly CONFIG_SERVICE: IConfigService;
 
 	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
@@ -45,13 +45,14 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * Initializes a new instance of the SemanticReleaseModuleService.
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
+	 * @param configService - Service for managing app configuration
 	 */
-	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
+	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService, configService: IConfigService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
-		this.COMMAND_SERVICE = new NodeCommandService();
+		this.COMMAND_SERVICE = new NodeCommandService(cliInterfaceService);
 		this.PACKAGE_JSON_SERVICE = new PackageJsonService(fileSystemService, this.COMMAND_SERVICE);
-		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
+		this.CONFIG_SERVICE = configService;
 	}
 
 	/**
@@ -280,12 +281,12 @@ export class SemanticReleaseModuleService implements IModuleService {
 			}
 
 			if (savedRepoUrl.startsWith("git+")) {
-				// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+				// eslint-disable-next-line @elsikora/typescript/no-magic-numbers
 				savedRepoUrl = savedRepoUrl.slice(4);
 			}
 
 			if (savedRepoUrl.endsWith(".git")) {
-				// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+				// eslint-disable-next-line @elsikora/typescript/no-magic-numbers
 				savedRepoUrl = savedRepoUrl.slice(0, Math.max(0, savedRepoUrl.length - 4));
 			}
 		}

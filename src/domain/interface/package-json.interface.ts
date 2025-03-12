@@ -24,7 +24,7 @@ export interface IPackageJson {
 	main?: string;
 	name: string;
 	prettier?: Record<string, any>;
-	// eslint-disable-next-line @elsikora-typescript/naming-convention
+	// eslint-disable-next-line @elsikora/typescript/naming-convention
 	private?: boolean;
 	repository?: IPackageJsonRepository | string;
 	scripts?: TPackageJsonScripts;

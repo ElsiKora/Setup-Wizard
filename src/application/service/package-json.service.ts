@@ -132,14 +132,14 @@ export class PackageJsonService {
 
 		if (versionString.startsWith(">=")) {
 			flag = EPackageJsonDependencyVersionFlag.GREATER_THAN_OR_EQUAL;
-			// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+			// eslint-disable-next-line @elsikora/typescript/no-magic-numbers
 			version = versionString.slice(2);
 		} else if (versionString.startsWith(">")) {
 			flag = EPackageJsonDependencyVersionFlag.GREATER_THAN;
 			version = versionString.slice(1);
 		} else if (versionString.startsWith("<=")) {
 			flag = EPackageJsonDependencyVersionFlag.LESS_THAN_OR_EQUAL;
-			// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+			// eslint-disable-next-line @elsikora/typescript/no-magic-numbers
 			version = versionString.slice(2);
 		} else if (versionString.startsWith("<")) {
 			flag = EPackageJsonDependencyVersionFlag.LESS_THAN;
@@ -173,7 +173,7 @@ export class PackageJsonService {
 		const versionParts: Array<number> = versionOnly.split(".").map((part: string) => Number.parseInt(part, 10));
 		const majorVersion: number = versionParts[0] || 0;
 		const minorVersion: number = versionParts[1] || 0;
-		// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+		// eslint-disable-next-line @elsikora/typescript/no-magic-numbers
 		const patchVersion: number = versionParts[2] || 0;
 
 		return {
@@ -216,7 +216,7 @@ export class PackageJsonService {
 			return;
 		}
 
-		const packageString: string = packageList.join(" ");
+		const packageString: string = packageList.join(`${version ? "@" + version : ""} `);
 		await this.commandService.execute(`npm install ${typeFlag} ${packageString}`);
 	}
 
@@ -262,17 +262,17 @@ export class PackageJsonService {
 
 		if (type === EPackageJsonDependencyType.ANY) {
 			if (packageJson.dependencies?.[name]) {
-				// eslint-disable-next-line @elsikora-typescript/no-dynamic-delete
+				// eslint-disable-next-line @elsikora/typescript/no-dynamic-delete
 				delete packageJson.dependencies[name];
 			}
 
 			if (packageJson.devDependencies?.[name]) {
-				// eslint-disable-next-line @elsikora-typescript/no-dynamic-delete
+				// eslint-disable-next-line @elsikora/typescript/no-dynamic-delete
 				delete packageJson.devDependencies[name];
 			}
 
 			if (packageJson.peerDependencies?.[name]) {
-				// eslint-disable-next-line @elsikora-typescript/no-dynamic-delete
+				// eslint-disable-next-line @elsikora/typescript/no-dynamic-delete
 				delete packageJson.peerDependencies[name];
 			}
 
@@ -280,7 +280,7 @@ export class PackageJsonService {
 				delete packageJson.optionalDependencies;
 			}
 		} else if (packageJson[type]?.[name]) {
-			// eslint-disable-next-line @elsikora-typescript/no-dynamic-delete
+			// eslint-disable-next-line @elsikora/typescript/no-dynamic-delete
 			delete packageJson[type][name];
 			await this.set(packageJson);
 		}
@@ -295,7 +295,7 @@ export class PackageJsonService {
 		const packageJson: IPackageJson = await this.get();
 
 		if (packageJson.scripts?.[name]) {
-			// eslint-disable-next-line @elsikora-typescript/no-dynamic-delete
+			// eslint-disable-next-line @elsikora/typescript/no-dynamic-delete
 			delete packageJson.scripts[name];
 			await this.set(packageJson);
 		}
@@ -307,7 +307,7 @@ export class PackageJsonService {
 	 * @returns Promise that resolves when the file is written
 	 */
 	async set(packageJson: IPackageJson): Promise<void> {
-		// eslint-disable-next-line @elsikora-typescript/no-magic-numbers
+		// eslint-disable-next-line @elsikora/typescript/no-magic-numbers
 		await this.fileSystemService.writeFile(PACKAGE_JSON_FILE_PATH, JSON.stringify(packageJson, null, 2));
 	}
 

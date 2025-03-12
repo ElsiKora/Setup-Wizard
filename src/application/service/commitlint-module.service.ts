@@ -2,6 +2,7 @@ import type { IPackageJson } from "../../domain/interface/package-json.interface
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
+import type { IConfigService } from "../interface/config-service.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
@@ -14,7 +15,6 @@ import { COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT } from "../constant/commitlin
 import { COMMITLINT_CONFIG_HUSKY_PRE_PUSH_SCRIPT } from "../constant/commitlint-config-husky-pre-push-script.constant";
 import { COMMITLINT_CONFIG } from "../constant/commitlint-config.constant";
 
-import { ConfigService } from "./config.service";
 import { PackageJsonService } from "./package-json.service";
 
 /**
@@ -29,26 +29,27 @@ export class CommitlintModuleService implements IModuleService {
 	/** Command service for executing shell commands */
 	readonly COMMAND_SERVICE: ICommandService;
 
+	/** Configuration service for managing app configuration */
+	readonly CONFIG_SERVICE: IConfigService;
+
 	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
 	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
 
-	/** Configuration service for managing app configuration */
-	private readonly CONFIG_SERVICE: ConfigService;
-
 	/**
 	 * Initializes a new instance of the CommitlintModuleService.
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
+	 * @param configService - Service for managing app configuration
 	 */
-	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
+	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService, configService: IConfigService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
-		this.COMMAND_SERVICE = new NodeCommandService();
+		this.COMMAND_SERVICE = new NodeCommandService(cliInterfaceService);
 		this.PACKAGE_JSON_SERVICE = new PackageJsonService(fileSystemService, this.COMMAND_SERVICE);
-		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
+		this.CONFIG_SERVICE = configService;
 	}
 
 	/**

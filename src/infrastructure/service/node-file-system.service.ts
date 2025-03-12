@@ -17,7 +17,7 @@ export class NodeFileSystemService implements IFileSystemService {
 	 */
 	async createDirectory(directoryPath: string, options?: { isRecursive: boolean }): Promise<void> {
 		directoryPath = path.dirname(directoryPath);
-		// eslint-disable-next-line @elsikora-typescript/naming-convention
+		// eslint-disable-next-line @elsikora/typescript/naming-convention
 		await fs.mkdir(directoryPath, { recursive: options?.isRecursive });
 	}
 
@@ -28,6 +28,24 @@ export class NodeFileSystemService implements IFileSystemService {
 	 */
 	async deleteFile(filePath: string): Promise<void> {
 		await fs.unlink(filePath);
+	}
+
+	/**
+	 * Gets the directory name from a file path.
+	 * @param filePath
+	 * @returns The directory name
+	 */
+	getDirectoryNameFromFilePath(filePath: string): string {
+		return path.dirname(filePath);
+	}
+
+	/**
+	 * Gets the extension from a file path.
+	 * @param filePath
+	 * @returns The file extension
+	 */
+	getExtensionFromFilePath(filePath: string): string {
+		return path.extname(filePath);
 	}
 
 	/**
@@ -70,6 +88,7 @@ export class NodeFileSystemService implements IFileSystemService {
 	 * @param encoding - The encoding to use when reading the file, defaults to "utf8"
 	 * @returns Promise that resolves to the file contents as a string
 	 */
+	// eslint-disable-next-line @elsikora/javascript/no-undef
 	async readFile(filePath: string, encoding: BufferEncoding = "utf8"): Promise<string> {
 		return await fs.readFile(filePath, { encoding });
 	}
@@ -81,8 +100,9 @@ export class NodeFileSystemService implements IFileSystemService {
 	 * @param encoding - The encoding to use when writing the file, defaults to "utf8"
 	 * @returns Promise that resolves when the file is written
 	 */
+	// eslint-disable-next-line @elsikora/javascript/no-undef
 	async writeFile(filePath: string, content: string, encoding: BufferEncoding = "utf8"): Promise<void> {
-		// eslint-disable-next-line @elsikora-typescript/naming-convention
+		// eslint-disable-next-line @elsikora/typescript/naming-convention
 		await fs.mkdir(path.dirname(filePath), { recursive: true });
 		await fs.writeFile(filePath, content, { encoding });
 	}

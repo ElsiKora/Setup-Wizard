@@ -16,15 +16,23 @@ export const ESLINT_FEATURE_GROUPS: Array<IEslintFeatureGroup> = [
 		name: "File Types",
 	},
 	{
-		features: [EEslintFeature.REACT, EEslintFeature.NEST, EEslintFeature.NEXT],
+		features: [EEslintFeature.REACT, EEslintFeature.NEST, EEslintFeature.NEXT, EEslintFeature.TANSTACK, EEslintFeature.STORYBOOK],
 		name: "Frameworks",
 	},
 	{
-		features: [EEslintFeature.NODE, EEslintFeature.REGEXP, EEslintFeature.TYPEORM],
+		features: [EEslintFeature.NODE, EEslintFeature.REGEXP, EEslintFeature.TYPEORM, EEslintFeature.I18NEXT],
 		name: "Other Tools",
 	},
 	{
 		features: [EEslintFeature.TAILWIND_CSS, EEslintFeature.PRETTIER, EEslintFeature.STYLISTIC, EEslintFeature.CSS],
 		name: "Styling",
+	},
+	{
+		features: [EEslintFeature.FSD],
+		name: "Project Architecture",
+	},
+	{
+		features: [EEslintFeature.NO_SECRETS],
+		name: "Security",
 	},
 ];

@@ -1,4 +1,4 @@
-/* eslint-disable @elsikora-typescript/naming-convention,@elsikora-typescript/no-magic-numbers */
+/* eslint-disable @elsikora/typescript/naming-convention,@elsikora/typescript/no-magic-numbers */
 import type { IIdeConfig } from "../interface/ide-config.interface";
 
 import { EIde } from "../enum/ide.enum";

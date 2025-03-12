@@ -4,6 +4,7 @@ import type { IPackageJson } from "../../domain/interface/package-json.interface
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
+import type { IConfigService } from "../interface/config-service.interface";
 import type { IConfigLintStaged } from "../interface/config/lint-staged.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
@@ -18,7 +19,6 @@ import { LINT_STAGED_CONFIG_HUSKY_PRE_COMMIT_SCRIPT } from "../constant/lint-sta
 import { LINT_STAGED_CONFIG } from "../constant/lint-staged-config.constant";
 import { LINT_STAGED_CORE_DEPENDENCIES } from "../constant/lint-staged-core-dependencies.constant";
 
-import { ConfigService } from "./config.service";
 import { PackageJsonService } from "./package-json.service";
 
 /**
@@ -33,6 +33,9 @@ export class LintStagedModuleService implements IModuleService {
 	/** Command service for executing shell commands */
 	readonly COMMAND_SERVICE: ICommandService;
 
+	/** Configuration service for managing app configuration */
+	readonly CONFIG_SERVICE: IConfigService;
+
 	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
 
@@ -42,9 +45,6 @@ export class LintStagedModuleService implements IModuleService {
 	/** Cached lint-staged configuration */
 	private config: IConfigLintStaged | null = null;
 
-	/** Configuration service for managing app configuration */
-	private readonly CONFIG_SERVICE: ConfigService;
-
 	/** Selected lint-staged features to configure */
 	private selectedFeatures: Array<ELintStagedFeature> = [];
 
@@ -52,13 +52,14 @@ export class LintStagedModuleService implements IModuleService {
 	 * Initializes a new instance of the LintStagedModuleService.
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
+	 * @param configService - Service for managing app configuration
 	 */
-	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
+	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService, configService: IConfigService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
-		this.COMMAND_SERVICE = new NodeCommandService();
+		this.COMMAND_SERVICE = new NodeCommandService(cliInterfaceService);
 		this.PACKAGE_JSON_SERVICE = new PackageJsonService(fileSystemService, this.COMMAND_SERVICE);
-		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
+		this.CONFIG_SERVICE = configService;
 	}
 
 	/**

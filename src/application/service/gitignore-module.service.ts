@@ -1,12 +1,11 @@
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
+import type { IConfigService } from "../interface/config-service.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
 import { GITIGNORE_CONFIG } from "../../domain/constant/gitignore-config.constant";
 import { EModule } from "../../domain/enum/module.enum";
-
-import { ConfigService } from "./config.service";
 
 /**
  * Service for setting up and managing .gitignore file.
@@ -17,21 +16,22 @@ export class GitignoreModuleService implements IModuleService {
 	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
 
+	/** Configuration service for managing app configuration */
+	readonly CONFIG_SERVICE: IConfigService;
+
 	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
-
-	/** Configuration service for managing app configuration */
-	private readonly CONFIG_SERVICE: ConfigService;
 
 	/**
 	 * Initializes a new instance of the GitignoreModuleService.
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
+	 * @param configService - Service for managing app configuration
 	 */
-	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
+	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService, configService: IConfigService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
-		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
+		this.CONFIG_SERVICE = configService;
 	}
 
 	/**
