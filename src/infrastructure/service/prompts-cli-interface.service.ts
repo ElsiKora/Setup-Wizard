@@ -40,8 +40,8 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	async confirm(message: string, isConfirmedByDefault: boolean = false): Promise<boolean> {
 		try {
 			const response: prompts.Answers<string> = await prompts({
-				active: "yes",
-				inactive: "no",
+				active: "Yes",
+				inactive: "No",
 				// eslint-disable-next-line @elsikora/typescript/naming-convention
 				initial: isConfirmedByDefault,
 				message,
