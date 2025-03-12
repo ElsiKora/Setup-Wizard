@@ -1,4 +1,4 @@
-// eslint-disable-next-line @elsikora-unicorn/prevent-abbreviations
+// eslint-disable-next-line @elsikora/unicorn/prevent-abbreviations
 export const COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT: string = `#!/usr/bin/env sh
 
 if [ -n "$CI" ]; then

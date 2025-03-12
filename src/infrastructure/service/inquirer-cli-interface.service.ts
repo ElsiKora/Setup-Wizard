@@ -1,10 +1,10 @@
-/* eslint-disable @elsikora-unicorn/no-process-exit,elsikora-node/no-process-exit,@elsikora-typescript/no-unsafe-member-access,@elsikora-typescript/no-unsafe-call,@elsikora-typescript/no-unsafe-return,@elsikora-sonar/function-return-type */
+/* eslint-disable @elsikora/unicorn/no-process-exit,@elsikora/typescript/no-unsafe-member-access,@elsikora/typescript/no-unsafe-call,@elsikora/typescript/no-unsafe-return,@elsikora/sonar/function-return-type */
 import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
 import type { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
 
 import chalk from "chalk";
 // @ts-ignore
-// eslint-disable-next-line elsikora-node/no-extraneous-import
+// eslint-disable-next-line @elsikora/node/no-extraneous-import
 import inquirer from "inquirer";
 // @ts-ignore
 import ora from "ora";
@@ -42,9 +42,9 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	 */
 	async confirm(message: string, isConfirmedByDefault: boolean = false): Promise<boolean> {
 		try {
-			// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
+			// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
 			const answer: any = await inquirer.prompt({
-				// eslint-disable-next-line @elsikora-typescript/naming-convention
+				// eslint-disable-next-line @elsikora/typescript/naming-convention
 				default: isConfirmedByDefault,
 				message,
 				name: "confirmation",
@@ -80,7 +80,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		for (const [group, groupOptions] of Object.entries(options)) {
 			for (const opt of groupOptions) {
 				choices.push({
-					// eslint-disable-next-line @elsikora-typescript/naming-convention
+					// eslint-disable-next-line @elsikora/typescript/naming-convention
 					checked: initialValues?.includes(opt.value) ?? false,
 					name: `${group}: ${opt.label}`,
 					value: opt.value,
@@ -89,7 +89,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		}
 
 		try {
-			// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
+			// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
 			const answer: any = await inquirer.prompt({
 				choices,
 				message: `${message} (space to select)`,
@@ -141,16 +141,16 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	 * @returns Promise resolving to an array of selected values
 	 */
 	async multiselect<T>(message: string, options: Array<ICliInterfaceServiceSelectOptions>, isRequired: boolean = false, initialValues?: Array<string>): Promise<Array<T>> {
-		// eslint-disable-next-line @elsikora-typescript/naming-convention
+		// eslint-disable-next-line @elsikora/typescript/naming-convention
 		const choices: Array<{ checked: boolean; name: string; value: string }> = options.map((opt: ICliInterfaceServiceSelectOptions) => ({
-			// eslint-disable-next-line @elsikora-typescript/naming-convention
+			// eslint-disable-next-line @elsikora/typescript/naming-convention
 			checked: initialValues?.includes(opt.value) ?? false,
 			name: opt.label,
 			value: opt.value,
 		}));
 
 		try {
-			// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
+			// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
 			const answer: any = await inquirer.prompt({
 				choices,
 				message: `${message} (space to select)`,
@@ -188,7 +188,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		const choices: Array<{ name: string; value: string }> = options.map((opt: ICliInterfaceServiceSelectOptions) => ({ name: opt.label, value: opt.value }));
 
 		try {
-			// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
+			// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
 			const answer: any = await inquirer.prompt({
 				choices,
 				default: initialValue,
@@ -242,7 +242,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	 */
 	async text(message: string, placeholder?: string, initialValue?: string, validate?: (value: string) => Error | string | undefined): Promise<string> {
 		try {
-			// eslint-disable-next-line @elsikora-typescript/no-unsafe-assignment
+			// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
 			const answer: any = await inquirer.prompt({
 				default: initialValue,
 				message,

@@ -4,6 +4,7 @@ import type { IPackageJsonAuthor } from "../../domain/interface/package-json-aut
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
+import type { IConfigService } from "../interface/config-service.interface";
 import type { IConfigLicense } from "../interface/config/license.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
@@ -14,7 +15,6 @@ import { NodeCommandService } from "../../infrastructure/service/node-command.se
 import { LICENSE_FILE_NAMES } from "../constant/license-file-names.constant";
 import { CliInterfaceServiceMapper } from "../mapper/cli-interface-service.mapper";
 
-import { ConfigService } from "./config.service";
 import { PackageJsonService } from "./package-json.service";
 
 /**
@@ -30,7 +30,7 @@ export class LicenseModuleService implements IModuleService {
 	readonly COMMAND_SERVICE: ICommandService;
 
 	/** Configuration service for managing app configuration */
-	readonly CONFIG_SERVICE: ConfigService;
+	readonly CONFIG_SERVICE: IConfigService;
 
 	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
@@ -45,16 +45,14 @@ export class LicenseModuleService implements IModuleService {
 	 * Initializes a new instance of the LicenseModuleService.
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
+	 * @param configService - Service for managing app configuration
 	 */
-	constructor(
-		readonly cliInterfaceService: ICliInterfaceService,
-		readonly fileSystemService: IFileSystemService,
-	) {
+	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService, configService: IConfigService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
-		this.COMMAND_SERVICE = new NodeCommandService();
+		this.COMMAND_SERVICE = new NodeCommandService(cliInterfaceService);
 		this.PACKAGE_JSON_SERVICE = new PackageJsonService(fileSystemService, this.COMMAND_SERVICE);
-		this.CONFIG_SERVICE = new ConfigService(fileSystemService);
+		this.CONFIG_SERVICE = configService;
 	}
 
 	/**
@@ -64,32 +62,32 @@ export class LicenseModuleService implements IModuleService {
 	 */
 	async handleExistingSetup(): Promise<boolean> {
 		try {
-			const existingLicense: string | undefined = await this.fileSystemService.isOneOfPathsExists(LICENSE_FILE_NAMES);
+			const existingLicense: string | undefined = await this.FILE_SYSTEM_SERVICE.isOneOfPathsExists(LICENSE_FILE_NAMES);
 
 			if (!existingLicense) {
 				return true;
 			}
 
-			const shouldReplace: boolean = await this.cliInterfaceService.confirm(`An existing license file was found (${existingLicense}). Would you like to replace it?`);
+			const shouldReplace: boolean = await this.CLI_INTERFACE_SERVICE.confirm(`An existing license file was found (${existingLicense}). Would you like to replace it?`);
 
 			if (!shouldReplace) {
-				this.cliInterfaceService.warn("Keeping existing license file.");
+				this.CLI_INTERFACE_SERVICE.warn("Keeping existing license file.");
 
 				return false;
 			}
 
 			try {
-				await this.fileSystemService.deleteFile(existingLicense);
-				this.cliInterfaceService.success("Deleted existing license file.");
+				await this.FILE_SYSTEM_SERVICE.deleteFile(existingLicense);
+				this.CLI_INTERFACE_SERVICE.success("Deleted existing license file.");
 
 				return true;
 			} catch (error) {
-				this.cliInterfaceService.handleError("Failed to delete existing license file", error);
+				this.CLI_INTERFACE_SERVICE.handleError("Failed to delete existing license file", error);
 
 				return false;
 			}
 		} catch (error) {
-			this.cliInterfaceService.handleError("Failed to check existing license setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError("Failed to check existing license setup", error);
 
 			return false;
 		}
@@ -128,7 +126,7 @@ export class LicenseModuleService implements IModuleService {
 
 			return { wasInstalled: setupResult.isSuccess };
 		} catch (error) {
-			this.cliInterfaceService.handleError("Failed to complete license installation", error);
+			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete license installation", error);
 
 			throw error;
 		}
@@ -142,9 +140,9 @@ export class LicenseModuleService implements IModuleService {
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.cliInterfaceService.confirm("Do you want to generate LICENSE for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.LICENSE));
+			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to generate LICENSE for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.LICENSE));
 		} catch (error) {
-			this.cliInterfaceService.handleError("Failed to get user confirmation", error);
+			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
 
 			return false;
 		}
@@ -164,7 +162,7 @@ export class LicenseModuleService implements IModuleService {
 			try {
 				packageAuthor = await this.PACKAGE_JSON_SERVICE.getProperty("author");
 			} catch {
-				this.cliInterfaceService.warn("Failed to get author from package.json, using saved or default");
+				this.CLI_INTERFACE_SERVICE.warn("Failed to get author from package.json, using saved or default");
 				packageAuthor = undefined;
 			}
 
@@ -184,19 +182,19 @@ export class LicenseModuleService implements IModuleService {
 				authorName = "Your Name";
 			}
 
-			authorName = await this.cliInterfaceService.text("Enter the copyright holder's name:", "Your Name", authorName);
+			authorName = await this.CLI_INTERFACE_SERVICE.text("Enter the copyright holder's name:", "Your Name", authorName);
 
-			this.cliInterfaceService.startSpinner("Generating license file...");
+			this.CLI_INTERFACE_SERVICE.startSpinner("Generating license file...");
 			const year: string = new Date().getFullYear().toString();
 			const licenseFileContent: string = LICENSE_CONFIG[license].template(year, authorName);
 
-			await this.fileSystemService.writeFile("LICENSE", licenseFileContent);
+			await this.FILE_SYSTEM_SERVICE.writeFile("LICENSE", licenseFileContent);
 			await this.PACKAGE_JSON_SERVICE.setProperty("license", license);
-			this.cliInterfaceService.stopSpinner("License file generated");
+			this.CLI_INTERFACE_SERVICE.stopSpinner("License file generated");
 
 			return { author: authorName };
 		} catch (error) {
-			this.cliInterfaceService.stopSpinner();
+			this.CLI_INTERFACE_SERVICE.stopSpinner();
 
 			throw error;
 		}
@@ -222,7 +220,7 @@ export class LicenseModuleService implements IModuleService {
 
 		summary.push("", "Remember to:", "- Review the generated LICENSE file", "- Include license information in your documentation");
 
-		this.cliInterfaceService.note("License Setup Summary", summary.join("\n"));
+		this.CLI_INTERFACE_SERVICE.note("License Setup Summary", summary.join("\n"));
 	}
 
 	/**
@@ -269,9 +267,9 @@ export class LicenseModuleService implements IModuleService {
 			const options: Array<ICliInterfaceServiceSelectOptions> = CliInterfaceServiceMapper.fromLicenseConfigsToSelectOptions(LICENSE_CONFIG);
 			const initialValue: ELicense | undefined = savedLicense ?? undefined;
 
-			return await this.cliInterfaceService.select("Select a license for your project:", options, initialValue);
+			return await this.CLI_INTERFACE_SERVICE.select("Select a license for your project:", options, initialValue);
 		} catch (error) {
-			this.cliInterfaceService.handleError("Failed to select license", error);
+			this.CLI_INTERFACE_SERVICE.handleError("Failed to select license", error);
 
 			throw error;
 		}

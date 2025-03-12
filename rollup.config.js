@@ -9,7 +9,7 @@ export default {
 	 * External dependencies that should not be bundled.
 	 * These are either Node.js built-in modules or dependencies that will be installed.
 	 */
-	external: ["node:fs", "node:fs/promises", "node:path", "node:child_process", "node:util", "commander", "@clack/prompts"],
+	external: ["node:fs", "node:fs/promises", "node:path", "node:child_process", "node:util", "commander", "@clack/prompts", "chalk", "ora", "prompts", "cosmiconfig", "javascript-stringify", "yaml"],
 
 	/**
 	 * Entry point for the application.

@@ -1,4 +1,4 @@
-/* eslint-disable @elsikora-typescript/no-magic-numbers */
+/* eslint-disable @elsikora/typescript/no-magic-numbers */
 import type { EEslintFeature } from "../../domain/enum/eslint-feature.enum";
 
 import { ESLINT_FEATURE_CONFIG } from "../../domain/constant/eslint-feature-config.constant";

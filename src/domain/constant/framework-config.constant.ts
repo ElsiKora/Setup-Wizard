@@ -1,4 +1,4 @@
-/* eslint-disable @elsikora-sonar/no-duplicate-string */
+/* eslint-disable @elsikora/sonar/no-duplicate-string */
 import type { IFrameworkConfig } from "../interface/framework-config.interface";
 
 import { EEslintFeature } from "../enum/eslint-feature.enum";
@@ -36,7 +36,6 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 			dependencies: ["alpinejs"],
 		},
 	},
-
 	[EFramework.ANGULAR]: {
 		description: "Angular framework project",
 		displayName: "Angular",
@@ -489,6 +488,22 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 		},
 	},
 
+	[EFramework.I18NEXT]: {
+		description: "i18next internationalization framework",
+		displayName: "i18next",
+		features: [EEslintFeature.I18NEXT],
+		fileIndicators: [],
+		ignorePath: {
+			directories: [],
+			patterns: [],
+		},
+		lintPaths: [],
+		name: EFramework.I18NEXT,
+		packageIndicators: {
+			dependencies: ["i18next"],
+		},
+	},
+
 	[EFramework.IONIC]: {
 		description: "Ionic mobile & desktop framework project",
 		displayName: "Ionic",
@@ -794,7 +809,6 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 			dependencies: ["nativescript"],
 		},
 	},
-
 	[EFramework.NEST]: {
 		description: "NestJS framework project",
 		displayName: "NestJS",
@@ -812,7 +826,6 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 			devDependencies: ["@nestjs/cli"],
 		},
 	},
-
 	[EFramework.NEXT]: {
 		description: "Next.js React framework project",
 		displayName: "Next.js",
@@ -1378,7 +1391,7 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 	[EFramework.TANSTACK_QUERY]: {
 		description: "TanStack React Query for data fetching",
 		displayName: "TanStack Query (React Query)",
-		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.PRETTIER],
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.PRETTIER, EEslintFeature.TANSTACK],
 		fileIndicators: [],
 		ignorePath: {
 			directories: [],
@@ -1390,7 +1403,21 @@ export const FRAMEWORK_CONFIG: Record<EFramework, IFrameworkConfig> = {
 			dependencies: ["@tanstack/react-query"],
 		},
 	},
-
+	[EFramework.TANSTACK_ROUTER]: {
+		description: "TanStack React Router",
+		displayName: "TanStack Router (React Router)",
+		features: [EEslintFeature.REACT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX, EEslintFeature.PRETTIER, EEslintFeature.TANSTACK],
+		fileIndicators: [],
+		ignorePath: {
+			directories: [],
+			patterns: [],
+		},
+		lintPaths: ["src/**/*"],
+		name: EFramework.TANSTACK_ROUTER,
+		packageIndicators: {
+			dependencies: ["@tanstack/react-router"],
+		},
+	},
 	[EFramework.TAURI]: {
 		description: "Tauri desktop application framework",
 		displayName: "Tauri",

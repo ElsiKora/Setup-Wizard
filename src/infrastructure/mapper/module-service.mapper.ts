@@ -1,4 +1,5 @@
 import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
+import type { IConfigService } from "../../application/interface/config-service.interface";
 import type { IFileSystemService } from "../../application/interface/file-system-service.interface";
 import type { IModuleService } from "../interface/module-service.interface";
 
@@ -13,6 +14,7 @@ import { PrettierModuleService } from "../../application/service/prettier-module
 import { SemanticReleaseModuleService } from "../../application/service/semantic-release-module.service";
 import { StylelintModuleService } from "../../application/service/stylelint-module.service";
 import { EModule } from "../../domain/enum/module.enum";
+import { CosmicConfigService } from "../service/cosmi-config-config.service";
 
 /**
  * Mapper class for creating module service instances based on module type.
@@ -21,6 +23,9 @@ import { EModule } from "../../domain/enum/module.enum";
 export class ModuleServiceMapper {
 	/** CLI interface service for user interaction */
 	readonly CLI_INTERFACE_SERVICE: ICliInterfaceService;
+
+	/** Configuration service for reading and writing config */
+	readonly CONFIG_SERVICE: IConfigService;
 
 	/** File system service for file operations */
 	readonly FILE_SYSTEM_SERVICE: IFileSystemService;
@@ -33,6 +38,7 @@ export class ModuleServiceMapper {
 	constructor(cliInterfaceService: ICliInterfaceService, fileSystemService: IFileSystemService) {
 		this.CLI_INTERFACE_SERVICE = cliInterfaceService;
 		this.FILE_SYSTEM_SERVICE = fileSystemService;
+		this.CONFIG_SERVICE = new CosmicConfigService(fileSystemService);
 	}
 
 	/**
@@ -43,46 +49,46 @@ export class ModuleServiceMapper {
 	 * @throws Error if the module type is not supported
 	 */
 	getModuleService(module: EModule): IModuleService {
-		// eslint-disable-next-line @elsikora-unicorn/prefer-module
+		// eslint-disable-next-line @elsikora/unicorn/prefer-module
 		switch (module) {
 			case EModule.CI: {
-				return new CiModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+				return new CiModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			case EModule.COMMITLINT: {
-				return new CommitlintModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+				return new CommitlintModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			case EModule.ESLINT: {
-				return new EslintModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+				return new EslintModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			case EModule.GITIGNORE: {
-				return new GitignoreModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+				return new GitignoreModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			case EModule.IDE: {
-				return new IdeModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+				return new IdeModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			case EModule.LICENSE: {
-				return new LicenseModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+				return new LicenseModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			case EModule.LINT_STAGED: {
-				return new LintStagedModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+				return new LintStagedModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			case EModule.PRETTIER: {
-				return new PrettierModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+				return new PrettierModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			case EModule.SEMANTIC_RELEASE: {
-				return new SemanticReleaseModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+				return new SemanticReleaseModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			case EModule.STYLELINT: {
-				return new StylelintModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE);
+				return new StylelintModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			default: {
