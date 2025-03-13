@@ -38,7 +38,7 @@
 		"prepare": "husky",
 		"release": "semantic-release",
 		"test:all": "npm run test:unit && npm run test:e2e",
-		"test:e2e": "vitest --config vitest.config.e2e.ts",
+		"test:e2e": "npm run build && vitest --config vitest.config.e2e.ts --typecheck.tsconfig tsconfig.json",
 		"test:unit": "vitest run test/unit --config vitest.config.unit.ts"
 	},
 	"config": {
