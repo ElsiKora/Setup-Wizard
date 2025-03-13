@@ -6,29 +6,18 @@ export default defineConfig({
 		globals: true,
 		environment: "node",
 		include: ["**/*.test.ts"],
-		exclude: ["**/node_modules/**", "**/dist/**", "**/tests/e2e/**"],
+		exclude: ["**/node_modules/**", "**/dist/**", "**/test/e2e/**"],
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "json", "html"],
-			exclude: [
-				"node_modules/",
-				"dist/",
-				"**/index.ts",
-				"src/index.ts", // Explicitly exclude src/index.ts
-				"**/*.d.ts",
-				"**/tests/**",
-				"**/*.interface.ts",
-				"**/*.type.ts",
-				"*.config.js",
-				"*.config.ts",
-				".elsikora/**",
-			],
-			include: [
-				"src/**/*.ts", // Include all source files
-				"!src/index.ts", // Explicitly exclude index.ts
-			],
-			all: true, // Include all source files
+			exclude: ["node_modules/", "dist/", "**/index.ts", "src/index.ts", "**/*.d.ts", "**/test/**", "**/*.interface.ts", "**/*.type.ts", "*.config.js", "*.config.ts", ".elsikora/**"],
+			include: ["src/**/*.ts", "bin/**/*.js", "!src/index.ts", "!bin/index.js"],
+			all: true,
 		},
+		root: ".",
+		watch: false,
+	},
+	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./src"),
 		},

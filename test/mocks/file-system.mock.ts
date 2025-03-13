@@ -1,10 +1,10 @@
 import { vi } from "vitest";
-import type { FileSystemService } from "../../src/application/interface/file-system-service.interface";
+import type { IFileSystemService } from "../../src/application/interface/file-system-service.interface";
 
 /**
  * In-memory file system implementation for testing
  */
-export class MockFileSystem implements FileSystemService {
+export class MockFileSystem implements IFileSystemService {
 	private files: Map<string, string> = new Map();
 	private directories: Set<string> = new Set();
 
