@@ -175,15 +175,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 	}
 
 	/**
-	 * Ensures the changelog directory exists.
-	 * Creates any necessary directories for changelog if they don't exist.
-	 */
-	private async ensureChangelogDirectory(): Promise<void> {
-		// The changelog is now in the root directory, so we don't need to create any directories
-		// but we keep this method for future flexibility if needed
-	}
-
-	/**
 	 * Finds existing semantic-release configuration files.
 	 * @returns Promise resolving to an array of file paths for existing configuration files
 	 */
@@ -218,7 +209,11 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 		return await this.CLI_INTERFACE_SERVICE.text("Enter the name of your development branch for backmerge:", "dev", initialBranch, (value: string) => {
 			if (!value) {
-				return "Development branch name is required";
+				return "Branch name is required";
+			}
+
+			if (value.includes(" ")) {
+				return "Branch name cannot contain spaces";
 			}
 		});
 	}
@@ -232,7 +227,11 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 		return await this.CLI_INTERFACE_SERVICE.text("Enter the name of your main release branch:", "main", initialBranch, (value: string) => {
 			if (!value) {
-				return "Main branch name is required";
+				return "Branch name is required";
+			}
+
+			if (value.includes(" ")) {
+				return "Branch name cannot contain spaces";
 			}
 		});
 	}
@@ -246,7 +245,11 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 		return await this.CLI_INTERFACE_SERVICE.text("Enter the name of your pre-release branch:", "dev", initialBranch, (value: string) => {
 			if (!value) {
-				return "Pre-release branch name is required";
+				return "Branch name is required";
+			}
+
+			if (value.includes(" ")) {
+				return "Branch name cannot contain spaces";
 			}
 		});
 	}
@@ -260,7 +263,11 @@ export class SemanticReleaseModuleService implements IModuleService {
 
 		return await this.CLI_INTERFACE_SERVICE.text("Enter the pre-release channel name (e.g., beta, alpha, next):", "beta", initialChannel, (value: string) => {
 			if (!value) {
-				return "Pre-release channel name is required";
+				return "Channel name is required";
+			}
+
+			if (value.includes(" ")) {
+				return "Channel name cannot contain spaces";
 			}
 		});
 	}
@@ -381,11 +388,10 @@ export class SemanticReleaseModuleService implements IModuleService {
 			}
 
 			// Backmerge configuration
-			let isBackmergeEnabled: boolean = false;
 			let developBranch: string | undefined = undefined;
 
 			// Only ask about backmerge if we're not in a pre-release branch
-			isBackmergeEnabled = await this.isBackmergeEnabled(mainBranch);
+			const isBackmergeEnabled: boolean = await this.isBackmergeEnabled(mainBranch);
 			parameters.isBackmergeEnabled = isBackmergeEnabled;
 
 			if (isBackmergeEnabled) {
@@ -397,7 +403,6 @@ export class SemanticReleaseModuleService implements IModuleService {
 			await this.PACKAGE_JSON_SERVICE.installPackages(SEMANTIC_RELEASE_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
 			await this.createConfigs(repositoryUrl, mainBranch, preReleaseBranch, preReleaseChannel, isBackmergeEnabled, developBranch);
 			await this.setupScripts();
-			await this.ensureChangelogDirectory();
 
 			this.CLI_INTERFACE_SERVICE.stopSpinner("Semantic Release configuration completed successfully!");
 			this.displaySetupSummary(mainBranch, preReleaseBranch, preReleaseChannel, isBackmergeEnabled, developBranch);
