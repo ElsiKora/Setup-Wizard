@@ -216,7 +216,7 @@ export class PackageJsonService {
 			return;
 		}
 
-		const packageString: string = packageList.join(`${version ? "@" + version : ""} `);
+		const packageString: string = version ? packageList.map((packageName: string) => `${packageName}@${version}`).join(" ") : packageList.join(" ");
 		await this.commandService.execute(`npm install ${typeFlag} ${packageString}`);
 	}
 
@@ -259,25 +259,35 @@ export class PackageJsonService {
 	 */
 	async removeDependency(name: string, type: EPackageJsonDependencyType = EPackageJsonDependencyType.PROD): Promise<void> {
 		const packageJson: IPackageJson = await this.get();
+		let wasModified: boolean = false;
 
 		if (type === EPackageJsonDependencyType.ANY) {
 			if (packageJson.dependencies?.[name]) {
 				// eslint-disable-next-line @elsikora/typescript/no-dynamic-delete
 				delete packageJson.dependencies[name];
+				wasModified = true;
 			}
 
 			if (packageJson.devDependencies?.[name]) {
 				// eslint-disable-next-line @elsikora/typescript/no-dynamic-delete
 				delete packageJson.devDependencies[name];
+				wasModified = true;
 			}
 
 			if (packageJson.peerDependencies?.[name]) {
 				// eslint-disable-next-line @elsikora/typescript/no-dynamic-delete
 				delete packageJson.peerDependencies[name];
+				wasModified = true;
 			}
 
 			if (packageJson.optionalDependencies?.[name]) {
-				delete packageJson.optionalDependencies;
+				// eslint-disable-next-line @elsikora/typescript/no-dynamic-delete
+				delete packageJson.optionalDependencies[name];
+				wasModified = true;
+			}
+
+			if (wasModified) {
+				await this.set(packageJson);
 			}
 		} else if (packageJson[type]?.[name]) {
 			// eslint-disable-next-line @elsikora/typescript/no-dynamic-delete
