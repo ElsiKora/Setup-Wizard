@@ -165,7 +165,7 @@ export class CosmicConfigService implements IConfigService {
 		try {
 			const result: { config: IConfig; filepath: string; isEmpty?: boolean } | null = await this.EXPLORER.search();
 
-			const filePath: string = result?.filepath ?? `.${CONFIG_MODULE_NAME}rc.json`;
+			const filePath: string = result?.filepath ?? `${CONFIG_FILE_DIRECTORY}/${CONFIG_MODULE_NAME}.config.js`;
 
 			await this.writeFile(filePath, config);
 
