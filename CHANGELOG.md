@@ -1,3 +1,10 @@
+## [2.2.2](https://github.com/ElsiKora/Setup-Wizard/compare/v2.2.1...v2.2.2) (2025-03-15)
+
+
+### Bug Fixes
+
+* **config:** update default config file path to use js extension ([38d150e](https://github.com/ElsiKora/Setup-Wizard/commit/38d150e629802a5f2d9fcc6260513c114bf3d60f))
+
 ## [2.2.1](https://github.com/ElsiKora/Setup-Wizard/compare/v2.2.0...v2.2.1) (2025-03-13)
 
 # [2.2.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.1.2...v2.2.0) (2025-03-05)
