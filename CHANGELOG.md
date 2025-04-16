@@ -1,3 +1,10 @@
+## [2.2.6](https://github.com/ElsiKora/Setup-Wizard/compare/v2.2.5...v2.2.6) (2025-04-16)
+
+
+### Bug Fixes
+
+* **lint-staged:** update eslint flags from --no-ignore to --no-warn-ignored ([84b5886](https://github.com/ElsiKora/Setup-Wizard/commit/84b5886825e2fbf8fb257ceb76e64d0687894e60))
+
 ## [2.2.5](https://github.com/ElsiKora/Setup-Wizard/compare/v2.2.4...v2.2.5) (2025-04-16)
 
 ## [2.2.4](https://github.com/ElsiKora/Setup-Wizard/compare/v2.2.3...v2.2.4) (2025-04-16)
