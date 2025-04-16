@@ -15,7 +15,7 @@ export default {
 		});
 
 		if (eslintFiles.length > 0) {
-			commands.push(`eslint --fix --max-warnings=0 --no-ignore ${eslintFiles.join(" ")}`);
+			commands.push(`eslint --fix --max-warnings=0 --no-warn-ignored ${eslintFiles.join(" ")}`);
 		}
 
 		return commands;
