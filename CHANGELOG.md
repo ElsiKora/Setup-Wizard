@@ -1,3 +1,5 @@
+## [2.2.3](https://github.com/ElsiKora/Setup-Wizard/compare/v2.2.2...v2.2.3) (2025-04-16)
+
 ## [2.2.2](https://github.com/ElsiKora/Setup-Wizard/compare/v2.2.1...v2.2.2) (2025-03-15)
 
 
