@@ -46,8 +46,8 @@ export const IDE_CONFIG: Record<EIde, IIdeConfig> = {
 					JSON.stringify(
 						{
 							"editor.codeActionsOnSave": {
-								"source.fixAll.eslint": true,
-								"source.fixAll.prettier": true,
+								"source.fixAll.eslint": "explicit",
+								"source.fixAll.prettier": "explicit",
 							},
 							"editor.defaultFormatter": "esbenp.prettier-vscode",
 							"editor.formatOnSave": true,
