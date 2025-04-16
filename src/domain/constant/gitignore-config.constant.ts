@@ -141,7 +141,6 @@ dist/
 
 # Gatsby
 .cache/
-public/
 
 # Vue
 .vue-test-utils/
@@ -209,6 +208,7 @@ tsconfig.tsbuildinfo
 .nodemon-debug
 .clinic/
 .depcruise.cache
+.elsikora/commitlint-ai.config.js
 
 # Documentation
 /docs/_build/
