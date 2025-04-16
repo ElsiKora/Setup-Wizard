@@ -13,7 +13,7 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 	[EEslintFeature.CSS]: {
 		configFlag: "withCss",
 		description: "CSS support",
-		packages: [],
+		packages: ["@elsikora/eslint-plugin-css"],
 	},
 	[EEslintFeature.FSD]: {
 		configFlag: "withFsd",
