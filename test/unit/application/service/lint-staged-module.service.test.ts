@@ -469,7 +469,7 @@ describe("LintStagedModuleService", () => {
 			expect(writtenContent).not.toContain("prettier --write");
 			expect(writtenContent).not.toContain("styleFiles");
 			// Verify we're accessing the LINT_STAGED_FEATURE_CONFIG
-			expect(writtenContent).toContain("eslint --fix --max-warnings=0 --no-ignore");
+			expect(writtenContent).toContain("eslint --fix --max-warnings=0 --no-warn-ignored");
 		});
 
 		it("should write configuration file with only Stylelint", async () => {
@@ -491,7 +491,7 @@ describe("LintStagedModuleService", () => {
 			const writtenContent = mockFileSystemService.writeFile.mock.calls[0][1];
 			expect(writtenContent).toContain('commands.push("prettier --write --ignore-unknown")');
 			expect(writtenContent).toContain("const eslintFiles = files.filter");
-			expect(writtenContent).toContain("eslint --fix --max-warnings=0 --no-ignore");
+			expect(writtenContent).toContain("eslint --fix --max-warnings=0 --no-warn-ignored");
 			expect(writtenContent).toContain("const styleFiles = files.filter");
 			expect(writtenContent).toContain("stylelint --fix");
 		});
@@ -512,7 +512,7 @@ describe("LintStagedModuleService", () => {
 
 			// For ESLINT (lines 304-309)
 			expect(fileContent).toContain("const eslintFiles = files.filter");
-			expect(fileContent).toContain("eslint --fix --max-warnings=0 --no-ignore");
+			expect(fileContent).toContain("eslint --fix --max-warnings=0 --no-warn-ignored");
 
 			// For STYLELINT (lines 310-316)
 			expect(fileContent).toContain("const styleFiles = files.filter");
