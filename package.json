@@ -1,6 +1,6 @@
 {
 	"name": "@elsikora/setup-wizard",
-	"version": "2.2.6",
+	"version": "2.2.7",
 	"description": "Setup Wizard - CLI scaffolding utility",
 	"keywords": [
 		"cli",
