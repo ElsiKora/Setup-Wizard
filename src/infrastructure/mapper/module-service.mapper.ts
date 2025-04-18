@@ -3,6 +3,7 @@ import type { IConfigService } from "../../application/interface/config-service.
 import type { IFileSystemService } from "../../application/interface/file-system-service.interface";
 import type { IModuleService } from "../interface/module-service.interface";
 
+import { BranchLintModuleService } from "../../application/service/branch-lint-module.service";
 import { CiModuleService } from "../../application/service/ci-module.service";
 import { CommitlintModuleService } from "../../application/service/commitlint-module.service";
 import { EslintModuleService } from "../../application/service/eslint-module.service";
@@ -51,6 +52,10 @@ export class ModuleServiceMapper {
 	getModuleService(module: EModule): IModuleService {
 		// eslint-disable-next-line @elsikora/unicorn/prefer-module
 		switch (module) {
+			case EModule.BRANCH_LINT: {
+				return new BranchLintModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
+			}
+
 			case EModule.CI: {
 				return new CiModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}

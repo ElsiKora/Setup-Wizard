@@ -1,5 +1,7 @@
 export const ESLINT_CONFIG_IGNORE_PATHS: Array<string> = [
 	"package-lock.json",
+	".elsikora/commitlint-ai.config.js",
+	".elsikora/setup-wizard.config.js",
 	"yarn.lock",
 	"bun.lock",
 	"pnpm-lock.yaml",
