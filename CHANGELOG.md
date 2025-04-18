@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.2.7...v2.3.0) (2025-04-18)
+
+
+### Features
+
+* **git:** add branch-lint module for git branch name validation ([fee4958](https://github.com/ElsiKora/Setup-Wizard/commit/fee495813a123626cd28b1386bea35fca4426b16))
+
 ## [2.2.7](https://github.com/ElsiKora/Setup-Wizard/compare/v2.2.6...v2.2.7) (2025-04-17)
 
 ## [2.2.6](https://github.com/ElsiKora/Setup-Wizard/compare/v2.2.5...v2.2.6) (2025-04-16)
