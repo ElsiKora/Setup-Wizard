@@ -1,4 +1,5 @@
 export enum EModule {
+	BRANCH_LINT = "branch-lint",
 	CI = "ci",
 	COMMITLINT = "commitlint",
 	ESLINT = "eslint",

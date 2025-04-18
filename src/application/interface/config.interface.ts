@@ -1,5 +1,6 @@
 import type { EModule } from "../../domain/enum/module.enum";
 
+import type { IBranchlint } from "./config/branch-lint.interface";
 import type { IConfigCi } from "./config/ci.interface";
 import type { IConfigCommitlint } from "./config/commitlint.interface";
 import type { IConfigEslint } from "./config/eslint.interface";
@@ -12,6 +13,7 @@ import type { IConfigSemanticRelease } from "./config/semantic-release.interface
 import type { IConfigStylelint } from "./config/stylelint.interface";
 
 export interface IConfig {
+	[EModule.BRANCH_LINT]?: IBranchlint;
 	[EModule.CI]?: IConfigCi;
 	[EModule.COMMITLINT]?: IConfigCommitlint;
 	[EModule.ESLINT]?: IConfigEslint;

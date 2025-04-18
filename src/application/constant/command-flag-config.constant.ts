@@ -3,6 +3,11 @@ import type { ICommandFlagConfig } from "../interface/command-flag-config.interf
 import { EModule } from "../../domain/enum/module.enum";
 
 export const COMMAND_FLAG_CONFIG: Record<EModule, ICommandFlagConfig> = {
+	[EModule.BRANCH_LINT]: {
+		description: "Add branch-lint configuration",
+		fullFlag: "withBranchLint",
+		shortFlag: "b",
+	},
 	[EModule.CI]: {
 		description: "Add GitHub CI configuration",
 		fullFlag: "withCI",
