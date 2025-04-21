@@ -1,8 +1,20 @@
-// eslint-disable-next-line @elsikora/typescript/typedef
-export const BRANCHLINT_VALID_BRANCH_NAMES = ["bugfix", "feature", "hotfix", "release", "support"] as const;
-
 export const BRANCHLINT_CONFIG_CORE_DEPENDENCIES: Array<string> = ["husky", "@elsikora/git-branch-lint"];
-export const BRANCHLINT_CONFIG_FILE_NAMES: Array<string> = [".elsikora/git-branch-lint.config.js"];
+export const BRANCHLINT_CONFIG_FILE_NAMES: Array<string> = [
+	".elsikora/git-branch-lint.config.js",
+	"package.json",
+	`.elsikora/.git-branch-lintrc`,
+	`.elsikora/.git-branch-lintrc.json`,
+	`.elsikora/.git-branch-lintrc.yaml`,
+	`.elsikora/.git-branch-lintrc.yml`,
+	`.elsikora/.git-branch-lintrc.js`,
+	`.elsikora/.git-branch-lintrc.ts`,
+	`.elsikora/.git-branch-lintrc.mjs`,
+	`.elsikora/.git-branch-lintrc.cjs`,
+	`.elsikora/git-branch-lint.config.js`,
+	`.elsikora/git-branch-lint.config.ts`,
+	`.elsikora/git-branch-lint.config.mjs`,
+	`.elsikora/git-branch-lint.config.cjs`,
+];
 
 export const BRANCHLINT_CONFIG_HUSKY_PRE_PUSH_SCRIPT: string = `#!/usr/bin/env sh
 
