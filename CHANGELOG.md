@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.4.0...v2.5.0) (2025-04-21)
+
+
+### Features
+
+* **service:** add npm error parsing and formatting functionality ([2be5df3](https://github.com/ElsiKora/Setup-Wizard/commit/2be5df31db5458e6750a40121396083d351cbc45))
+
 # [2.4.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.3.1...v2.4.0) (2025-04-21)
 
 
