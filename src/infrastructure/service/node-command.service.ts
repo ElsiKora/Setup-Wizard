@@ -1,9 +1,21 @@
+/* eslint-disable @elsikora/typescript/naming-convention */
 import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
 import type { ICommandService } from "../../application/interface/command-service.interface";
 import type { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
 
 import { exec } from "node:child_process";
 import { promisify } from "node:util";
+
+import chalk from "chalk";
+
+interface NPMError {
+	cmd: string;
+	code: number;
+	killed: boolean;
+	signal: null;
+	stderr: string;
+	stdout: string;
+}
 
 /**
  * Implementation of the command service using Node.js child_process.
@@ -35,11 +47,69 @@ export class NodeCommandService implements ICommandService {
 		} catch (error) {
 			// Check if the failed command is npm
 			if (command.trim().startsWith("npm install") || command.trim().startsWith("npm ci") || command.trim().startsWith("npm update") || command.trim().startsWith("npm uninstall")) {
+				this.formatAndParseNpmError(command, error as NPMError);
 				await this.handleNpmInstallFailure(command);
 			} else {
 				// For non-npm commands, throw the error as before
 				throw error;
 			}
+		}
+	}
+
+	/**
+	 * Formate and parse npm error to readable format
+	 * @param command - The original npm command that failed
+	 * @param error - Error npm object
+	 * @returns void
+	 */
+	private formatAndParseNpmError(command: string, error: NPMError): void {
+		// Форматируем и выводим ошибку
+		console.error(chalk.red.bold("🚨 NPM Command Failed"));
+		console.error(chalk.gray(`Command: ${command}`));
+		console.error(chalk.red("Error Details:"));
+
+		// Парсим stderr для структурированного вывода
+		if (error.stderr) {
+			const lines: Array<string> = error.stderr.split("\n").filter((line: string) => line.trim());
+			let errorCode: null | string = null;
+			const conflictDetails: Array<string> = [];
+			let resolutionAdvice: null | string = null;
+			let logFile: null | string = null;
+
+			for (const line of lines) {
+				if (line.includes("npm error code")) {
+					errorCode = line.replace("npm error code", "").trim();
+				} else if (line.includes("While resolving") || line.includes("Found") || line.includes("Could not resolve dependency") || line.includes("Conflicting peer dependency")) {
+					conflictDetails.push(line.replace("npm error", "").trim());
+				} else if (line.includes("Fix the upstream dependency conflict") || line.includes("--force") || line.includes("--legacy-peer-deps")) {
+					resolutionAdvice = line.replace("npm error", "").trim();
+				} else if (line.includes("A complete log of this run can be found in")) {
+					logFile = line.replace("npm error", "").trim();
+				}
+			}
+
+			// Выводим структурированную ошибку
+			if (errorCode) {
+				console.error(chalk.red(`  Code: ${errorCode}`));
+			}
+
+			if (conflictDetails.length > 0) {
+				console.error(chalk.yellow("  Dependency Conflict:"));
+
+				for (const detail of conflictDetails) console.error(chalk.yellow(`    - ${detail}`));
+			}
+
+			if (resolutionAdvice) {
+				console.error(chalk.cyan("  Resolution:"));
+				console.error(chalk.cyan(`    ${resolutionAdvice}`));
+			}
+
+			if (logFile) {
+				console.error(chalk.gray(`  Log File: ${logFile}`));
+			}
+		} else {
+			// Если stderr пустой, выводим общую информацию об ошибке
+			console.error(chalk.red("Unknown error occurred"));
 		}
 	}
 
