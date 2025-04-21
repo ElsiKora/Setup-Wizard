@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.5.0...v2.6.0) (2025-04-21)
+
+
+### Features
+
+* **branch-lint:** expand supported configuration file paths ([9bf11d7](https://github.com/ElsiKora/Setup-Wizard/commit/9bf11d797c9ba5f1697d9173c30f17b2e003d8b2))
+
 # [2.5.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.4.0...v2.5.0) (2025-04-21)
 
 
