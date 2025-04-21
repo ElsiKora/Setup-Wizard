@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.3.1...v2.4.0) (2025-04-21)
+
+
+### Features
+
+* **branch-lint:** add git branch lint configuration and setup ([d5c1a1c](https://github.com/ElsiKora/Setup-Wizard/commit/d5c1a1cf409d759632bd7dcb5cb144cafe5caad0))
+
 ## [2.3.1](https://github.com/ElsiKora/Setup-Wizard/compare/v2.3.0...v2.3.1) (2025-04-21)
 
 # [2.3.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.2.7...v2.3.0) (2025-04-18)
