@@ -48,7 +48,7 @@
 		}
 	},
 	"dependencies": {
-		"commander": "^13.1.0",
+		"commander": "^14.0.0",
 		"cosmiconfig": "^9.0.0",
 		"javascript-stringify": "^2.1.0",
 		"ora": "^8.2.0",
