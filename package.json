@@ -105,7 +105,7 @@
 		"stylelint": "^16.15.0",
 		"stylelint-config-css-modules": "^4.4.0",
 		"stylelint-config-rational-order": "^0.1.2",
-		"stylelint-config-standard-scss": "^14.0.0",
+		"stylelint-config-standard-scss": "^15.0.1",
 		"stylelint-order": "^6.0.4",
 		"stylelint-prettier": "^5.0.3",
 		"tslib": "^2.8.1",
