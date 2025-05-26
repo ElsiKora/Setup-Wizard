@@ -11,8 +11,8 @@
 </a> <img src="https://img.shields.io/badge/version-blue.svg?style=for-the-badge&logo=npm&logoColor=white" alt="version"> <img src="https://img.shields.io/badge/license-MIT-yellow.svg?style=for-the-badge&logo=license&logoColor=white" alt="license-MIT"> <img src="https://img.shields.io/badge/typescript-blue.svg?style=for-the-badge&logo=typescript&logoColor=white" alt="typescript"> <img src="https://img.shields.io/badge/node-green.svg?style=for-the-badge&logo=node.js&logoColor=white" alt="node"> <img src="https://img.shields.io/badge/eslint-purple.svg?style=for-the-badge&logo=eslint&logoColor=white" alt="eslint"> <img src="https://img.shields.io/badge/prettier-ff69b4.svg?style=for-the-badge&logo=prettier&logoColor=white" alt="prettier">
 </p>
 
-
 ## 📚 Table of Contents
+
 - [Description](#-description)
 - [Features](#-features)
 - [Installation](#-installation)
@@ -21,11 +21,12 @@
 - [FAQ](#-faq)
 - [License](#-license)
 
-
 ## 📖 Description
+
 Setup-Wizard is a powerful command-line tool designed to simplify and standardize the project setup process for JavaScript and TypeScript developers. It automates the configuration of essential development tools like ESLint, Prettier, Stylelint, Commitlint, and more. By intelligently detecting your project's framework and dependencies, Setup-Wizard creates optimized configurations tailored to your specific needs. Save hours of setup time, enforce consistent coding standards across teams, and eliminate configuration drift between projects. Whether you're starting a new React application, Node.js service, or any modern JavaScript project, Setup-Wizard provides a seamless scaffolding experience with just a few commands.
 
 ## 🚀 Features
+
 - ✨ **📊 Intelligent Framework Detection - Automatically identifies and configures for React, Next.js, Node.js, and 50+ other frameworks**
 - ✨ **🧰 Comprehensive Tooling - Sets up ESLint, Prettier, Stylelint, Commitlint, Semantic Release, Husky hooks, and more**
 - ✨ **🎯 Optimized Configurations - Creates customized linting rules based on your project's specific needs**
@@ -36,6 +37,7 @@ Setup-Wizard is a powerful command-line tool designed to simplify and standardiz
 - ✨ **🚀 Future-Proof - Supports ESLint flat config and modern JavaScript/TypeScript tooling**
 
 ## 🛠 Installation
+
 ```bash
 ### Global Installation
 
@@ -56,6 +58,7 @@ npx @elsikora/setup-wizard init
 ```
 
 ## 💡 Usage
+
 ## Basic Usage
 
 Run the initialization wizard to set up your project with interactive prompts:
@@ -131,7 +134,8 @@ cd my-react-app
 npx @elsikora/setup-wizard init --withEslint
 ```
 
-Setup-Wizard will detect React and offer to include:  
+Setup-Wizard will detect React and offer to include:
+
 - React specific ESLint rules
 - JSX accessibility rules
 - TypeScript support (if detected)
@@ -147,6 +151,7 @@ npx @elsikora/setup-wizard init --withEslint --withPrettier
 ```
 
 NestJS-specific features include:
+
 - TypeORM linting rules (if TypeORM is detected)
 - NestJS module organization rules
 - API endpoint validation rules
@@ -160,6 +165,7 @@ npx @elsikora/setup-wizard init --withLintStaged --withCommitlint
 ```
 
 This will:
+
 1. Install and configure Husky
 2. Set up pre-commit hooks to run linters
 3. Configure commit message validation
@@ -174,6 +180,7 @@ npx @elsikora/setup-wizard init --withCI
 ```
 
 You'll be prompted to select specific CI modules:
+
 - Release automation
 - Dependabot configuration
 - Quality scanning with Qodana
@@ -210,31 +217,33 @@ npx @elsikora/setup-wizard init \
 The wizard will guide you through configuring each module with sensible defaults based on your project.
 
 ## 🛣 Roadmap
-| Task / Feature | Status |
-|---------------|--------|
-| ## Future Development Plans | 🚧 In Progress |
-| - **Auto-Migration Tool** - Assist users in migrating from legacy ESLint configs to flat config | 🚧 In Progress |
-| - **Monorepo Support** - Enhanced configuration for complex monorepo project structures | 🚧 In Progress |
-| - **Custom Templates** - Save and reuse configuration templates across projects | 🚧 In Progress |
-| - **Plugin System** - Support for third-party plugins and custom module extensions | 🚧 In Progress |
-| - **UI Dashboard** - Web interface for managing and monitoring configurations | 🚧 In Progress |
-| - **Additional CI Providers** - Support for GitLab CI, CircleCI, Azure DevOps, and more | 🚧 In Progress |
-| - **Dependency Analysis** - Identify and suggest updates for outdated or vulnerable dependencies | 🚧 In Progress |
-| - **Cross-Tool Integration** - Better integration between linting tools and test frameworks | 🚧 In Progress |
-| **Completed tasks from CHANGELOG:** |  |
-| **husky:** remove husky.sh import from pre-commit script ([d5d3a62](https://github.com/ElsiKora/Setup-Wizard/commit/d5d3a62f2654228158b6ca2981bd40921e705528)) | ✅ Done |
-| **ci:** correct indentation in release workflow ([9a28927](https://github.com/ElsiKora/Setup-Wizard/commit/9a28927c850cc09a15dc38185e3e1f7407f362ed)) | ✅ Done |
-| **commitlint:** add branch name linting to pre-push hook ([2538c28](https://github.com/ElsiKora/Setup-Wizard/commit/2538c281964d77478f0f42aafd15997a89e30f31)) | ✅ Done |
-| **eslint-config.constant.ts:** refactor ESLint config export logic ([0356871](https://github.com/ElsiKora/Setup-Wizard/commit/03568714c14be6d5f4dc57b5be983fd0876ac562)) | ✅ Done |
-| **ci:** refactor CI setup and add major release rule ([0535403](https://github.com/ElsiKora/Setup-Wizard/commit/05354030ee718a18dc70947dd4143f5e82ce95e6)) | ✅ Done |
-| **global:** refactor module configuration and caching logic ([4bf017c](https://github.com/ElsiKora/Setup-Wizard/commit/4bf017c7d9e31a2f3a10311ffa70e8a4d41c5133)) | ✅ Done |
-| **ci:** need to update major version | ✅ Done |
-| **config:** refactor config handling and update setup paths ([2686a98](https://github.com/ElsiKora/Setup-Wizard/commit/2686a98edb85e9bf8ae7e72f06901feb5474478e)) | ✅ Done |
-| **config:** config for app now stored .elsikora/setup-wizard.js | ✅ Done |
-| **eslint-config:** Refactor ESLint configuration dependencies ([d1c34d1](https://github.com/ElsiKora/Setup-Wizard/commit/d1c34d19535b3f0b8f2a1a6f9d3877ace7129a33)) | ✅ Done |
-| **release.config.js:** Update repository URL in release config ([4f281a6](https://github.com/ElsiKora/Setup-Wizard/commit/4f281a679bfd854961f1c120e742e117dfac7acf)) | ✅ Done |
+
+| Task / Feature                                                                                                                                                           | Status         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
+| ## Future Development Plans                                                                                                                                              | 🚧 In Progress |
+| - **Auto-Migration Tool** - Assist users in migrating from legacy ESLint configs to flat config                                                                          | 🚧 In Progress |
+| - **Monorepo Support** - Enhanced configuration for complex monorepo project structures                                                                                  | 🚧 In Progress |
+| - **Custom Templates** - Save and reuse configuration templates across projects                                                                                          | 🚧 In Progress |
+| - **Plugin System** - Support for third-party plugins and custom module extensions                                                                                       | 🚧 In Progress |
+| - **UI Dashboard** - Web interface for managing and monitoring configurations                                                                                            | 🚧 In Progress |
+| - **Additional CI Providers** - Support for GitLab CI, CircleCI, Azure DevOps, and more                                                                                  | 🚧 In Progress |
+| - **Dependency Analysis** - Identify and suggest updates for outdated or vulnerable dependencies                                                                         | 🚧 In Progress |
+| - **Cross-Tool Integration** - Better integration between linting tools and test frameworks                                                                              | 🚧 In Progress |
+| **Completed tasks from CHANGELOG:**                                                                                                                                      |                |
+| **husky:** remove husky.sh import from pre-commit script ([d5d3a62](https://github.com/ElsiKora/Setup-Wizard/commit/d5d3a62f2654228158b6ca2981bd40921e705528))           | ✅ Done        |
+| **ci:** correct indentation in release workflow ([9a28927](https://github.com/ElsiKora/Setup-Wizard/commit/9a28927c850cc09a15dc38185e3e1f7407f362ed))                    | ✅ Done        |
+| **commitlint:** add branch name linting to pre-push hook ([2538c28](https://github.com/ElsiKora/Setup-Wizard/commit/2538c281964d77478f0f42aafd15997a89e30f31))           | ✅ Done        |
+| **eslint-config.constant.ts:** refactor ESLint config export logic ([0356871](https://github.com/ElsiKora/Setup-Wizard/commit/03568714c14be6d5f4dc57b5be983fd0876ac562)) | ✅ Done        |
+| **ci:** refactor CI setup and add major release rule ([0535403](https://github.com/ElsiKora/Setup-Wizard/commit/05354030ee718a18dc70947dd4143f5e82ce95e6))               | ✅ Done        |
+| **global:** refactor module configuration and caching logic ([4bf017c](https://github.com/ElsiKora/Setup-Wizard/commit/4bf017c7d9e31a2f3a10311ffa70e8a4d41c5133))        | ✅ Done        |
+| **ci:** need to update major version                                                                                                                                     | ✅ Done        |
+| **config:** refactor config handling and update setup paths ([2686a98](https://github.com/ElsiKora/Setup-Wizard/commit/2686a98edb85e9bf8ae7e72f06901feb5474478e))        | ✅ Done        |
+| **config:** config for app now stored .elsikora/setup-wizard.js                                                                                                          | ✅ Done        |
+| **eslint-config:** Refactor ESLint configuration dependencies ([d1c34d1](https://github.com/ElsiKora/Setup-Wizard/commit/d1c34d19535b3f0b8f2a1a6f9d3877ace7129a33))      | ✅ Done        |
+| **release.config.js:** Update repository URL in release config ([4f281a6](https://github.com/ElsiKora/Setup-Wizard/commit/4f281a679bfd854961f1c120e742e117dfac7acf))     | ✅ Done        |
 
 ## ❓ FAQ
+
 ## Frequently Asked Questions
 
 ### How does Setup-Wizard detect my project's framework?
@@ -266,27 +275,17 @@ After Setup-Wizard generates the configuration files, you can edit them manually
 Yes, Setup-Wizard is compatible with npm, Yarn, and pnpm.
 
 ## 🔒 License
-This project is licensed under **MIT License
+
+This project is licensed under \*\*MIT License
 
 Copyright (c) 2025 ElsiKora
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.**.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\*\*.
 
 ## 📋 Changelog
+
 See [CHANGELOG.md](CHANGELOG.md) for details.

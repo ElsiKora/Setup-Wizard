@@ -12,23 +12,23 @@ export interface IPackageJson {
 	[EPackageJsonDependencyType.PROD]?: Record<string, string>;
 	author?: IPackageJsonAuthor | string;
 	bugs?: IPackageJsonBugs | string;
-	config?: Record<string, any>;
+	config?: Record<string, unknown>;
 	contributors?: Array<IPackageJsonAuthor | string>;
 	description?: string;
 	engines?: Record<string, string>;
-	eslintConfig?: Record<string, any>;
+	eslintConfig?: Record<string, unknown>;
 	homepage?: string;
 	keywords?: Array<string>;
 	license?: string;
 	"lint-staged"?: Record<string, string>;
 	main?: string;
 	name: string;
-	prettier?: Record<string, any>;
+	prettier?: Record<string, unknown>;
 	// eslint-disable-next-line @elsikora/typescript/naming-convention
 	private?: boolean;
 	repository?: IPackageJsonRepository | string;
 	scripts?: TPackageJsonScripts;
-	stylelint?: Record<string, any>;
+	stylelint?: Record<string, unknown>;
 	type?: "commonjs" | "module";
 	version: string;
 	workspaces?: { packages: Array<string> } | Array<string>;

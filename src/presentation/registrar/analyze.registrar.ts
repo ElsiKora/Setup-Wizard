@@ -45,7 +45,7 @@ Options:
 			)
 			.option("-e, --hasEslint", "Checks for ESLint configuration")
 			.option("-p, --hasPrettier", "Checks for Prettier configuration")
-			.action(async (options: any) => {
+			.action(async (options: unknown) => {
 				const command: ICommand = this.COMMAND_FACTORY.createCommand(ECommand.ANALYZE, options);
 				await command.execute();
 			});

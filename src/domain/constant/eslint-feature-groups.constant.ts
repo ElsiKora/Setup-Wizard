@@ -8,7 +8,7 @@ export const ESLINT_FEATURE_GROUPS: Array<IEslintFeatureGroup> = [
 		name: "Code Quality",
 	},
 	{
-		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.JSX],
+		features: [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT, EEslintFeature.TYPESCRIPT_STRICT, EEslintFeature.JSX],
 		name: "Core Features",
 	},
 	{

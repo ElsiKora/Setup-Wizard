@@ -3,13 +3,14 @@ import { EslintModuleService } from "../../../../src/application/service/eslint-
 import { createMockCLIInterfaceService, createMockConfigService, createMockFileSystemService } from "../../../helpers/test-utils";
 import { EEslintFeature } from "../../../../src/domain/enum/eslint-feature.enum";
 import { EFramework } from "../../../../src/domain/enum/framework.enum";
-import { ESLINT_CONFIG_FILE_NAME } from "../../../../src/application/constant/eslint-config-file-name.constant";
-import { ESLINT_CONFIG_FILE_NAMES } from "../../../../src/application/constant/eslint-config-file-names.constant";
-import { ESLINT_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/eslint-config-core-dependencies.constant";
+import { ESLINT_CONFIG_FILE_NAMES } from "../../../../src/application/constant/eslint/file-names.constant";
+import { ESLINT_CONFIG_FILE_NAME } from "../../../../src/application/constant/eslint/file-name.constant";
+import { ESLINT_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/eslint/core-dependencies.constant";
+import { ESLINT_CONFIG_ESLINT_PACKAGE_NAME } from "../../../../src/application/constant/eslint/eslint-package-name.constant";
+import { ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION } from "../../../../src/application/constant/eslint/eslint-minimum-required-version.constant";
+import { ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME } from "../../../../src/application/constant/eslint/elsikora-package-name.constant";
+import { ESLINT_CONFIG_MESSAGES } from "../../../../src/application/constant/eslint/messages.constant";
 import { EModule } from "../../../../src/domain/enum/module.enum";
-import { ESLINT_CONFIG_ESLINT_PACKAGE_NAME } from "../../../../src/application/constant/eslint-config-eslint-package-name.costant";
-import { ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION } from "../../../../src/application/constant/eslint-config-eslint-minimum-required-version.constant";
-import { ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME } from "../../../../src/application/constant/eslint-config-elsikora-package-name.constant";
 import { EPackageJsonDependencyType } from "../../../../src/domain/enum/package-json-dependency-type.enum";
 import { EPackageJsonDependencyVersionFlag } from "../../../../src/domain/enum/package-json-dependency-version-flag.enum";
 
@@ -78,7 +79,7 @@ describe("EslintModuleService", () => {
 			const result = await eslintService.shouldInstall();
 
 			expect(result).toBe(true);
-			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith("Do you want to set up ESLint for your project?", true);
+			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.setupEslintPrompt, true);
 		});
 
 		it("should return false when user declines installation", async () => {
@@ -144,9 +145,9 @@ describe("EslintModuleService", () => {
 			expect(result).toBe(true);
 			expect(mockCliInterfaceService.info).toHaveBeenCalled();
 			expect(mockCliInterfaceService.confirm).toHaveBeenCalled();
-			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith("Uninstalling ESLint...");
+			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.uninstallingEslint);
 			expect(mockPackageJsonService.uninstallPackages).toHaveBeenCalledWith(ESLINT_CONFIG_ESLINT_PACKAGE_NAME);
-			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith("ESLint uninstalled successfully.");
+			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.eslintUninstalledSuccessfully);
 		});
 
 		it("should return false when ESLint version is too old and user declines update", async () => {
@@ -209,7 +210,7 @@ describe("EslintModuleService", () => {
 		it("should return false when user declines to uninstall existing config", async () => {
 			// Mock existing ElsiKora configuration
 			mockPackageJsonService.isExistsDependency.mockResolvedValueOnce(true);
-			
+
 			// Setup spy for uninstallExistingConfig
 			vi.spyOn(eslintService as any, "uninstallExistingConfig").mockResolvedValue(undefined);
 
@@ -220,7 +221,7 @@ describe("EslintModuleService", () => {
 
 			expect(result).toBe(false);
 			expect(mockCliInterfaceService.confirm).toHaveBeenCalled();
-			expect(mockCliInterfaceService.warn).toHaveBeenCalled();
+			expect(mockCliInterfaceService.warn).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.existingConfigAborted);
 			expect(eslintService["uninstallExistingConfig"]).not.toHaveBeenCalled();
 		});
 
@@ -251,7 +252,7 @@ describe("EslintModuleService", () => {
 
 			expect(result).toBe(false);
 			expect(mockCliInterfaceService.confirm).toHaveBeenCalled();
-			expect(mockCliInterfaceService.warn).toHaveBeenCalled();
+			expect(mockCliInterfaceService.warn).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.existingFilesAborted);
 			expect(mockFileSystemService.deleteFile).not.toHaveBeenCalled();
 		});
 	});
@@ -286,9 +287,9 @@ describe("EslintModuleService", () => {
 			await (eslintService as any).uninstallExistingConfig();
 
 			// Assert
-			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith("Uninstalling existing ESLint configuration...");
+			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.uninstallingConfig);
 			expect(mockPackageJsonService.uninstallPackages).toHaveBeenCalledWith([ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME, ESLINT_CONFIG_ESLINT_PACKAGE_NAME]);
-			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith("Existing ESLint configuration uninstalled successfully!");
+			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.existingConfigUninstalled);
 		});
 
 		it("should handle errors when uninstalling", async () => {
@@ -298,7 +299,7 @@ describe("EslintModuleService", () => {
 			// Act & Assert
 			await expect((eslintService as any).uninstallExistingConfig()).rejects.toThrow();
 			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalled();
-			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith("Failed to uninstall existing ESLint configuration");
+			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.failedUninstallConfig);
 		});
 	});
 
@@ -315,10 +316,10 @@ describe("EslintModuleService", () => {
 			await (eslintService as any).detectFrameworks();
 
 			// Assert
-			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith("Detecting frameworks...");
+			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.detectingFrameworks);
 			expect(mockFrameworkService.detect).toHaveBeenCalled();
-			expect(mockCliInterfaceService.info).toHaveBeenCalledWith("Detected frameworks: React, TypeScript");
-			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith("Framework detection completed");
+			expect(mockCliInterfaceService.info).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.detectedFrameworks("React, TypeScript"));
+			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.frameworkDetectionCompleted);
 			expect((eslintService as any).detectedFrameworks).toEqual(mockFrameworks);
 		});
 
@@ -329,7 +330,7 @@ describe("EslintModuleService", () => {
 			// Act & Assert
 			await expect((eslintService as any).detectFrameworks()).rejects.toThrow();
 			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalled();
-			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith("Failed to detect frameworks");
+			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.failedDetectFrameworks);
 		});
 	});
 
@@ -770,39 +771,30 @@ describe("EslintModuleService", () => {
 			expect(mockCliInterfaceService.handleError).toHaveBeenCalledWith("Failed to complete ESLint setup", expect.any(Error));
 		});
 	});
-	
+
 	describe("generateLintFixCommand", () => {
 		it("should generate lint fix command with framework-specific extensions", () => {
 			// There's already a test for this at line 497, we'll remove the duplicate
 		});
 	});
-	
+
 	describe("createConfig", () => {
 		it("should create ESLint config with correct features and frameworks", async () => {
 			const selectedFeatures = [EEslintFeature.JAVASCRIPT, EEslintFeature.TYPESCRIPT];
 			const detectedFrameworks = [EFramework.REACT, EFramework.TYPESCRIPT];
-			
+
 			await (eslintService as any).createConfig(selectedFeatures, detectedFrameworks);
-			
-			expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(
-				ESLINT_CONFIG_FILE_NAME,
-				expect.any(String),
-				"utf8"
-			);
+
+			expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(ESLINT_CONFIG_FILE_NAME, expect.any(String), "utf8");
 		});
-		
+
 		it("should handle no frameworks case", async () => {
 			const selectedFeatures = [EEslintFeature.JAVASCRIPT];
 			const detectedFrameworks = [];
-			
+
 			await (eslintService as any).createConfig(selectedFeatures, detectedFrameworks);
-			
-			expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(
-				ESLINT_CONFIG_FILE_NAME,
-				expect.any(String),
-				"utf8"
-			);
+
+			expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(ESLINT_CONFIG_FILE_NAME, expect.any(String), "utf8");
 		});
 	});
-	
 });

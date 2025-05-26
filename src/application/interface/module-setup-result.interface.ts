@@ -1,4 +1,4 @@
 export interface IModuleSetupResult {
-	customProperties?: Record<string, any>;
+	customProperties?: Record<string, unknown>;
 	wasInstalled: boolean;
 }

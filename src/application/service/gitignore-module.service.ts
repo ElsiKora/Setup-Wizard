@@ -4,8 +4,12 @@ import type { IConfigService } from "../interface/config-service.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
-import { GITIGNORE_CONFIG } from "../../domain/constant/gitignore-config.constant";
 import { EModule } from "../../domain/enum/module.enum";
+import { GITIGNORE_CONFIG } from "../constant/gitignore/config.constant";
+import { GITIGNORE_CONFIG_FILE_NAME } from "../constant/gitignore/file-name.constant";
+import { GITIGNORE_CONFIG_FILE_NAMES } from "../constant/gitignore/file-names.constant";
+import { GITIGNORE_CONFIG_MESSAGES } from "../constant/gitignore/messages.constant";
+import { GITIGNORE_CONFIG_SUMMARY } from "../constant/gitignore/summary.constant";
 
 /**
  * Service for setting up and managing .gitignore file.
@@ -41,32 +45,32 @@ export class GitignoreModuleService implements IModuleService {
 	 */
 	async handleExistingSetup(): Promise<boolean> {
 		try {
-			const existingGitignore: string | undefined = await this.FILE_SYSTEM_SERVICE.isOneOfPathsExists([".gitignore"]);
+			const existingGitignore: string | undefined = await this.FILE_SYSTEM_SERVICE.isOneOfPathsExists(GITIGNORE_CONFIG_FILE_NAMES);
 
 			if (!existingGitignore) {
 				return true;
 			}
 
-			const shouldReplace: boolean = await this.CLI_INTERFACE_SERVICE.confirm(`An existing .gitignore file was found (${existingGitignore}). Would you like to replace it?`);
+			const shouldReplace: boolean = await this.CLI_INTERFACE_SERVICE.confirm(GITIGNORE_CONFIG_MESSAGES.existingFileFound(existingGitignore));
 
 			if (!shouldReplace) {
-				this.CLI_INTERFACE_SERVICE.warn("Keeping existing .gitignore file.");
+				this.CLI_INTERFACE_SERVICE.warn(GITIGNORE_CONFIG_MESSAGES.keepingExisting);
 
 				return false;
 			}
 
 			try {
 				await this.FILE_SYSTEM_SERVICE.deleteFile(existingGitignore);
-				this.CLI_INTERFACE_SERVICE.success("Deleted existing .gitignore file.");
+				this.CLI_INTERFACE_SERVICE.success(GITIGNORE_CONFIG_MESSAGES.deletedExisting);
 
 				return true;
 			} catch (error) {
-				this.CLI_INTERFACE_SERVICE.handleError("Failed to delete existing .gitignore file", error);
+				this.CLI_INTERFACE_SERVICE.handleError(GITIGNORE_CONFIG_MESSAGES.failedDeleteExisting, error);
 
 				return false;
 			}
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to check existing .gitignore setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError(GITIGNORE_CONFIG_MESSAGES.failedCheckExisting, error);
 
 			return false;
 		}
@@ -92,7 +96,7 @@ export class GitignoreModuleService implements IModuleService {
 
 			return { wasInstalled: true };
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete .gitignore installation", error);
+			this.CLI_INTERFACE_SERVICE.handleError(GITIGNORE_CONFIG_MESSAGES.failedComplete, error);
 
 			throw error;
 		}
@@ -106,9 +110,9 @@ export class GitignoreModuleService implements IModuleService {
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to generate .gitignore file for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.GITIGNORE));
+			return await this.CLI_INTERFACE_SERVICE.confirm(GITIGNORE_CONFIG_MESSAGES.confirmGenerate, await this.CONFIG_SERVICE.isModuleEnabled(EModule.GITIGNORE));
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
+			this.CLI_INTERFACE_SERVICE.handleError(GITIGNORE_CONFIG_MESSAGES.failedConfirmation, error);
 
 			return false;
 		}
@@ -124,14 +128,14 @@ export class GitignoreModuleService implements IModuleService {
 		const summary: Array<string> = [];
 
 		if (isSuccess) {
-			summary.push("Successfully created configuration:", "✓ .gitignore file");
+			summary.push(GITIGNORE_CONFIG_SUMMARY.successConfig, GITIGNORE_CONFIG_SUMMARY.fileCreated);
 		} else {
-			summary.push("Failed configuration:", `✗ .gitignore - ${error?.message ?? "Unknown error"}`);
+			summary.push(GITIGNORE_CONFIG_SUMMARY.failedConfig, GITIGNORE_CONFIG_SUMMARY.fileFailed(error?.message ?? "Unknown error"));
 		}
 
-		summary.push("", "The .gitignore configuration includes:", "- Build outputs and dependencies", "- Common IDEs and editors", "- Testing and coverage files", "- Environment and local config files", "- System and temporary files", "- Framework-specific files", "- Lock files", "", "You can customize it further by editing .gitignore");
+		summary.push(GITIGNORE_CONFIG_SUMMARY.description);
 
-		this.CLI_INTERFACE_SERVICE.note("Gitignore Setup Summary", summary.join("\n"));
+		this.CLI_INTERFACE_SERVICE.note(GITIGNORE_CONFIG_SUMMARY.title, summary.join("\n"));
 	}
 
 	/**
@@ -139,11 +143,11 @@ export class GitignoreModuleService implements IModuleService {
 	 * @returns Promise resolving to an object indicating success or failure with optional error
 	 */
 	private async generateNewGitignore(): Promise<{ error?: Error; isSuccess: boolean }> {
-		this.CLI_INTERFACE_SERVICE.startSpinner("Generating .gitignore file...");
+		this.CLI_INTERFACE_SERVICE.startSpinner(GITIGNORE_CONFIG_MESSAGES.generatingFile);
 
 		try {
-			await this.FILE_SYSTEM_SERVICE.writeFile(".gitignore", GITIGNORE_CONFIG);
-			this.CLI_INTERFACE_SERVICE.stopSpinner(".gitignore file generated");
+			await this.FILE_SYSTEM_SERVICE.writeFile(GITIGNORE_CONFIG_FILE_NAME, GITIGNORE_CONFIG);
+			this.CLI_INTERFACE_SERVICE.stopSpinner(GITIGNORE_CONFIG_MESSAGES.fileGenerated);
 
 			return { isSuccess: true };
 		} catch (error) {

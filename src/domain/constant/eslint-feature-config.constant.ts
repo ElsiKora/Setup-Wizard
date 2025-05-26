@@ -2,8 +2,6 @@ import type { IEslintFeatureConfig } from "../interface/eslint-feature-config.in
 
 import { EEslintFeature } from "../enum/eslint-feature.enum";
 
-const a: number = 5;
-
 export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig> = {
 	[EEslintFeature.CHECK_FILE]: {
 		configFlag: "withCheckFile",
@@ -137,7 +135,14 @@ export const ESLINT_FEATURE_CONFIG: Record<EEslintFeature, IEslintFeatureConfig>
 	},
 	[EEslintFeature.TYPESCRIPT]: {
 		configFlag: "withTypescript",
-		description: "TypeScript support",
+		description: "TypeScript support (basic rules)",
+		detect: ["typescript", "@types/node"],
+		isRequiresTypescript: true,
+		packages: [],
+	},
+	[EEslintFeature.TYPESCRIPT_STRICT]: {
+		configFlag: "withTypescriptStrict",
+		description: "TypeScript strict mode (recommended)",
 		detect: ["typescript", "@types/node"],
 		isRequiresTypescript: true,
 		packages: [],

@@ -1,5 +1,5 @@
 /* eslint-disable @elsikora/typescript/no-unsafe-argument */
-/* eslint-disable @elsikora/typescript/no-unsafe-assignment */
+
 import type { ICiConfig } from "../interface/ci-config.interface";
 
 import { ECiModuleType } from "../enum/ci-module-type.enum";
@@ -143,9 +143,9 @@ jobs:
 			[ECiProvider.GITHUB]: {
 				filePath: ".github/workflows/release.yml",
 				template: (properties: object = {}) => {
-					const mainBranch: string = (properties as Record<string, any>).mainBranch ?? "main";
-					const preReleaseBranch: string | undefined = (properties as Record<string, any>).preReleaseBranch;
-					const isPrerelease: boolean = (properties as Record<string, any>).isPrerelease ?? false;
+					const mainBranch: string = ((properties as Record<string, unknown>).mainBranch as string) ?? "main";
+					const preReleaseBranch: string | undefined = (properties as Record<string, unknown>).preReleaseBranch as string | undefined;
+					const isPrerelease: boolean = ((properties as Record<string, unknown>).isPrerelease as boolean) ?? false;
 
 					const branches: Array<string> = [`- ${mainBranch}`];
 
@@ -208,9 +208,9 @@ jobs:
 			[ECiProvider.GITHUB]: {
 				filePath: ".github/workflows/release.yml",
 				template: (properties: object = {}) => {
-					const mainBranch: string = (properties as Record<string, any>).mainBranch ?? "main";
-					const preReleaseBranch: string | undefined = (properties as Record<string, any>).preReleaseBranch;
-					const isPrerelease: boolean = (properties as Record<string, any>).isPrerelease ?? false;
+					const mainBranch: string = ((properties as Record<string, unknown>).mainBranch as string) ?? "main";
+					const preReleaseBranch: string | undefined = (properties as Record<string, unknown>).preReleaseBranch as string | undefined;
+					const isPrerelease: boolean = ((properties as Record<string, unknown>).isPrerelease as boolean) ?? false;
 
 					const branches: Array<string> = [`- ${mainBranch}`];
 

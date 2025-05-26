@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { LintStagedModuleService } from "../../../../src/application/service/lint-staged-module.service";
 import { EModule } from "../../../../src/domain/enum/module.enum";
 import { ELintStagedFeature } from "../../../../src/domain/enum/lint-staged-feature.enum";
-import { LINT_STAGED_CONFIG_FILE_NAMES } from "../../../../src/application/constant/lint-staged-config-file-names.constant";
-import { LINT_STAGED_CONFIG_HUSKY_PRE_COMMIT_SCRIPT } from "../../../../src/application/constant/lint-staged-config-husky-pre-commit-script.constant";
-import { LINT_STAGED_CORE_DEPENDENCIES } from "../../../../src/application/constant/lint-staged-core-dependencies.constant";
+import { LINT_STAGED_CONFIG_FILE_NAMES } from "../../../../src/application/constant/lint-staged/file-names.constant";
+import { LINT_STAGED_CONFIG_HUSKY_PRE_COMMIT_SCRIPT } from "../../../../src/application/constant/lint-staged/husky-pre-commit-script.constant";
+import { LINT_STAGED_CORE_DEPENDENCIES } from "../../../../src/application/constant/lint-staged/core-dependencies.constant";
 import { LINT_STAGED_FEATURE_CONFIG } from "../../../../src/domain/constant/lint-staged-feature-config.constant";
 import { EPackageJsonDependencyType } from "../../../../src/domain/enum/package-json-dependency-type.enum";
 

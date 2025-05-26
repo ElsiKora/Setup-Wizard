@@ -1,4 +1,4 @@
-/* eslint-disable @elsikora/typescript/no-unsafe-call,@elsikora/typescript/naming-convention,@elsikora/unicorn/no-process-exit,@elsikora/typescript/no-unsafe-member-access,@elsikora/typescript/no-unsafe-assignment */
+/* eslint-disable @elsikora/typescript/no-unsafe-call,@elsikora/typescript/naming-convention,@elsikora/unicorn/no-process-exit,@elsikora/typescript/no-unsafe-member-access */
 import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
 import type { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
 
@@ -11,12 +11,13 @@ import { confirm, groupMultiselect, isCancel, log, multiselect, note, select, sp
  */
 export class ClackCliInterface implements ICliInterfaceService {
 	/** Reference to the active spinner instance */
-	private spinner: any;
+	private spinner: { start(message: string): void; stop(message?: string): void } | undefined;
 
 	/**
 	 * Clears the console screen.
 	 */
 	clear(): void {
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.clear();
 	}
 
@@ -80,7 +81,7 @@ export class ClackCliInterface implements ICliInterfaceService {
 	 */
 	handleError(message: string, error: unknown): void {
 		log.error(message);
-		console.log(error);
+		console.error(error);
 	}
 
 	/**
@@ -165,7 +166,7 @@ export class ClackCliInterface implements ICliInterfaceService {
 			this.spinner.stop();
 		}
 
-		this.spinner = spinner();
+		this.spinner = spinner() as { start(message: string): void; stop(message?: string): void };
 
 		this.spinner.start(message);
 	}

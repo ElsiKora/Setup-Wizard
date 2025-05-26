@@ -3,10 +3,11 @@ import { SemanticReleaseModuleService } from "../../../../src/application/servic
 import { createMockCLIInterfaceService, createMockConfigService, createMockFileSystemService } from "../../../helpers/test-utils";
 import { EModule } from "../../../../src/domain/enum/module.enum";
 import { EPackageJsonDependencyType } from "../../../../src/domain/enum/package-json-dependency-type.enum";
-import { SEMANTIC_RELEASE_CONFIG_FILE_NAMES } from "../../../../src/application/constant/semantic-release-config-file-names.constant";
-import { SEMANTIC_RELEASE_CONFIG_FILE_NAME } from "../../../../src/application/constant/semantic-release-config-file-name.constant";
-import { SEMANTIC_RELEASE_CONFIG } from "../../../../src/application/constant/semantic-release-config.constant";
-import { SEMANTIC_RELEASE_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/semantic-release-config-core-dependencies.constant";
+import { SEMANTIC_RELEASE_CONFIG } from "../../../../src/application/constant/semantic-release/config.constant";
+import { SEMANTIC_RELEASE_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/semantic-release/core-dependencies.constant";
+import { SEMANTIC_RELEASE_CONFIG_FILE_NAME } from "../../../../src/application/constant/semantic-release/file-name.constant";
+import { SEMANTIC_RELEASE_CONFIG_FILE_NAMES } from "../../../../src/application/constant/semantic-release/file-names.constant";
+import { SEMANTIC_RELEASE_CONFIG_MESSAGES } from "../../../../src/application/constant/semantic-release/messages.constant";
 
 describe("SemanticReleaseModuleService", () => {
 	// Mocks
@@ -67,7 +68,7 @@ describe("SemanticReleaseModuleService", () => {
 			const result = await semanticReleaseService.shouldInstall();
 
 			expect(result).toBe(true);
-			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith("Do you want to set up Semantic Release for automated versioning and publishing?", true);
+			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.confirmSetup, true);
 		});
 
 		it("should return false when user declines installation", async () => {
@@ -140,7 +141,7 @@ describe("SemanticReleaseModuleService", () => {
 			const result = await semanticReleaseService.handleExistingSetup();
 
 			expect(result).toBe(true);
-			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith(expect.stringContaining("Existing Semantic Release configuration files detected"), true);
+			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith(expect.stringContaining(SEMANTIC_RELEASE_CONFIG_MESSAGES.existingFilesDetected), true);
 			expect(mockFileSystemService.deleteFile).toHaveBeenCalledTimes(2);
 			expect(mockFileSystemService.deleteFile).toHaveBeenCalledWith("release.config.js");
 			expect(mockFileSystemService.deleteFile).toHaveBeenCalledWith("CHANGELOG.md");
@@ -153,7 +154,7 @@ describe("SemanticReleaseModuleService", () => {
 			const result = await semanticReleaseService.handleExistingSetup();
 
 			expect(result).toBe(false);
-			expect(mockCliInterfaceService.warn).toHaveBeenCalledWith("Existing Semantic Release configuration files detected. Setup aborted.");
+			expect(mockCliInterfaceService.warn).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.existingFilesAborted);
 			expect(mockFileSystemService.deleteFile).not.toHaveBeenCalled();
 		});
 	});
@@ -198,7 +199,7 @@ describe("SemanticReleaseModuleService", () => {
 			const result = await (semanticReleaseService as any).getRepositoryUrl();
 
 			expect(result).toBe("https://github.com/manual/entry");
-			expect(mockCliInterfaceService.text).toHaveBeenCalledWith("Enter your repository URL (e.g., https://github.com/username/repo):", undefined, undefined, expect.any(Function));
+			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.enterRepositoryUrl, undefined, undefined, expect.any(Function));
 		});
 
 		it("should allow user to override detected repository URL", async () => {
@@ -230,9 +231,9 @@ describe("SemanticReleaseModuleService", () => {
 			// Now test the validator directly
 			expect(validatorFn).toBeDefined();
 			// Should require a URL
-			expect(validatorFn!("")).toBe("Repository URL is required");
+			expect(validatorFn!("")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlRequired);
 			// Should require http/https protocol
-			expect(validatorFn!("git@github.com:user/repo.git")).toBe("Repository URL must start with 'https://' or 'http://'");
+			expect(validatorFn!("git@github.com:user/repo.git")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlStartError);
 			// Valid URL should pass
 			expect(validatorFn!("https://github.com/user/repo")).toBeUndefined();
 		});
@@ -253,9 +254,9 @@ describe("SemanticReleaseModuleService", () => {
 			// Now test the validator directly
 			expect(validatorFn).toBeDefined();
 			// Should require a URL
-			expect(validatorFn!("")).toBe("Repository URL is required");
+			expect(validatorFn!("")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlRequired);
 			// Should require http/https protocol
-			expect(validatorFn!("git@github.com:user/repo.git")).toBe("Repository URL must start with 'https://' or 'http://'");
+			expect(validatorFn!("git@github.com:user/repo.git")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlStartError);
 			// Valid URL should pass
 			expect(validatorFn!("https://github.com/user/repo")).toBeUndefined();
 		});
@@ -268,7 +269,7 @@ describe("SemanticReleaseModuleService", () => {
 			const result = await (semanticReleaseService as any).getMainBranch();
 
 			expect(result).toBe("master");
-			expect(mockCliInterfaceService.text).toHaveBeenCalledWith("Enter the name of your main release branch:", "main", "main", expect.any(Function));
+			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.mainBranchPrompt, "main", "main", expect.any(Function));
 		});
 
 		it("getMainBranch should validate branch name format", async () => {
@@ -283,8 +284,8 @@ describe("SemanticReleaseModuleService", () => {
 
 			// Test the validator with invalid branch names
 			expect(validatorFn).toBeDefined();
-			expect(validatorFn!("branch with spaces")).toBe("Branch name cannot contain spaces");
-			expect(validatorFn!("")).toBe("Branch name is required");
+			expect(validatorFn!("branch with spaces")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError);
+			expect(validatorFn!("")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameRequired);
 			expect(validatorFn!("valid-branch")).toBeUndefined(); // Should pass validation
 		});
 
@@ -294,7 +295,7 @@ describe("SemanticReleaseModuleService", () => {
 			const result = await (semanticReleaseService as any).getPreReleaseBranch();
 
 			expect(result).toBe("develop");
-			expect(mockCliInterfaceService.text).toHaveBeenCalledWith("Enter the name of your pre-release branch:", "dev", "dev", expect.any(Function));
+			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.preReleaseBranchPrompt, "dev", "dev", expect.any(Function));
 		});
 
 		it("getPreReleaseBranch should validate branch name format", async () => {
@@ -309,8 +310,8 @@ describe("SemanticReleaseModuleService", () => {
 
 			// Test the validator with invalid branch names
 			expect(validatorFn).toBeDefined();
-			expect(validatorFn!("branch with spaces")).toBe("Branch name cannot contain spaces");
-			expect(validatorFn!("")).toBe("Branch name is required");
+			expect(validatorFn!("branch with spaces")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError);
+			expect(validatorFn!("")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameRequired);
 			expect(validatorFn!("valid-branch")).toBeUndefined(); // Should pass validation
 		});
 
@@ -320,7 +321,7 @@ describe("SemanticReleaseModuleService", () => {
 			const result = await (semanticReleaseService as any).getPreReleaseChannel();
 
 			expect(result).toBe("alpha");
-			expect(mockCliInterfaceService.text).toHaveBeenCalledWith("Enter the pre-release channel name (e.g., beta, alpha, next):", "beta", "beta", expect.any(Function));
+			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.preReleaseChannelPrompt, "beta", "beta", expect.any(Function));
 		});
 
 		it("getPreReleaseChannel should validate channel name format", async () => {
@@ -335,8 +336,8 @@ describe("SemanticReleaseModuleService", () => {
 
 			// Test the validator with invalid channel names
 			expect(validatorFn).toBeDefined();
-			expect(validatorFn!("space in channel")).toBe("Channel name cannot contain spaces");
-			expect(validatorFn!("")).toBe("Channel name is required");
+			expect(validatorFn!("space in channel")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.channelNameSpacesError);
+			expect(validatorFn!("")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.channelNameRequired);
 			expect(validatorFn!("alpha")).toBeUndefined(); // Should pass validation
 		});
 
@@ -346,7 +347,7 @@ describe("SemanticReleaseModuleService", () => {
 			const result = await (semanticReleaseService as any).getDevelopBranch();
 
 			expect(result).toBe("development");
-			expect(mockCliInterfaceService.text).toHaveBeenCalledWith("Enter the name of your development branch for backmerge:", "dev", "dev", expect.any(Function));
+			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.developBranchPrompt, "dev", "dev", expect.any(Function));
 		});
 
 		it("getDevelopBranch should validate branch name format", async () => {
@@ -361,8 +362,8 @@ describe("SemanticReleaseModuleService", () => {
 
 			// Test the validator with invalid branch names
 			expect(validatorFn).toBeDefined();
-			expect(validatorFn!("branch with spaces")).toBe("Branch name cannot contain spaces");
-			expect(validatorFn!("")).toBe("Branch name is required");
+			expect(validatorFn!("branch with spaces")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError);
+			expect(validatorFn!("")).toBe(SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameRequired);
 			expect(validatorFn!("develop")).toBeUndefined(); // Should pass validation
 		});
 
@@ -374,7 +375,7 @@ describe("SemanticReleaseModuleService", () => {
 			const result = await (semanticReleaseService as any).isPrereleaseEnabledChannel();
 
 			expect(result).toBe(true);
-			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith("Do you want to configure a pre-release channel for development branches?", true);
+			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.confirmPrereleaseChannel, true);
 		});
 
 		it("isBackmergeEnabled should prompt for backmerge config", async () => {
@@ -385,7 +386,7 @@ describe("SemanticReleaseModuleService", () => {
 			const result = await (semanticReleaseService as any).isBackmergeEnabled("main");
 
 			expect(result).toBe(true);
-			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith("Do you want to enable automatic backmerge from main to development branch after release?", true);
+			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.confirmBackmerge("main"), true);
 		});
 	});
 
@@ -415,20 +416,20 @@ describe("SemanticReleaseModuleService", () => {
 		it("should display basic setup summary", () => {
 			(semanticReleaseService as any).displaySetupSummary("main");
 
-			expect(mockCliInterfaceService.note).toHaveBeenCalledWith("Semantic Release Setup", expect.stringContaining("Semantic Release configuration has been created."));
-			expect(mockCliInterfaceService.note).toHaveBeenCalledWith("Semantic Release Setup", expect.stringContaining("Main release branch: main"));
+			expect(mockCliInterfaceService.note).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(SEMANTIC_RELEASE_CONFIG_MESSAGES.configurationCreated));
+			expect(mockCliInterfaceService.note).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining("Main release branch: main"));
 		});
 
 		it("should include pre-release information in summary when provided", () => {
 			(semanticReleaseService as any).displaySetupSummary("main", "dev", "beta");
 
-			expect(mockCliInterfaceService.note).toHaveBeenCalledWith("Semantic Release Setup", expect.stringContaining("Pre-release branch: dev (channel: beta)"));
+			expect(mockCliInterfaceService.note).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining("Pre-release branch: dev (channel: beta)"));
 		});
 
 		it("should include backmerge information in summary when enabled", () => {
 			(semanticReleaseService as any).displaySetupSummary("main", undefined, undefined, true, "develop");
 
-			expect(mockCliInterfaceService.note).toHaveBeenCalledWith("Semantic Release Setup", expect.stringContaining("Backmerge enabled: Changes from main will be automatically merged to develop after release"));
+			expect(mockCliInterfaceService.note).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining("Backmerge enabled: Changes from main will be automatically merged to develop after release"));
 		});
 	});
 
@@ -458,11 +459,11 @@ describe("SemanticReleaseModuleService", () => {
 				developBranch: "develop",
 			});
 
-			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith("Setting up Semantic Release configuration...");
+			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.settingUpSpinner);
 			expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
 			expect(semanticReleaseService["createConfigs"]).toHaveBeenCalledWith("https://github.com/test/repo", "main", "dev", "beta", true, "develop");
 			expect(semanticReleaseService["setupScripts"]).toHaveBeenCalled();
-			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith("Semantic Release configuration completed successfully!");
+			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.configurationCompleted);
 			expect(semanticReleaseService["displaySetupSummary"]).toHaveBeenCalledWith("main", "dev", "beta", true, "develop");
 		});
 
@@ -502,7 +503,7 @@ describe("SemanticReleaseModuleService", () => {
 			vi.spyOn(semanticReleaseService as any, "createConfigs").mockRejectedValueOnce(new Error("Config error"));
 
 			await expect((semanticReleaseService as any).setupSemanticRelease()).rejects.toThrow("Config error");
-			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith("Failed to setup Semantic Release configuration");
+			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.failedSetupConfiguration);
 		});
 
 		it("should handle errors during package installation", async () => {
@@ -518,7 +519,7 @@ describe("SemanticReleaseModuleService", () => {
 			await expect((semanticReleaseService as any).setupSemanticRelease()).rejects.toThrow("Installation failed");
 
 			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalled();
-			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith("Failed to setup Semantic Release configuration");
+			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.failedSetupConfiguration);
 		});
 
 		it("should handle errors during script setup", async () => {
@@ -535,7 +536,7 @@ describe("SemanticReleaseModuleService", () => {
 			await expect((semanticReleaseService as any).setupSemanticRelease()).rejects.toThrow("Script setup failed");
 
 			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalled();
-			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith("Failed to setup Semantic Release configuration");
+			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.failedSetupConfiguration);
 		});
 	});
 
@@ -605,7 +606,7 @@ describe("SemanticReleaseModuleService", () => {
 
 			// Call and expect rejection
 			await expect(semanticReleaseService.install()).rejects.toThrow("Setup error");
-			expect(mockCliInterfaceService.handleError).toHaveBeenCalledWith("Failed to complete Semantic Release setup", expect.any(Error));
+			expect(mockCliInterfaceService.handleError).toHaveBeenCalledWith(SEMANTIC_RELEASE_CONFIG_MESSAGES.failedSetupError, expect.any(Error));
 		});
 	});
 });

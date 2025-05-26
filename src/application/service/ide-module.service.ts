@@ -10,6 +10,7 @@ import type { IModuleSetupResult } from "../interface/module-setup-result.interf
 import { IDE_CONFIG } from "../../domain/constant/ide-config.constant";
 import { EIde } from "../../domain/enum/ide.enum";
 import { EModule } from "../../domain/enum/module.enum";
+import { IDE_CONFIG_MESSAGES } from "../constant/ide/messages.constant";
 
 /**
  * Service for setting up and managing IDE-specific configurations.
@@ -56,9 +57,9 @@ export class IdeModuleService implements IModuleService {
 			return true;
 		}
 
-		this.CLI_INTERFACE_SERVICE.warn("Found existing IDE configuration files that might be modified:\n" + existingFiles.map((file: string) => `- ${file}`).join("\n"));
+		this.CLI_INTERFACE_SERVICE.warn(IDE_CONFIG_MESSAGES.existingFilesFound + "\n" + existingFiles.map((file: string) => `- ${file}`).join("\n"));
 
-		return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to continue? This might overwrite existing files.", false);
+		return await this.CLI_INTERFACE_SERVICE.confirm(IDE_CONFIG_MESSAGES.confirmContinue, false);
 	}
 
 	/**
@@ -77,13 +78,13 @@ export class IdeModuleService implements IModuleService {
 			this.selectedIdes = await this.selectIdes(this.config?.ides ?? []);
 
 			if (this.selectedIdes.length === 0) {
-				this.CLI_INTERFACE_SERVICE.warn("No IDEs selected.");
+				this.CLI_INTERFACE_SERVICE.warn(IDE_CONFIG_MESSAGES.noIdesSelected);
 
 				return { wasInstalled: false };
 			}
 
 			if (!(await this.handleExistingSetup())) {
-				this.CLI_INTERFACE_SERVICE.warn("Setup cancelled by user.");
+				this.CLI_INTERFACE_SERVICE.warn(IDE_CONFIG_MESSAGES.setupCancelledByUser);
 
 				return { wasInstalled: false };
 			}
@@ -97,7 +98,7 @@ export class IdeModuleService implements IModuleService {
 				wasInstalled: true,
 			};
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete IDE setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError(IDE_CONFIG_MESSAGES.failedSetupError, error);
 
 			throw error;
 		}
@@ -110,7 +111,7 @@ export class IdeModuleService implements IModuleService {
 	 * @returns Promise resolving to true if the module should be installed, false otherwise
 	 */
 	async shouldInstall(): Promise<boolean> {
-		return await this.CLI_INTERFACE_SERVICE.confirm("Would you like to set up ESLint and Prettier configurations for your code editors?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.IDE));
+		return await this.CLI_INTERFACE_SERVICE.confirm(IDE_CONFIG_MESSAGES.confirmSetup, await this.CONFIG_SERVICE.isModuleEnabled(EModule.IDE));
 	}
 
 	/**
@@ -120,7 +121,7 @@ export class IdeModuleService implements IModuleService {
 	 */
 	private displaySetupSummary(successful: Array<{ ide: EIde }>, failed: Array<{ error?: Error; ide: EIde }>): void {
 		const summary: Array<string> = [
-			"Successfully created configurations:",
+			IDE_CONFIG_MESSAGES.successfulConfiguration,
 			...successful.map(({ ide }: { ide: EIde }) => {
 				const files: string = IDE_CONFIG[ide].content.map((config: IIdeConfigContent) => `  - ${config.filePath}`).join("\n");
 
@@ -129,10 +130,10 @@ export class IdeModuleService implements IModuleService {
 		];
 
 		if (failed.length > 0) {
-			summary.push("Failed configurations:", ...failed.map(({ error, ide }: { error?: Error; ide: EIde }) => `✗ ${IDE_CONFIG[ide].name} - ${error?.message ?? "Unknown error"}`));
+			summary.push(IDE_CONFIG_MESSAGES.failedConfiguration, ...failed.map(({ error, ide }: { error?: Error; ide: EIde }) => `✗ ${IDE_CONFIG[ide].name} - ${error?.message ?? IDE_CONFIG_MESSAGES.unknownError}`));
 		}
 
-		this.CLI_INTERFACE_SERVICE.note("IDE Setup Summary", summary.join("\n"));
+		this.CLI_INTERFACE_SERVICE.note(IDE_CONFIG_MESSAGES.setupSummaryTitle, summary.join("\n"));
 	}
 
 	/**
@@ -171,7 +172,7 @@ export class IdeModuleService implements IModuleService {
 
 		const initialSelection: Array<EIde> | undefined = validSavedIdes.length > 0 ? validSavedIdes : undefined;
 
-		return await this.CLI_INTERFACE_SERVICE.multiselect<EIde>("Select your code editor(s):", choices, true, initialSelection);
+		return await this.CLI_INTERFACE_SERVICE.multiselect<EIde>(IDE_CONFIG_MESSAGES.selectIdesPrompt, choices, true, initialSelection);
 	}
 
 	/**
@@ -200,7 +201,7 @@ export class IdeModuleService implements IModuleService {
 	 * Creates and writes IDE-specific configuration files.
 	 */
 	private async setupSelectedIdes(): Promise<void> {
-		this.CLI_INTERFACE_SERVICE.startSpinner("Setting up IDE configurations...");
+		this.CLI_INTERFACE_SERVICE.startSpinner(IDE_CONFIG_MESSAGES.settingUpSpinner);
 
 		try {
 			const results: Array<
@@ -211,7 +212,7 @@ export class IdeModuleService implements IModuleService {
 				}>
 			> = await Promise.all(this.selectedIdes.map((ide: EIde) => this.setupIde(ide)));
 
-			this.CLI_INTERFACE_SERVICE.stopSpinner("IDE configuration completed successfully!");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(IDE_CONFIG_MESSAGES.setupCompleteSpinner);
 
 			const successfulSetups: Array<Awaited<{ error?: Error; ide: EIde; isSuccess: boolean }>> = results.filter(
 				(

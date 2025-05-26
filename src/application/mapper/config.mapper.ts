@@ -1,4 +1,3 @@
-/* eslint-disable @elsikora/typescript/no-unsafe-member-access */
 import type { ECiModule } from "../../domain/enum/ci-module.enum";
 import type { ECiProvider } from "../../domain/enum/ci-provider.enum";
 import type { EEslintFeature } from "../../domain/enum/eslint-feature.enum";
@@ -56,7 +55,7 @@ export const ConfigMapper: {
 					  }
 					| {
 							isEnabled?: boolean;
-							moduleProperties?: Partial<Record<ECiModule, { [p: string]: any; isEnabled?: boolean } | boolean>>;
+							moduleProperties?: Partial<Record<ECiModule, { [p: string]: unknown; isEnabled?: boolean } | boolean>>;
 							modules?: Array<ECiModule>;
 							provider?: ECiProvider;
 					  }
@@ -64,11 +63,11 @@ export const ConfigMapper: {
 					| undefined = config[key as keyof IConfig];
 
 				if (typeof value === "boolean") {
-					(properties as any)[key] = value;
+					(properties as Record<string, unknown>)[key] = value;
 				} else if (value && typeof value === "object" && "isEnabled" in value) {
-					(properties as any)[key] = value.isEnabled;
+					(properties as Record<string, unknown>)[key] = value.isEnabled;
 				} else {
-					(properties as any)[key] = !!value;
+					(properties as Record<string, unknown>)[key] = !!value;
 				}
 			}
 		}
@@ -87,7 +86,7 @@ export const ConfigMapper: {
 
 		for (const key in setupResults) {
 			if (Object.prototype.hasOwnProperty.call(setupResults, key)) {
-				(config as any)[key] = { isEnabled: setupResults[key as EModule]?.wasInstalled, ...setupResults[key as EModule]?.customProperties };
+				(config as Record<string, unknown>)[key] = { isEnabled: setupResults[key as EModule]?.wasInstalled, ...setupResults[key as EModule]?.customProperties };
 			}
 		}
 

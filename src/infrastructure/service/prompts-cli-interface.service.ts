@@ -14,7 +14,7 @@ import prompts from "prompts";
 export class PromptsCliInterface implements ICliInterfaceService {
 	/** Reference to the active spinner instance */
 	// @ts-ignore
-	private spinner: any;
+	private spinner: { start(): { stop(): void }; stop(): void };
 
 	/**
 	 * Initializes a new instance of the PromptsCliInterface.
@@ -28,6 +28,7 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	 * Clears the console screen.
 	 */
 	clear(): void {
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.clear();
 	}
 
@@ -80,7 +81,8 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	 */
 	async groupMultiselect<T>(message: string, options: Record<string, Array<ICliInterfaceServiceSelectOptions>>, isRequired: boolean = false, initialValues?: Array<string>): Promise<Array<T>> {
 		// Convert options to a flat array with group prefixes
-		const choices: Array<any> = [];
+		// eslint-disable-next-line @elsikora/typescript/naming-convention
+		const choices: Array<{ selected: boolean; title: string; value: string }> = [];
 
 		for (const [group, groupOptions] of Object.entries(options)) {
 			for (const opt of groupOptions) {
@@ -131,6 +133,7 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	 * @param message - The info message to display
 	 */
 	info(message: string): void {
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.log(chalk.blue(message));
 	}
 
@@ -139,6 +142,7 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	 * @param message - The message to display
 	 */
 	log(message: string): void {
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.log(message);
 	}
 
@@ -204,19 +208,24 @@ export class PromptsCliInterface implements ICliInterfaceService {
 		const paddedLines: Array<string> = lines.map((line: string) => ` ${line.padEnd(width - 2)} `);
 
 		// Log the note box with styling
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.log(chalk.dim(top));
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.log(chalk.dim("│") + chalk.bold(paddedTitle) + chalk.dim("│"));
 
 		if (lines.length > 0) {
 			// Add a separator line
+			// eslint-disable-next-line @elsikora/javascript/no-console
 			console.log(chalk.dim(`├${"─".repeat(width)}┤`));
 
 			// Add message content
 			for (const line of paddedLines) {
+				// eslint-disable-next-line @elsikora/javascript/no-console
 				console.log(chalk.dim("│") + chalk.dim(line) + chalk.dim("│"));
 			}
 		}
 
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.log(chalk.dim(bottom));
 	}
 
@@ -262,7 +271,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	 * @param message - The message to display while the spinner is active
 	 */
 	startSpinner(message: string): void {
-		// eslint-disable-next-line @elsikora/typescript/no-unsafe-call,@elsikora/typescript/no-unsafe-member-access
 		this.spinner.stop();
 		this.spinner = ora(message).start();
 	}
@@ -272,10 +280,10 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	 * @param message - Optional message to display when the spinner stops
 	 */
 	stopSpinner(message?: string): void {
-		// eslint-disable-next-line @elsikora/typescript/no-unsafe-member-access,@elsikora/typescript/no-unsafe-call
 		this.spinner.stop();
 
 		if (message) {
+			// eslint-disable-next-line @elsikora/javascript/no-console
 			console.log(message);
 		}
 	}
@@ -285,6 +293,7 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	 * @param message - The success message to display
 	 */
 	success(message: string): void {
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.log(chalk.green(message));
 	}
 
@@ -339,6 +348,6 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	 * @param message - The warning message to display
 	 */
 	warn(message: string): void {
-		console.log(chalk.yellow(message));
+		console.warn(chalk.yellow(message));
 	}
 }
