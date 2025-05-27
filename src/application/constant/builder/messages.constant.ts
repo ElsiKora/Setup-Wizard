@@ -1,6 +1,10 @@
 interface IBuilderConfigMessages {
+	buildDescription: string;
 	buildTsconfigCreated: string;
+	buildWatchDescription: string;
 	cleanEnabled: string;
+	cliAppNotSupported: (toolName: string) => string;
+	configGeneratorNotImplemented: (toolName: string) => string;
 	configurationCreated: string;
 	configurationOptionsLabel: string;
 	confirmBuildTsconfig: string;
@@ -34,8 +38,7 @@ interface IBuilderConfigMessages {
 	outputDirValidation: string;
 	packageJsonGenerationEnabled: string;
 	pathAliasEnabled: string;
-	rollupBuildDescription: string;
-	rollupWatchDescription: string;
+	selectBuildTool: string;
 	settingUpSpinner: string;
 	setupCompleteSpinner: string;
 	setupCompleteTitle: string;
@@ -45,12 +48,17 @@ interface IBuilderConfigMessages {
 	summaryFormats: (formats: string) => string;
 	summaryOutputDirectory: (outputDirectory: string) => string;
 	summaryTool: (tool: string) => string;
+	todoConfigContent: string;
 }
 
 export const BUILDER_CONFIG_MESSAGES: IBuilderConfigMessages = {
+	buildDescription: "  - build: Build the project",
 	buildTsconfigCreated: "  - Build TypeScript Config: tsconfig.build.json created",
+	buildWatchDescription: "  - build:watch: Build and watch for changes",
 	cleanEnabled: "  - Clean: Enabled (removes output directory before build)",
-	configurationCreated: " Builder configuration created successfully!",
+	cliAppNotSupported: (toolName: string): string => `${toolName} does not support CLI application builds`,
+	configGeneratorNotImplemented: (toolName: string): string => `Configuration generator for ${toolName} is not yet implemented. Creating empty config file.`,
+	configurationCreated: "Builder configuration created successfully!",
 	configurationOptionsLabel: "Configuration options:",
 	confirmBuildTsconfig: "Create a separate tsconfig.build.json for builds?",
 	confirmClean: "Enable clean output directory before build?",
@@ -83,8 +91,7 @@ export const BUILDER_CONFIG_MESSAGES: IBuilderConfigMessages = {
 	outputDirValidation: "Output directory must be a relative path",
 	packageJsonGenerationEnabled: "  - Package.json Generation: Enabled for each output format",
 	pathAliasEnabled: "  - Path Aliases: Enabled (dts-path-alias)",
-	rollupBuildDescription: "  - build: Build the project",
-	rollupWatchDescription: "  - build:watch: Build and watch for changes",
+	selectBuildTool: "Select a build tool:",
 	settingUpSpinner: "Setting up builder...",
 	setupCompleteSpinner: "Builder setup complete!",
 	setupCompleteTitle: "Builder Setup Complete",
@@ -94,4 +101,5 @@ export const BUILDER_CONFIG_MESSAGES: IBuilderConfigMessages = {
 	summaryFormats: (formats: string): string => `  - Output Formats: ${formats}`,
 	summaryOutputDirectory: (outputDirectory: string): string => `  - Output Directory: ${outputDirectory}`,
 	summaryTool: (tool: string): string => `  - Build Tool: ${tool}`,
+	todoConfigContent: "// TODO: Add configuration\n",
 };

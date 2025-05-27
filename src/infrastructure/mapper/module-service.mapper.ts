@@ -15,6 +15,7 @@ import { LintStagedModuleService } from "../../application/service/lint-staged-m
 import { PrettierModuleService } from "../../application/service/prettier-module.service";
 import { SemanticReleaseModuleService } from "../../application/service/semantic-release-module.service";
 import { StylelintModuleService } from "../../application/service/stylelint-module.service";
+import { TestingModuleService } from "../../application/service/testing-module.service";
 import { TypescriptModuleService } from "../../application/service/typescript-module.service";
 import { EModule } from "../../domain/enum/module.enum";
 import { CosmicConfigService } from "../service/cosmi-config-config.service";
@@ -100,6 +101,10 @@ export class ModuleServiceMapper {
 
 			case EModule.STYLELINT: {
 				return new StylelintModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
+			}
+
+			case EModule.TESTING: {
+				return new TestingModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			case EModule.TYPESCRIPT: {

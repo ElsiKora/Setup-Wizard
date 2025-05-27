@@ -92,11 +92,7 @@ export default {
 };
 `;
 
-		await fs.writeFile(
-			path.join(testUtils.testDir, "rollup.config.js"),
-			rollupConfig,
-			"utf8"
-		);
+		await fs.writeFile(path.join(testUtils.testDir, "rollup.config.js"), rollupConfig, "utf8");
 
 		// Update package.json with builder dependencies and scripts
 		const packageJsonContent = await testUtils.readFile("package.json");
@@ -104,24 +100,20 @@ export default {
 
 		packageJson.devDependencies = {
 			...packageJson.devDependencies,
-			"rollup": "^4.0.0",
+			rollup: "^4.0.0",
 			"@rollup/plugin-node-resolve": "^15.0.0",
 			"@rollup/plugin-commonjs": "^25.0.0",
-			"rimraf": "^5.0.0",
+			rimraf: "^5.0.0",
 		};
 
 		packageJson.scripts = {
 			...packageJson.scripts,
-			"build": "npm run prebuild && rollup -c",
+			build: "npm run prebuild && rollup -c",
 			"build:watch": "rollup -c -w",
-			"prebuild": "rimraf dist",
+			prebuild: "rimraf dist",
 		};
 
-		await fs.writeFile(
-			path.join(testUtils.testDir, "package.json"),
-			JSON.stringify(packageJson, null, 2),
-			"utf8"
-		);
+		await fs.writeFile(path.join(testUtils.testDir, "package.json"), JSON.stringify(packageJson, null, 2), "utf8");
 
 		// Check that rollup.config.js was created
 		const configExists = await testUtils.fileExists("rollup.config.js");
@@ -177,11 +169,7 @@ export default {
 };
 `;
 
-		await fs.writeFile(
-			path.join(testUtils.testDir, "rollup.config.js"),
-			rollupConfig,
-			"utf8"
-		);
+		await fs.writeFile(path.join(testUtils.testDir, "rollup.config.js"), rollupConfig, "utf8");
 
 		// Update package.json
 		const packageJsonContent = await testUtils.readFile("package.json");
@@ -189,7 +177,7 @@ export default {
 
 		packageJson.devDependencies = {
 			...packageJson.devDependencies,
-			"rollup": "^4.0.0",
+			rollup: "^4.0.0",
 			"@rollup/plugin-node-resolve": "^15.0.0",
 			"@rollup/plugin-commonjs": "^25.0.0",
 			"@rollup/plugin-typescript": "^11.0.0",
@@ -198,17 +186,13 @@ export default {
 
 		packageJson.scripts = {
 			...packageJson.scripts,
-			"build": "rollup -c",
+			build: "rollup -c",
 			"build:watch": "rollup -c -w",
 		};
 		// Remove prebuild script if it exists
 		delete packageJson.scripts.prebuild;
 
-		await fs.writeFile(
-			path.join(testUtils.testDir, "package.json"),
-			JSON.stringify(packageJson, null, 2),
-			"utf8"
-		);
+		await fs.writeFile(path.join(testUtils.testDir, "package.json"), JSON.stringify(packageJson, null, 2), "utf8");
 
 		// Check the content of rollup.config.js
 		const configContent = await testUtils.readFile("rollup.config.js");
@@ -266,11 +250,7 @@ export default {
 };
 `;
 
-		await fs.writeFile(
-			path.join(testUtils.testDir, "rollup.config.js"),
-			rollupConfig,
-			"utf8"
-		);
+		await fs.writeFile(path.join(testUtils.testDir, "rollup.config.js"), rollupConfig, "utf8");
 
 		// Check the content of rollup.config.js
 		const configContent = await testUtils.readFile("rollup.config.js");
@@ -285,13 +265,10 @@ export default {
 
 	it("should handle existing builder configuration files", async () => {
 		// Create an existing rollup config file
-		await fs.writeFile(
-			path.join(testUtils.testDir, "rollup.config.js"),
-			"// Existing config"
-		);
+		await fs.writeFile(path.join(testUtils.testDir, "rollup.config.js"), "// Existing config");
 
 		// Check that the existing file exists
 		const configContent = await testUtils.readFile("rollup.config.js");
 		expect(configContent).toBe("// Existing config");
 	});
-}); 
+});

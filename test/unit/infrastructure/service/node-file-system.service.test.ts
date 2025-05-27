@@ -26,30 +26,45 @@ describe("NodeFileSystemService", () => {
 	});
 
 	describe("createDirectory", () => {
-		it("should create a directory", async () => {
+		it("should create a directory if it does not exist", async () => {
 			// Setup
 			const directoryPath = "/test/dir";
+			vi.mocked(fs.access).mockRejectedValueOnce(new Error("ENOENT")); // Directory doesn't exist
 			vi.mocked(fs.mkdir).mockResolvedValueOnce(undefined);
 
 			// Execute
 			await fileSystemService.createDirectory(directoryPath);
 
 			// Verify
-			expect(path.dirname).toHaveBeenCalledWith(directoryPath);
-			expect(fs.mkdir).toHaveBeenCalledWith("/dir//test/dir", { recursive: undefined });
+			expect(fs.access).toHaveBeenCalledWith(directoryPath);
+			expect(fs.mkdir).toHaveBeenCalledWith(directoryPath, { recursive: undefined });
 		});
 
-		it("should create a directory recursively", async () => {
+		it("should not create a directory if it already exists", async () => {
+			// Setup
+			const directoryPath = "/test/dir";
+			vi.mocked(fs.access).mockResolvedValueOnce(undefined); // Directory exists
+
+			// Execute
+			await fileSystemService.createDirectory(directoryPath);
+
+			// Verify
+			expect(fs.access).toHaveBeenCalledWith(directoryPath);
+			expect(fs.mkdir).not.toHaveBeenCalled();
+		});
+
+		it("should create a directory recursively if it does not exist", async () => {
 			// Setup
 			const directoryPath = "/test/deep/dir";
+			vi.mocked(fs.access).mockRejectedValueOnce(new Error("ENOENT")); // Directory doesn't exist
 			vi.mocked(fs.mkdir).mockResolvedValueOnce(undefined);
 
 			// Execute
 			await fileSystemService.createDirectory(directoryPath, { isRecursive: true });
 
 			// Verify
-			expect(path.dirname).toHaveBeenCalledWith(directoryPath);
-			expect(fs.mkdir).toHaveBeenCalledWith("/dir//test/deep/dir", { recursive: true });
+			expect(fs.access).toHaveBeenCalledWith(directoryPath);
+			expect(fs.mkdir).toHaveBeenCalledWith(directoryPath, { recursive: true });
 		});
 	});
 

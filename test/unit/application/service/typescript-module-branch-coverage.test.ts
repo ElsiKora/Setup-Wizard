@@ -32,7 +32,7 @@ describe("TypescriptModuleService Branch Coverage", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		
+
 		// Default mocks
 		mockCliInterfaceService.confirm.mockResolvedValue(true);
 		mockCliInterfaceService.text.mockResolvedValue("./src");
@@ -60,12 +60,7 @@ describe("TypescriptModuleService Branch Coverage", () => {
 
 			await (typescriptService as any).getBaseUrl();
 
-			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-				TYPESCRIPT_CONFIG_MESSAGES.baseUrlPrompt,
-				TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault,
-				TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault,
-				expect.any(Function)
-			);
+			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.baseUrlPrompt, TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault, TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault, expect.any(Function));
 		});
 
 		it("should use default when config doesn't have baseUrl property", async () => {
@@ -74,12 +69,7 @@ describe("TypescriptModuleService Branch Coverage", () => {
 
 			await (typescriptService as any).getBaseUrl();
 
-			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-				TYPESCRIPT_CONFIG_MESSAGES.baseUrlPrompt,
-				TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault,
-				TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault,
-				expect.any(Function)
-			);
+			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.baseUrlPrompt, TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault, TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault, expect.any(Function));
 		});
 	});
 
@@ -90,12 +80,7 @@ describe("TypescriptModuleService Branch Coverage", () => {
 
 			await (typescriptService as any).getRootDir();
 
-			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-				TYPESCRIPT_CONFIG_MESSAGES.rootDirPrompt,
-				TYPESCRIPT_CONFIG_SUMMARY.rootDirDefault,
-				TYPESCRIPT_CONFIG_SUMMARY.rootDirDefault,
-				expect.any(Function)
-			);
+			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.rootDirPrompt, TYPESCRIPT_CONFIG_SUMMARY.rootDirDefault, TYPESCRIPT_CONFIG_SUMMARY.rootDirDefault, expect.any(Function));
 		});
 
 		it("should use saved rootDirectory when available", async () => {
@@ -104,12 +89,7 @@ describe("TypescriptModuleService Branch Coverage", () => {
 
 			await (typescriptService as any).getRootDir();
 
-			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-				TYPESCRIPT_CONFIG_MESSAGES.rootDirPrompt,
-				TYPESCRIPT_CONFIG_SUMMARY.rootDirDefault,
-				"./custom",
-				expect.any(Function)
-			);
+			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.rootDirPrompt, TYPESCRIPT_CONFIG_SUMMARY.rootDirDefault, "./custom", expect.any(Function));
 		});
 	});
 
@@ -120,12 +100,7 @@ describe("TypescriptModuleService Branch Coverage", () => {
 
 			await (typescriptService as any).getOutDir();
 
-			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-				TYPESCRIPT_CONFIG_MESSAGES.outDirPrompt,
-				TYPESCRIPT_CONFIG_SUMMARY.outDirDefault,
-				TYPESCRIPT_CONFIG_SUMMARY.outDirDefault,
-				expect.any(Function)
-			);
+			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.outDirPrompt, TYPESCRIPT_CONFIG_SUMMARY.outDirDefault, TYPESCRIPT_CONFIG_SUMMARY.outDirDefault, expect.any(Function));
 		});
 
 		it("should use saved outputDirectory when available", async () => {
@@ -134,12 +109,7 @@ describe("TypescriptModuleService Branch Coverage", () => {
 
 			await (typescriptService as any).getOutDir();
 
-			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-				TYPESCRIPT_CONFIG_MESSAGES.outDirPrompt,
-				TYPESCRIPT_CONFIG_SUMMARY.outDirDefault,
-				"./build",
-				expect.any(Function)
-			);
+			expect(mockCliInterfaceService.text).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.outDirPrompt, TYPESCRIPT_CONFIG_SUMMARY.outDirDefault, "./build", expect.any(Function));
 		});
 	});
 
@@ -288,7 +258,7 @@ describe("TypescriptModuleService Branch Coverage", () => {
 				addScript: vi.fn(),
 			};
 			vi.spyOn(typescriptService as any, "PACKAGE_JSON_SERVICE", "get").mockReturnValue(mockPackageJsonService);
-			
+
 			vi.spyOn(typescriptService as any, "getBaseUrl").mockResolvedValue("./src");
 			vi.spyOn(typescriptService as any, "getRootDir").mockResolvedValue("./src");
 			vi.spyOn(typescriptService as any, "getOutDir").mockResolvedValue("./dist");
@@ -303,10 +273,10 @@ describe("TypescriptModuleService Branch Coverage", () => {
 			// Check that the internal parameters object has booleans
 			expect(typeof result.isCleanArchitectureEnabled).toBe("boolean");
 			expect(typeof result.isDecoratorsEnabled).toBe("boolean");
-			
+
 			// But when cast as Record<string, string>, they should be treated as strings
 			const castResult = result as Record<string, string>;
 			expect(castResult).toBeDefined();
 		});
 	});
-}); 
+});

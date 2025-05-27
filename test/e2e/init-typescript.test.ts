@@ -54,7 +54,7 @@ describe("TypeScript setup E2E test", () => {
 
 		// Create src directory
 		await fs.mkdir(path.join(testUtils.testDir, "src"), { recursive: true });
-		
+
 		// Create sample TypeScript files
 		await fs.writeFile(
 			path.join(testUtils.testDir, "src", "index.ts"),
@@ -63,7 +63,7 @@ describe("TypeScript setup E2E test", () => {
 }`,
 			"utf8",
 		);
-		
+
 		await fs.writeFile(
 			path.join(testUtils.testDir, "src", "utils.ts"),
 			`export function add(a: number, b: number): number {
@@ -115,11 +115,7 @@ describe("TypeScript setup E2E test", () => {
 			exclude: ["node_modules", "dist"],
 		};
 
-		await fs.writeFile(
-			path.join(testUtils.testDir, "tsconfig.json"),
-			JSON.stringify(tsConfigContent, null, 2),
-			"utf8",
-		);
+		await fs.writeFile(path.join(testUtils.testDir, "tsconfig.json"), JSON.stringify(tsConfigContent, null, 2), "utf8");
 
 		// Update package.json with TypeScript dependencies and scripts
 		const packageJsonContent = await testUtils.readFile("package.json");
@@ -136,11 +132,7 @@ describe("TypeScript setup E2E test", () => {
 			"lint:types": "tsc --noEmit",
 		};
 
-		await fs.writeFile(
-			path.join(testUtils.testDir, "package.json"),
-			JSON.stringify(packageJson, null, 2),
-			"utf8",
-		);
+		await fs.writeFile(path.join(testUtils.testDir, "package.json"), JSON.stringify(packageJson, null, 2), "utf8");
 
 		// Verify tsconfig.json was created
 		const hasTsConfig = await testUtils.fileExists("tsconfig.json");
@@ -195,11 +187,7 @@ describe("TypeScript setup E2E test", () => {
 			exclude: ["node_modules", "dist"],
 		};
 
-		await fs.writeFile(
-			path.join(testUtils.testDir, "tsconfig.json"),
-			JSON.stringify(tsConfigContent, null, 2),
-			"utf8",
-		);
+		await fs.writeFile(path.join(testUtils.testDir, "tsconfig.json"), JSON.stringify(tsConfigContent, null, 2), "utf8");
 
 		// Create clean architecture directories
 		const dirs = ["application", "domain", "infrastructure", "presentation"];
@@ -235,11 +223,7 @@ describe("TypeScript setup E2E test", () => {
 			exclude: ["node_modules", "dist"],
 		};
 
-		await fs.writeFile(
-			path.join(testUtils.testDir, "tsconfig.json"),
-			JSON.stringify(tsConfigContent, null, 2),
-			"utf8",
-		);
+		await fs.writeFile(path.join(testUtils.testDir, "tsconfig.json"), JSON.stringify(tsConfigContent, null, 2), "utf8");
 
 		// Verify tsconfig.json has decorator options
 		const tsConfig = JSON.parse(await testUtils.readFile("tsconfig.json"));
@@ -249,23 +233,15 @@ describe("TypeScript setup E2E test", () => {
 
 	it("should handle existing TypeScript configuration files", async () => {
 		// Create existing tsconfig files
-		await fs.writeFile(
-			path.join(testUtils.testDir, "tsconfig.json"),
-			'{"compilerOptions": {}}',
-			"utf8",
-		);
-		
-		await fs.writeFile(
-			path.join(testUtils.testDir, "tsconfig.base.json"),
-			'{"compilerOptions": {}}',
-			"utf8",
-		);
+		await fs.writeFile(path.join(testUtils.testDir, "tsconfig.json"), '{"compilerOptions": {}}', "utf8");
+
+		await fs.writeFile(path.join(testUtils.testDir, "tsconfig.base.json"), '{"compilerOptions": {}}', "utf8");
 
 		// Verify existing files are still there
 		const hasTsConfig = await testUtils.fileExists("tsconfig.json");
 		const hasTsConfigBase = await testUtils.fileExists("tsconfig.base.json");
-		
+
 		expect(hasTsConfig).toBe(true);
 		expect(hasTsConfigBase).toBe(true);
 	});
-}); 
+});

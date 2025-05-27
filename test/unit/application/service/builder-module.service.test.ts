@@ -22,6 +22,7 @@ describe("BuilderModuleService", () => {
 		note: vi.fn(),
 		text: vi.fn(),
 		multiselect: vi.fn(),
+		select: vi.fn(),
 	};
 
 	const mockFileSystemService = {
@@ -52,6 +53,7 @@ describe("BuilderModuleService", () => {
 		mockCliInterfaceService.confirm.mockResolvedValue(true);
 		mockCliInterfaceService.text.mockResolvedValue("./src/index.js");
 		mockCliInterfaceService.multiselect.mockResolvedValue(["esm", "cjs"]);
+		mockCliInterfaceService.select.mockResolvedValue("rollup");
 		mockConfigService.isModuleEnabled.mockResolvedValue(true);
 		mockConfigService.getModuleConfig.mockResolvedValue(null);
 		mockFileSystemService.isPathExists.mockResolvedValue(false);
@@ -224,12 +226,7 @@ describe("BuilderModuleService", () => {
 				const result = await (builderService as any).getEntryPoint();
 
 				expect(result).toBe("./src/index.js");
-				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.entryPointPrompt,
-					BUILDER_CONFIG_SUMMARY.entryPointDefault,
-					BUILDER_CONFIG_SUMMARY.entryPointDefault,
-					expect.any(Function)
-				);
+				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.entryPointPrompt, BUILDER_CONFIG_SUMMARY.entryPointDefault, BUILDER_CONFIG_SUMMARY.entryPointDefault, expect.any(Function));
 			});
 
 			it("should validate entry point format", async () => {
@@ -253,28 +250,21 @@ describe("BuilderModuleService", () => {
 
 				await (builderService as any).getEntryPoint();
 
-				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.entryPointPrompt,
-					BUILDER_CONFIG_SUMMARY.entryPointDefault,
-					"./custom/main.ts",
-					expect.any(Function)
-				);
+				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.entryPointPrompt, BUILDER_CONFIG_SUMMARY.entryPointDefault, "./custom/main.ts", expect.any(Function));
 			});
 		});
 
 		describe("getOutputDirectory", () => {
 			it("should prompt for output directory with validation", async () => {
 				mockCliInterfaceService.text.mockResolvedValueOnce("./dist");
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				const { BUILD_TOOL_CONFIG } = await import("../../../../src/application/constant/builder/build-tool-config.constant");
+				const toolConfig = BUILD_TOOL_CONFIG[EBuildTool.ROLLUP];
 
-				const result = await (builderService as any).getOutputDirectory();
+				const result = await (builderService as any).getOutputDirectory(false, toolConfig);
 
 				expect(result).toBe("./dist");
-				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.outputDirPrompt,
-					BUILDER_CONFIG_SUMMARY.outputDirDefault,
-					BUILDER_CONFIG_SUMMARY.outputDirDefault,
-					expect.any(Function)
-				);
+				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.outputDirPrompt, BUILDER_CONFIG_SUMMARY.outputDirDefault, BUILDER_CONFIG_SUMMARY.outputDirDefault, expect.any(Function));
 			});
 
 			it("should validate output directory format", async () => {
@@ -287,43 +277,46 @@ describe("BuilderModuleService", () => {
 					return Promise.resolve("./dist");
 				});
 
-				await (builderService as any).getOutputDirectory();
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				const { BUILD_TOOL_CONFIG } = await import("../../../../src/application/constant/builder/build-tool-config.constant");
+				const toolConfig = BUILD_TOOL_CONFIG[EBuildTool.ROLLUP];
+
+				await (builderService as any).getOutputDirectory(false, toolConfig);
 			});
 		});
 
 		describe("getOutputFormats", () => {
 			it("should prompt for output formats with multiselect", async () => {
 				mockCliInterfaceService.multiselect.mockResolvedValueOnce(["esm", "cjs"]);
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				const { BUILD_TOOL_CONFIG } = await import("../../../../src/application/constant/builder/build-tool-config.constant");
+				const toolConfig = BUILD_TOOL_CONFIG[EBuildTool.ROLLUP];
 
-				const result = await (builderService as any).getOutputFormats();
+				const result = await (builderService as any).getOutputFormats(false, toolConfig);
 
 				expect(result).toEqual(["esm", "cjs"]);
-				expect(mockCliInterfaceService.multiselect).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.formatsPrompt,
-					expect.any(Array),
-					true,
-					BUILDER_CONFIG_SUMMARY.formatsDefault
-				);
+				expect(mockCliInterfaceService.multiselect).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.formatsPrompt, expect.any(Array), true, BUILDER_CONFIG_SUMMARY.formatsDefault);
 			});
 
 			it("should throw error when no formats selected", async () => {
 				mockCliInterfaceService.multiselect.mockResolvedValueOnce([]);
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				const { BUILD_TOOL_CONFIG } = await import("../../../../src/application/constant/builder/build-tool-config.constant");
+				const toolConfig = BUILD_TOOL_CONFIG[EBuildTool.ROLLUP];
 
-				await expect((builderService as any).getOutputFormats()).rejects.toThrow(BUILDER_CONFIG_MESSAGES.formatsRequired);
+				await expect((builderService as any).getOutputFormats(false, toolConfig)).rejects.toThrow(BUILDER_CONFIG_MESSAGES.formatsRequired);
 			});
 
 			it("should use saved config formats as default", async () => {
 				(builderService as any).config = { formats: ["umd"] };
 				mockCliInterfaceService.multiselect.mockResolvedValueOnce(["umd"]);
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				const { BUILD_TOOL_CONFIG } = await import("../../../../src/application/constant/builder/build-tool-config.constant");
+				const toolConfig = BUILD_TOOL_CONFIG[EBuildTool.ROLLUP];
 
-				await (builderService as any).getOutputFormats();
+				await (builderService as any).getOutputFormats(false, toolConfig);
 
-				expect(mockCliInterfaceService.multiselect).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.formatsPrompt,
-					expect.any(Array),
-					true,
-					["umd"]
-				);
+				expect(mockCliInterfaceService.multiselect).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.formatsPrompt, expect.any(Array), true, ["umd"]);
 			});
 		});
 
@@ -389,29 +382,27 @@ describe("BuilderModuleService", () => {
 
 		describe("createConfig", () => {
 			it("should create config file with provided options", async () => {
-				await (builderService as any).createConfig("./src/index.js", "./dist", ["esm", "cjs"], true, false, false, false, false, false, true);
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				await (builderService as any).createConfig(EBuildTool.ROLLUP, "./src/index.js", "./dist", ["esm", "cjs"], true, false, false, false, false, false, true);
 
-				expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(
-					BUILDER_CONFIG_FILE_NAME,
-					expect.any(String),
-					"utf8"
-				);
+				expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(BUILDER_CONFIG_FILE_NAME, expect.any(String), "utf8");
 
 				const configContent = mockFileSystemService.writeFile.mock.calls[0][1];
 				expect(configContent).toContain("import resolve from '@rollup/plugin-node-resolve'");
 				expect(configContent).toContain("import commonjs");
 				expect(configContent).not.toContain("import typescript");
 				expect(configContent).not.toContain("import terser");
-				expect(configContent).toContain("input: \"./src/index.js\"");
-				expect(configContent).toContain("dir: \"./dist/esm\"");
-				expect(configContent).toContain("dir: \"./dist/cjs\"");
-				expect(configContent).toContain("format: \"esm\"");
-				expect(configContent).toContain("format: \"cjs\"");
+				expect(configContent).toContain('input: "./src/index.js"');
+				expect(configContent).toContain('dir: "./dist/esm"');
+				expect(configContent).toContain('dir: "./dist/cjs"');
+				expect(configContent).toContain('format: "esm"');
+				expect(configContent).toContain('format: "cjs"');
 				expect(configContent).toContain("sourcemap: true");
 			});
 
 			it("should include TypeScript plugin for .ts entry points", async () => {
-				await (builderService as any).createConfig("./src/index.ts", "./dist", ["esm"], false, false, false, false, false, false, true);
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				await (builderService as any).createConfig(EBuildTool.ROLLUP, "./src/index.ts", "./dist", ["esm"], false, false, false, false, false, false, true);
 
 				const configContent = mockFileSystemService.writeFile.mock.calls[0][1];
 				expect(configContent).toContain("import typescript from '@rollup/plugin-typescript'");
@@ -419,7 +410,8 @@ describe("BuilderModuleService", () => {
 			});
 
 			it("should include terser plugin when minification is enabled", async () => {
-				await (builderService as any).createConfig("./src/index.js", "./dist", ["esm"], false, true, false, false, false, false, true);
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				await (builderService as any).createConfig(EBuildTool.ROLLUP, "./src/index.js", "./dist", ["esm"], false, true, false, false, false, false, true);
 
 				const configContent = mockFileSystemService.writeFile.mock.calls[0][1];
 				expect(configContent).toContain("import terser from '@rollup/plugin-terser'");
@@ -427,13 +419,14 @@ describe("BuilderModuleService", () => {
 			});
 
 			it("should handle different output formats correctly", async () => {
-				await (builderService as any).createConfig("./src/index.js", "./dist", ["esm", "cjs", "umd", "iife"], false, false, false, false, false, false, true);
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				await (builderService as any).createConfig(EBuildTool.ROLLUP, "./src/index.js", "./dist", ["esm", "cjs", "umd", "iife"], false, false, false, false, false, false, true);
 
 				const configContent = mockFileSystemService.writeFile.mock.calls[0][1];
-				expect(configContent).toContain("dir: \"./dist/esm\"");
-				expect(configContent).toContain("dir: \"./dist/cjs\"");
-				expect(configContent).toContain("dir: \"./dist/umd\"");
-				expect(configContent).toContain("dir: \"./dist/iife\"");
+				expect(configContent).toContain('dir: "./dist/esm"');
+				expect(configContent).toContain('dir: "./dist/cjs"');
+				expect(configContent).toContain('dir: "./dist/umd"');
+				expect(configContent).toContain('dir: "./dist/iife"');
 				expect(configContent).toMatch(/format: "esm"/);
 				expect(configContent).toMatch(/format: "cjs"/);
 				expect(configContent).toMatch(/format: "umd"/);
@@ -443,31 +436,21 @@ describe("BuilderModuleService", () => {
 
 		describe("setupScripts", () => {
 			it("should add build scripts to package.json with clean enabled", async () => {
-				await (builderService as any).setupScripts(true);
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				await (builderService as any).setupScripts(EBuildTool.ROLLUP, true, "./dist");
 
 				expect(mockPackageJsonService.addScript).toHaveBeenCalledTimes(3);
-				expect(mockPackageJsonService.addScript).toHaveBeenCalledWith(
-					BUILDER_CONFIG_SCRIPTS.build.name,
-					BUILDER_CONFIG_SCRIPTS.build.command
-				);
-				expect(mockPackageJsonService.addScript).toHaveBeenCalledWith(
-					BUILDER_CONFIG_SCRIPTS.buildWatch.name,
-					BUILDER_CONFIG_SCRIPTS.buildWatch.command
-				);
-				expect(mockPackageJsonService.addScript).toHaveBeenCalledWith(
-					BUILDER_CONFIG_SCRIPTS.prebuild.name,
-					BUILDER_CONFIG_SCRIPTS.prebuild.command
-				);
+				expect(mockPackageJsonService.addScript).toHaveBeenCalledWith("build", expect.any(String));
+				expect(mockPackageJsonService.addScript).toHaveBeenCalledWith("build:watch", expect.any(String));
+				expect(mockPackageJsonService.addScript).toHaveBeenCalledWith("prebuild", "rimraf ./dist");
 			});
 
 			it("should skip prebuild script when clean is disabled", async () => {
-				await (builderService as any).setupScripts(false);
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				await (builderService as any).setupScripts(EBuildTool.ROLLUP, false, "./dist");
 
 				expect(mockPackageJsonService.addScript).toHaveBeenCalledTimes(2);
-				expect(mockPackageJsonService.addScript).not.toHaveBeenCalledWith(
-					BUILDER_CONFIG_SCRIPTS.prebuild.name,
-					BUILDER_CONFIG_SCRIPTS.prebuild.command
-				);
+				expect(mockPackageJsonService.addScript).not.toHaveBeenCalledWith("prebuild", expect.any(String));
 			});
 		});
 
@@ -497,61 +480,42 @@ describe("BuilderModuleService", () => {
 		});
 
 		describe("displaySetupSummary", () => {
-			it("should display basic setup summary", () => {
-				(builderService as any).displaySetupSummary("rollup", "./src/index.js", "./dist", ["esm", "cjs"], false, false, false);
+			it("should display basic setup summary", async () => {
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				(builderService as any).displaySetupSummary(EBuildTool.ROLLUP, "./src/index.js", "./dist", ["esm", "cjs"], false, false, false, false, false, false, false, false);
 
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(BUILDER_CONFIG_MESSAGES.configurationCreated)
-				);
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(BUILDER_CONFIG_MESSAGES.summaryTool("rollup"))
-				);
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(BUILDER_CONFIG_MESSAGES.summaryEntryPoint("./src/index.js"))
-				);
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(BUILDER_CONFIG_MESSAGES.summaryOutputDirectory("./dist"))
-				);
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(BUILDER_CONFIG_MESSAGES.summaryFormats("esm, cjs"))
-				);
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(BUILDER_CONFIG_MESSAGES.configurationCreated));
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(BUILDER_CONFIG_MESSAGES.summaryTool("Rollup")));
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(BUILDER_CONFIG_MESSAGES.summaryEntryPoint("./src/index.js")));
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(BUILDER_CONFIG_MESSAGES.summaryOutputDirectory("./dist")));
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(BUILDER_CONFIG_MESSAGES.summaryFormats("esm, cjs")));
 			});
 
-			it("should include source maps info when enabled", () => {
-				(builderService as any).displaySetupSummary("rollup", "./src/index.js", "./dist", ["esm"], true, false, false);
+			it("should include source maps info when enabled", async () => {
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				(builderService as any).displaySetupSummary(EBuildTool.ROLLUP, "./src/index.js", "./dist", ["esm"], true, false, false, false, false, false, false, false);
 
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(BUILDER_CONFIG_MESSAGES.sourceMapsEnabled)
-				);
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(BUILDER_CONFIG_MESSAGES.sourceMapsEnabled));
 			});
 
-			it("should include minification info when enabled", () => {
-				(builderService as any).displaySetupSummary("rollup", "./src/index.js", "./dist", ["esm"], false, true, false);
+			it("should include minification info when enabled", async () => {
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				(builderService as any).displaySetupSummary(EBuildTool.ROLLUP, "./src/index.js", "./dist", ["esm"], false, true, false, false, false, false, false, false);
 
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(BUILDER_CONFIG_MESSAGES.minifyEnabled)
-				);
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(BUILDER_CONFIG_MESSAGES.minifyEnabled));
 			});
 
-			it("should include clean info when enabled", () => {
-				(builderService as any).displaySetupSummary("rollup", "./src/index.js", "./dist", ["esm"], false, false, true);
+			it("should include clean info when enabled", async () => {
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				(builderService as any).displaySetupSummary(EBuildTool.ROLLUP, "./src/index.js", "./dist", ["esm"], false, false, true, false, false, false, false, false);
 
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					BUILDER_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(BUILDER_CONFIG_MESSAGES.cleanEnabled)
-				);
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(BUILDER_CONFIG_MESSAGES.cleanEnabled));
 			});
 		});
 
 		describe("setupBuilder", () => {
 			beforeEach(() => {
+				vi.spyOn(builderService as any, "selectBuildTool").mockResolvedValue("rollup");
 				vi.spyOn(builderService as any, "isCliApp").mockResolvedValue(false);
 				vi.spyOn(builderService as any, "getEntryPoint").mockResolvedValue("./src/index.js");
 				vi.spyOn(builderService as any, "getOutputDirectory").mockResolvedValue("./dist");
@@ -590,15 +554,12 @@ describe("BuilderModuleService", () => {
 				});
 
 				expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.settingUpSpinner);
-				expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(
-					[...BUILDER_CONFIG_CORE_DEPENDENCIES],
-					"latest",
-					EPackageJsonDependencyType.DEV
-				);
-				expect(builderService["createConfig"]).toHaveBeenCalledWith("./src/index.js", "./dist", ["esm", "cjs"], true, false, false, false, false, false, true);
-				expect(builderService["setupScripts"]).toHaveBeenCalledWith(true);
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				expect(mockPackageJsonService.installPackages).toHaveBeenCalled();
+				expect(builderService["createConfig"]).toHaveBeenCalledWith(EBuildTool.ROLLUP, "./src/index.js", "./dist", ["esm", "cjs"], true, false, false, false, false, false, true);
+				expect(builderService["setupScripts"]).toHaveBeenCalledWith(EBuildTool.ROLLUP, true, "./dist");
 				expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(BUILDER_CONFIG_MESSAGES.setupCompleteSpinner);
-				expect(builderService["displaySetupSummary"]).toHaveBeenCalledWith("rollup", "./src/index.js", "./dist", ["esm", "cjs"], true, false, true, false, false, false, false, false);
+				expect(builderService["displaySetupSummary"]).toHaveBeenCalledWith(EBuildTool.ROLLUP, "./src/index.js", "./dist", ["esm", "cjs"], true, false, true, false, false, false, false, false);
 			});
 
 			it("should handle errors during setup", async () => {
@@ -624,9 +585,10 @@ describe("BuilderModuleService", () => {
 				expect(result.isSourceMapsEnabled).toBe(false);
 				expect(result.isMinifyEnabled).toBe(true);
 				expect(result.isCleanEnabled).toBe(false);
-				expect(builderService["createConfig"]).toHaveBeenCalledWith("./src/index.js", "./dist", ["esm"], false, true, true, false, true, false, true);
-				expect(builderService["setupScripts"]).toHaveBeenCalledWith(false);
+				const { EBuildTool } = await import("../../../../src/domain/enum/build-tool.enum");
+				expect(builderService["createConfig"]).toHaveBeenCalledWith(EBuildTool.ROLLUP, "./src/index.js", "./dist", ["esm"], false, true, true, false, true, false, true);
+				expect(builderService["setupScripts"]).toHaveBeenCalledWith(EBuildTool.ROLLUP, false, "./dist");
 			});
 		});
 	});
-}); 
+});

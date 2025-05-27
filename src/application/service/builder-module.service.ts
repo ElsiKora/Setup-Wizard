@@ -1,3 +1,4 @@
+import type { IBuildToolConfig } from "../../domain/interface/build-tool-config.interface";
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
@@ -6,15 +7,14 @@ import type { IConfigBuilder } from "../interface/config/builder.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
+import { EBuildTool } from "../../domain/enum/build-tool.enum";
 import { EModule } from "../../domain/enum/module.enum";
 import { EPackageJsonDependencyType } from "../../domain/enum/package-json-dependency-type.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
-import { BUILDER_CONFIG_FILE_NAME } from "../constant/builder/config-file-name.constant";
+import { BUILD_TOOL_CONFIG } from "../constant/builder/build-tool-config.constant";
 import { BUILDER_CONFIG } from "../constant/builder/config.constant";
-import { BUILDER_CONFIG_CORE_DEPENDENCIES, BUILDER_CONFIG_OPTIONAL_DEPENDENCIES } from "../constant/builder/core-dependencies.constant";
 import { BUILDER_CONFIG_FILE_NAMES } from "../constant/builder/file-names.constant";
 import { BUILDER_CONFIG_MESSAGES } from "../constant/builder/messages.constant";
-import { BUILDER_CONFIG_SCRIPTS } from "../constant/builder/scripts.constant";
 import { BUILDER_CONFIG_SUMMARY } from "../constant/builder/summary.constant";
 
 import { PackageJsonService } from "./package-json.service";
@@ -143,7 +143,8 @@ export class BuilderModuleService implements IModuleService {
 
 	/**
 	 * Creates build tool configuration file.
-	 * Generates the rollup.config.js file with user-specified options.
+	 * Generates the configuration file with user-specified options.
+	 * @param tool - The selected build tool
 	 * @param entryPoint - The entry point file for the build
 	 * @param outputDirectory - The output directory for built files
 	 * @param formats - The output formats to generate
@@ -153,9 +154,33 @@ export class BuilderModuleService implements IModuleService {
 	 * @param isPathAliasEnabled - Whether to use path aliases
 	 * @param isDecoratorsEnabled - Whether decorators are used
 	 * @param isPackageJsonGenerationEnabled - Whether to generate package.json
+	 * @param isCommonjsEnabled - Whether to include CommonJS plugin
 	 */
-	private async createConfig(entryPoint: string, outputDirectory: string, formats: Array<string>, isSourceMapsEnabled: boolean, isMinifyEnabled: boolean, isCliApp: boolean, isPathAliasEnabled: boolean, isDecoratorsEnabled: boolean, isPackageJsonGenerationEnabled: boolean, isCommonjsEnabled: boolean): Promise<void> {
-		await this.FILE_SYSTEM_SERVICE.writeFile(BUILDER_CONFIG_FILE_NAME, BUILDER_CONFIG.template(entryPoint, outputDirectory, formats, isSourceMapsEnabled, isMinifyEnabled, isCliApp, isPathAliasEnabled, isDecoratorsEnabled, isPackageJsonGenerationEnabled, isCommonjsEnabled), "utf8");
+	private async createConfig(tool: EBuildTool, entryPoint: string, outputDirectory: string, formats: Array<string>, isSourceMapsEnabled: boolean, isMinifyEnabled: boolean, isCliApp: boolean, isPathAliasEnabled: boolean, isDecoratorsEnabled: boolean, isPackageJsonGenerationEnabled: boolean, isCommonjsEnabled: boolean): Promise<void> {
+		const toolConfig: IBuildToolConfig = BUILD_TOOL_CONFIG[tool];
+		const isTypeScript: boolean = entryPoint.endsWith(".ts") || entryPoint.endsWith(".tsx");
+
+		if (toolConfig.configGenerator) {
+			const configContent: string = toolConfig.configGenerator({
+				entryPoint,
+				formats,
+				isCliApp,
+				isCommonjsEnabled,
+				isDecoratorsEnabled,
+				isMinifyEnabled,
+				isPackageJsonGenerationEnabled,
+				isPathAliasEnabled,
+				isSourceMapsEnabled,
+				isTypeScript,
+				outputDirectory,
+			});
+
+			await this.FILE_SYSTEM_SERVICE.writeFile(toolConfig.configFileName, configContent, "utf8");
+		} else {
+			// Fallback for tools without config generators yet
+			this.CLI_INTERFACE_SERVICE.warn(BUILDER_CONFIG_MESSAGES.configGeneratorNotImplemented(toolConfig.name));
+			await this.FILE_SYSTEM_SERVICE.writeFile(toolConfig.configFileName, BUILDER_CONFIG_MESSAGES.todoConfigContent, "utf8");
+		}
 	}
 
 	/**
@@ -168,14 +193,15 @@ export class BuilderModuleService implements IModuleService {
 	 * @param isSourceMapsEnabled - Whether source maps are enabled
 	 * @param isMinifyEnabled - Whether minification is enabled
 	 * @param isCleanEnabled - Whether clean is enabled
-	 * @param isCliApp - Whether this is a CLI app
+	 * @param isCliApp - Whether this is a CLI application
 	 * @param isPathAliasEnabled - Whether path aliases are enabled
 	 * @param isDecoratorsEnabled - Whether decorators are enabled
 	 * @param isPackageJsonGenerationEnabled - Whether package.json generation is enabled
-	 * @param isBuildTsconfigEnabled - Whether build tsconfig was created
+	 * @param isBuildTsconfigEnabled - Whether build tsconfig is enabled
 	 */
-	private displaySetupSummary(tool: string, entryPoint: string, outputDirectory: string, formats: Array<string>, isSourceMapsEnabled: boolean, isMinifyEnabled: boolean, isCleanEnabled: boolean, isCliApp: boolean, isPathAliasEnabled: boolean, isDecoratorsEnabled: boolean, isPackageJsonGenerationEnabled: boolean, isBuildTsconfigEnabled: boolean): void {
-		const summary: Array<string> = [BUILDER_CONFIG_MESSAGES.configurationCreated, "", BUILDER_CONFIG_MESSAGES.configurationOptionsLabel, BUILDER_CONFIG_MESSAGES.summaryTool(tool), BUILDER_CONFIG_MESSAGES.summaryEntryPoint(entryPoint), BUILDER_CONFIG_MESSAGES.summaryOutputDirectory(outputDirectory), BUILDER_CONFIG_MESSAGES.summaryFormats(formats.join(", "))];
+	private displaySetupSummary(tool: EBuildTool, entryPoint: string, outputDirectory: string, formats: Array<string>, isSourceMapsEnabled: boolean, isMinifyEnabled: boolean, isCleanEnabled: boolean, isCliApp: boolean, isPathAliasEnabled: boolean, isDecoratorsEnabled: boolean, isPackageJsonGenerationEnabled: boolean, isBuildTsconfigEnabled: boolean): void {
+		const toolConfig: IBuildToolConfig = BUILD_TOOL_CONFIG[tool];
+		const summary: Array<string> = [BUILDER_CONFIG_MESSAGES.configurationCreated, "", BUILDER_CONFIG_MESSAGES.configurationOptionsLabel, BUILDER_CONFIG_MESSAGES.summaryTool(toolConfig.name), BUILDER_CONFIG_MESSAGES.summaryEntryPoint(entryPoint), BUILDER_CONFIG_MESSAGES.summaryOutputDirectory(outputDirectory), BUILDER_CONFIG_MESSAGES.summaryFormats(formats.join(", "))];
 
 		if (isCliApp) {
 			summary.push(BUILDER_CONFIG_MESSAGES.summaryCliApp);
@@ -205,7 +231,7 @@ export class BuilderModuleService implements IModuleService {
 			summary.push(BUILDER_CONFIG_MESSAGES.packageJsonGenerationEnabled);
 		}
 
-		summary.push("", BUILDER_CONFIG_MESSAGES.generatedScriptsLabel, BUILDER_CONFIG_MESSAGES.rollupBuildDescription, BUILDER_CONFIG_MESSAGES.rollupWatchDescription, "", BUILDER_CONFIG_MESSAGES.generatedFilesLabel, `• ${BUILDER_CONFIG_FILE_NAME}`);
+		summary.push("", BUILDER_CONFIG_MESSAGES.generatedScriptsLabel, BUILDER_CONFIG_MESSAGES.buildDescription, BUILDER_CONFIG_MESSAGES.buildWatchDescription, "", BUILDER_CONFIG_MESSAGES.generatedFilesLabel, `• ${toolConfig.configFileName}`);
 
 		if (isBuildTsconfigEnabled) {
 			summary.push("• tsconfig.build.json");
@@ -249,10 +275,11 @@ export class BuilderModuleService implements IModuleService {
 	/**
 	 * Prompts the user for the output directory configuration.
 	 * @param isCliApp - Whether this is a CLI application
+	 * @param toolConfig - The selected build tool configuration
 	 * @returns Promise resolving to the output directory
 	 */
-	private async getOutputDirectory(isCliApp: boolean): Promise<string> {
-		const defaultDirectory: string = isCliApp ? BUILDER_CONFIG_SUMMARY.outputDirDefaultCli : BUILDER_CONFIG_SUMMARY.outputDirDefault;
+	private async getOutputDirectory(isCliApp: boolean, toolConfig: IBuildToolConfig): Promise<string> {
+		const defaultDirectory: string = isCliApp ? toolConfig.defaultOutputDirCli : toolConfig.defaultOutputDir;
 		const initialValue: string = this.config?.outputDirectory ?? defaultDirectory;
 
 		return await this.CLI_INTERFACE_SERVICE.text(BUILDER_CONFIG_MESSAGES.outputDirPrompt, defaultDirectory, initialValue, (value: string) => {
@@ -267,15 +294,22 @@ export class BuilderModuleService implements IModuleService {
 	/**
 	 * Prompts the user to select output formats.
 	 * @param isCliApp - Whether this is a CLI application
+	 * @param toolConfig - The selected build tool configuration
 	 * @returns Promise resolving to the selected formats
 	 */
-	private async getOutputFormats(isCliApp: boolean): Promise<Array<string>> {
+	private async getOutputFormats(isCliApp: boolean, toolConfig: IBuildToolConfig): Promise<Array<string>> {
 		if (isCliApp) {
 			// For CLI apps, let them choose a single format
-			const formatOptions: Array<{ hint: string; label: string; value: string }> = [
-				{ hint: "Modern JavaScript modules", label: "ESM (ECMAScript Modules)", value: "esm" },
-				{ hint: "Node.js compatible", label: "CommonJS", value: "cjs" },
-			];
+			const formatOptions: Array<{ hint: string; label: string; value: string }> = [];
+
+			// Add supported formats from the tool
+			if (toolConfig.supportedFormats.includes("esm")) {
+				formatOptions.push({ hint: "Modern JavaScript modules", label: "ESM (ECMAScript Modules)", value: "esm" });
+			}
+
+			if (toolConfig.supportedFormats.includes("cjs")) {
+				formatOptions.push({ hint: "Node.js compatible", label: "CommonJS", value: "cjs" });
+			}
 
 			const selected: string = await this.CLI_INTERFACE_SERVICE.select(BUILDER_CONFIG_MESSAGES.formatPromptCli, formatOptions, this.config?.formats?.[0] ?? "esm");
 
@@ -284,14 +318,29 @@ export class BuilderModuleService implements IModuleService {
 
 		const defaultFormats: Array<string> = this.config?.formats ?? BUILDER_CONFIG_SUMMARY.formatsDefault;
 
-		const formatOptions: Array<{ hint: string; label: string; value: string }> = [
-			{ hint: "Modern JavaScript modules", label: "ESM (ECMAScript Modules)", value: "esm" },
-			{ hint: "Node.js compatible", label: "CommonJS", value: "cjs" },
-			{ hint: "Works everywhere", label: "UMD (Universal Module Definition)", value: "umd" },
-			{ hint: "For browsers", label: "IIFE (Immediately Invoked Function Expression)", value: "iife" },
+		const formatOptions: Array<{ hint: string; label: string; value: string }> = [];
+
+		// Build format options based on what the tool supports
+		const formatDefinitions: Array<{ formats: Array<string>; hint: string; label: string; value: string }> = [
+			{ formats: ["esm", "es"], hint: "Modern JavaScript modules", label: "ESM (ECMAScript Modules)", value: "esm" },
+			{ formats: ["cjs", "commonjs"], hint: "Node.js compatible", label: "CommonJS", value: "cjs" },
+			{ formats: ["umd"], hint: "Works everywhere", label: "UMD (Universal Module Definition)", value: "umd" },
+			{ formats: ["iife"], hint: "For browsers", label: "IIFE (Immediately Invoked Function Expression)", value: "iife" },
+			{ formats: ["module"], hint: "ES6 modules", label: "Module", value: "module" },
 		];
 
-		const selected: Array<string> = await this.CLI_INTERFACE_SERVICE.multiselect<string>(BUILDER_CONFIG_MESSAGES.formatsPrompt, formatOptions, true, defaultFormats);
+		for (const formatDefinition of formatDefinitions) {
+			if (formatDefinition.formats.some((f: string) => toolConfig.supportedFormats.includes(f))) {
+				formatOptions.push({ hint: formatDefinition.hint, label: formatDefinition.label, value: formatDefinition.value });
+			}
+		}
+
+		const selected: Array<string> = await this.CLI_INTERFACE_SERVICE.multiselect<string>(
+			BUILDER_CONFIG_MESSAGES.formatsPrompt,
+			formatOptions,
+			true,
+			defaultFormats.filter((f: string) => toolConfig.supportedFormats.includes(f)),
+		);
 
 		if (!selected || selected.length === 0) {
 			throw new Error(BUILDER_CONFIG_MESSAGES.formatsRequired);
@@ -339,9 +388,15 @@ export class BuilderModuleService implements IModuleService {
 
 	/**
 	 * Prompts the user if they need CommonJS plugin support.
+	 * @param tool - The selected build tool
 	 * @returns Promise resolving to true if CommonJS plugin should be included
 	 */
-	private async isCommonjsEnabled(): Promise<boolean> {
+	private async isCommonjsEnabled(tool: EBuildTool): Promise<boolean> {
+		// Only ask for tools that have CommonJS plugin support (mainly Rollup)
+		if (tool !== EBuildTool.ROLLUP) {
+			return false;
+		}
+
 		const isConfirmedByDefault: boolean = this.config?.isCommonjsEnabled ?? true;
 
 		return await this.CLI_INTERFACE_SERVICE.confirm(BUILDER_CONFIG_MESSAGES.confirmCommonjs, isConfirmedByDefault);
@@ -410,31 +465,53 @@ export class BuilderModuleService implements IModuleService {
 	}
 
 	/**
-	 * Sets up build tool configuration.
-	 * Collects user input, installs dependencies, creates config file,
-	 * and sets up scripts.
-	 * @returns Promise resolving to an object containing setup parameters
+	 * Prompts the user to select a build tool.
+	 * @returns Promise resolving to the selected build tool
+	 */
+	private async selectBuildTool(): Promise<EBuildTool> {
+		const savedTool: EBuildTool | undefined = this.config?.tool;
+
+		// Create options for all available build tools
+		const availableTools: Array<{ description: string; label: string; value: EBuildTool }> = Object.values(EBuildTool).map((tool: EBuildTool) => ({
+			description: BUILD_TOOL_CONFIG[tool].description,
+			label: BUILD_TOOL_CONFIG[tool].name,
+			value: tool,
+		}));
+
+		return await this.CLI_INTERFACE_SERVICE.select<EBuildTool>(BUILDER_CONFIG_MESSAGES.selectBuildTool, availableTools, savedTool ?? EBuildTool.ROLLUP);
+	}
+
+	/**
+	 * Sets up the builder configuration.
+	 * Collects user input, installs dependencies, creates config files, and sets up scripts.
+	 * @returns Promise resolving to an object containing builder parameters
 	 */
 	private async setupBuilder(): Promise<Record<string, string>> {
 		try {
 			const parameters: Record<string, unknown> = {};
 
-			// For now, we only support Rollup
-			const tool: string = "rollup";
+			// Select build tool
+			const tool: EBuildTool = await this.selectBuildTool();
 			parameters.tool = tool;
 
-			// Ask if CLI app first as it affects other prompts
+			const toolConfig: IBuildToolConfig = BUILD_TOOL_CONFIG[tool];
+
+			// Get user input for build configuration
 			const isCliApp: boolean = await this.isCliApp();
 			parameters.isCliApp = isCliApp;
 
-			// Get configuration options from user
+			// Check if tool supports CLI apps
+			if (isCliApp && !toolConfig.canSupportCliApps) {
+				throw new Error(BUILDER_CONFIG_MESSAGES.cliAppNotSupported(toolConfig.name));
+			}
+
 			const entryPoint: string = await this.getEntryPoint();
 			parameters.entryPoint = entryPoint;
 
-			const outputDirectory: string = await this.getOutputDirectory(isCliApp);
+			const outputDirectory: string = await this.getOutputDirectory(isCliApp, toolConfig);
 			parameters.outputDirectory = outputDirectory;
 
-			const formats: Array<string> = await this.getOutputFormats(isCliApp);
+			const formats: Array<string> = await this.getOutputFormats(isCliApp, toolConfig);
 			parameters.formats = formats;
 
 			const isSourceMapsEnabled: boolean = await this.isSourceMapsEnabled();
@@ -446,8 +523,10 @@ export class BuilderModuleService implements IModuleService {
 			const isCleanEnabled: boolean = await this.isCleanEnabled();
 			parameters.isCleanEnabled = isCleanEnabled;
 
-			const isCommonjsEnabled: boolean = await this.isCommonjsEnabled();
+			const isCommonjsEnabled: boolean = await this.isCommonjsEnabled(tool);
 			parameters.isCommonjsEnabled = isCommonjsEnabled;
+
+			const isTypeScript: boolean = entryPoint.endsWith(".ts") || entryPoint.endsWith(".tsx");
 
 			const isPathAliasEnabled: boolean = await this.isPathAliasEnabled(entryPoint);
 			parameters.isPathAliasEnabled = isPathAliasEnabled;
@@ -465,17 +544,30 @@ export class BuilderModuleService implements IModuleService {
 			this.CLI_INTERFACE_SERVICE.startSpinner(BUILDER_CONFIG_MESSAGES.settingUpSpinner);
 
 			// Install core dependencies
-			await this.PACKAGE_JSON_SERVICE.installPackages([...BUILDER_CONFIG_CORE_DEPENDENCIES], "latest", EPackageJsonDependencyType.DEV);
+			await this.PACKAGE_JSON_SERVICE.installPackages([...toolConfig.coreDependencies], "latest", EPackageJsonDependencyType.DEV);
 
-			// Install optional dependencies
+			// Install optional dependencies based on features
 			const optionalDeps: Array<string> = [];
 
-			if (isPathAliasEnabled) {
-				optionalDeps.push(BUILDER_CONFIG_OPTIONAL_DEPENDENCIES.pathAlias);
+			if (isTypeScript && toolConfig.optionalDependencies.typescript) {
+				optionalDeps.push(...toolConfig.optionalDependencies.typescript);
 			}
 
-			if (isPackageJsonGenerationEnabled) {
-				optionalDeps.push(BUILDER_CONFIG_OPTIONAL_DEPENDENCIES.packageJsonGeneration);
+			if (isMinifyEnabled && toolConfig.optionalDependencies.minify) {
+				optionalDeps.push(...toolConfig.optionalDependencies.minify);
+			}
+
+			if (isPathAliasEnabled && toolConfig.optionalDependencies.pathAlias) {
+				optionalDeps.push(...toolConfig.optionalDependencies.pathAlias);
+			}
+
+			if (isDecoratorsEnabled && toolConfig.optionalDependencies.decorators) {
+				optionalDeps.push(...toolConfig.optionalDependencies.decorators);
+			}
+
+			// Add package.json generation dependency if needed (Rollup-specific for now)
+			if (isPackageJsonGenerationEnabled && tool === EBuildTool.ROLLUP) {
+				optionalDeps.push("rollup-plugin-generate-package-json");
 			}
 
 			if (optionalDeps.length > 0) {
@@ -483,13 +575,13 @@ export class BuilderModuleService implements IModuleService {
 			}
 
 			// Create configuration files
-			await this.createConfig(entryPoint, outputDirectory, formats, isSourceMapsEnabled, isMinifyEnabled, isCliApp, isPathAliasEnabled, isDecoratorsEnabled, isPackageJsonGenerationEnabled, isCommonjsEnabled);
+			await this.createConfig(tool, entryPoint, outputDirectory, formats, isSourceMapsEnabled, isMinifyEnabled, isCliApp, isPathAliasEnabled, isDecoratorsEnabled, isPackageJsonGenerationEnabled, isCommonjsEnabled);
 
 			if (isBuildTsconfigEnabled) {
 				await this.createBuildTsconfig();
 			}
 
-			await this.setupScripts(isCleanEnabled);
+			await this.setupScripts(tool, isCleanEnabled, outputDirectory);
 
 			this.CLI_INTERFACE_SERVICE.stopSpinner(BUILDER_CONFIG_MESSAGES.setupCompleteSpinner);
 			this.displaySetupSummary(tool, entryPoint, outputDirectory, formats, isSourceMapsEnabled, isMinifyEnabled, isCleanEnabled, isCliApp, isPathAliasEnabled, isDecoratorsEnabled, isPackageJsonGenerationEnabled, isBuildTsconfigEnabled);
@@ -505,14 +597,18 @@ export class BuilderModuleService implements IModuleService {
 	/**
 	 * Sets up npm scripts for the build tool.
 	 * Adds scripts for building and watching.
+	 * @param tool - The selected build tool
 	 * @param isCleanEnabled - Whether to add prebuild clean script
+	 * @param outputDirectory - The output directory
 	 */
-	private async setupScripts(isCleanEnabled: boolean): Promise<void> {
-		await this.PACKAGE_JSON_SERVICE.addScript(BUILDER_CONFIG_SCRIPTS.build.name, BUILDER_CONFIG_SCRIPTS.build.command);
-		await this.PACKAGE_JSON_SERVICE.addScript(BUILDER_CONFIG_SCRIPTS.buildWatch.name, BUILDER_CONFIG_SCRIPTS.buildWatch.command);
+	private async setupScripts(tool: EBuildTool, isCleanEnabled: boolean, outputDirectory: string): Promise<void> {
+		const toolConfig: IBuildToolConfig = BUILD_TOOL_CONFIG[tool];
 
-		if (isCleanEnabled) {
-			await this.PACKAGE_JSON_SERVICE.addScript(BUILDER_CONFIG_SCRIPTS.prebuild.name, BUILDER_CONFIG_SCRIPTS.prebuild.command);
+		await this.PACKAGE_JSON_SERVICE.addScript("build", toolConfig.scripts.build);
+		await this.PACKAGE_JSON_SERVICE.addScript("build:watch", toolConfig.scripts.watch);
+
+		if (isCleanEnabled && outputDirectory) {
+			await this.PACKAGE_JSON_SERVICE.addScript("prebuild", `rimraf ${outputDirectory}`);
 		}
 	}
 }

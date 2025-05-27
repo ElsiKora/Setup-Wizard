@@ -216,12 +216,7 @@ describe("TypescriptModuleService", () => {
 				const result = await (typescriptService as any).getBaseUrl();
 
 				expect(result).toBe("./src");
-				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_MESSAGES.baseUrlPrompt,
-					TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault,
-					TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault,
-					expect.any(Function)
-				);
+				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.baseUrlPrompt, TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault, TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault, expect.any(Function));
 			});
 
 			it("should validate base URL format", async () => {
@@ -243,12 +238,7 @@ describe("TypescriptModuleService", () => {
 
 				await (typescriptService as any).getBaseUrl();
 
-				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_MESSAGES.baseUrlPrompt,
-					TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault,
-					"./custom",
-					expect.any(Function)
-				);
+				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.baseUrlPrompt, TYPESCRIPT_CONFIG_SUMMARY.baseUrlDefault, "./custom", expect.any(Function));
 			});
 		});
 
@@ -259,12 +249,7 @@ describe("TypescriptModuleService", () => {
 				const result = await (typescriptService as any).getRootDir();
 
 				expect(result).toBe("./src");
-				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_MESSAGES.rootDirPrompt,
-					TYPESCRIPT_CONFIG_SUMMARY.rootDirDefault,
-					TYPESCRIPT_CONFIG_SUMMARY.rootDirDefault,
-					expect.any(Function)
-				);
+				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.rootDirPrompt, TYPESCRIPT_CONFIG_SUMMARY.rootDirDefault, TYPESCRIPT_CONFIG_SUMMARY.rootDirDefault, expect.any(Function));
 			});
 
 			it("should validate root directory format", async () => {
@@ -286,12 +271,7 @@ describe("TypescriptModuleService", () => {
 				const result = await (typescriptService as any).getOutDir();
 
 				expect(result).toBe("./dist");
-				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_MESSAGES.outDirPrompt,
-					TYPESCRIPT_CONFIG_SUMMARY.outDirDefault,
-					TYPESCRIPT_CONFIG_SUMMARY.outDirDefault,
-					expect.any(Function)
-				);
+				expect(mockCliInterfaceService.text).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.outDirPrompt, TYPESCRIPT_CONFIG_SUMMARY.outDirDefault, TYPESCRIPT_CONFIG_SUMMARY.outDirDefault, expect.any(Function));
 			});
 
 			it("should validate output directory format", async () => {
@@ -351,11 +331,7 @@ describe("TypescriptModuleService", () => {
 			it("should create config file with provided options", async () => {
 				await (typescriptService as any).createConfig("./src", "./src", "./dist", false, false);
 
-				expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_FILE_NAME,
-					expect.any(String),
-					"utf8"
-				);
+				expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_FILE_NAME, expect.any(String), "utf8");
 
 				const configContent = mockFileSystemService.writeFile.mock.calls[0][1];
 				const config = JSON.parse(configContent);
@@ -397,14 +373,8 @@ describe("TypescriptModuleService", () => {
 				await (typescriptService as any).setupScripts();
 
 				expect(mockPackageJsonService.addScript).toHaveBeenCalledTimes(2);
-				expect(mockPackageJsonService.addScript).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_SCRIPTS.buildTypes.name,
-					TYPESCRIPT_CONFIG_SCRIPTS.buildTypes.command
-				);
-				expect(mockPackageJsonService.addScript).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_SCRIPTS.lintTypes.name,
-					TYPESCRIPT_CONFIG_SCRIPTS.lintTypes.command
-				);
+				expect(mockPackageJsonService.addScript).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_SCRIPTS.buildTypes.name, TYPESCRIPT_CONFIG_SCRIPTS.buildTypes.command);
+				expect(mockPackageJsonService.addScript).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_SCRIPTS.lintTypes.name, TYPESCRIPT_CONFIG_SCRIPTS.lintTypes.command);
 			});
 		});
 
@@ -437,40 +407,22 @@ describe("TypescriptModuleService", () => {
 			it("should display basic setup summary", () => {
 				(typescriptService as any).displaySetupSummary("./src", "./src", "./dist", false, false);
 
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.configurationCreated)
-				);
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.summaryBaseUrl("./src"))
-				);
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.summaryRootDir("./src"))
-				);
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.summaryOutputDir("./dist"))
-				);
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.configurationCreated));
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.summaryBaseUrl("./src")));
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.summaryRootDir("./src")));
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.summaryOutputDir("./dist")));
 			});
 
 			it("should include clean architecture info when enabled", () => {
 				(typescriptService as any).displaySetupSummary("./src", "./src", "./dist", true, false);
 
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.cleanArchitectureEnabled)
-				);
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.cleanArchitectureEnabled));
 			});
 
 			it("should include decorators info when enabled", () => {
 				(typescriptService as any).displaySetupSummary("./src", "./src", "./dist", false, true);
 
-				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle,
-					expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.decoratorsEnabled)
-				);
+				expect(mockCliInterfaceService.note).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.setupCompleteTitle, expect.stringContaining(TYPESCRIPT_CONFIG_MESSAGES.decoratorsEnabled));
 			});
 		});
 
@@ -498,11 +450,7 @@ describe("TypescriptModuleService", () => {
 				});
 
 				expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.settingUpSpinner);
-				expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(
-					TYPESCRIPT_CONFIG_CORE_DEPENDENCIES,
-					"latest",
-					EPackageJsonDependencyType.DEV
-				);
+				expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
 				expect(typescriptService["createConfig"]).toHaveBeenCalledWith("./src", "./src", "./dist", false, false);
 				expect(typescriptService["setupScripts"]).toHaveBeenCalled();
 				expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.setupCompleteSpinner);
@@ -529,4 +477,4 @@ describe("TypescriptModuleService", () => {
 			});
 		});
 	});
-}); 
+});

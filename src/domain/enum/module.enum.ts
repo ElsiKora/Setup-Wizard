@@ -11,5 +11,6 @@ export enum EModule {
 	PRETTIER = "prettier",
 	SEMANTIC_RELEASE = "semantic-release",
 	STYLELINT = "stylelint",
+	TESTING = "testing",
 	TYPESCRIPT = "typescript",
 }

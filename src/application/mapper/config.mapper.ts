@@ -50,6 +50,12 @@ export const ConfigMapper: {
 					  }
 					| { features?: Array<EEslintFeature>; isEnabled?: boolean }
 					| {
+							framework?: string;
+							isCoverageEnabled?: boolean;
+							isE2eEnabled?: boolean;
+							isEnabled?: boolean;
+					  }
+					| {
 							ides?: Array<EIde>;
 							isEnabled?: boolean;
 					  }

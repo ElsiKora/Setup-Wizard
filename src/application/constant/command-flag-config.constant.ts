@@ -63,6 +63,11 @@ export const COMMAND_FLAG_CONFIG: Record<EModule, ICommandFlagConfig> = {
 		fullFlag: "withStylelint",
 		shortFlag: "s",
 	},
+	[EModule.TESTING]: {
+		description: "Add testing configuration (Vitest)",
+		fullFlag: "withTesting",
+		shortFlag: "T",
+	},
 	[EModule.TYPESCRIPT]: {
 		description: "Add TypeScript configuration",
 		fullFlag: "withTypescript",

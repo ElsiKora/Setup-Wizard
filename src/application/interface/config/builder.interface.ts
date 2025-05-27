@@ -1,3 +1,5 @@
+import type { EBuildTool } from "../../../domain/enum/build-tool.enum";
+
 /**
  * Configuration interface for the Builder module.
  * Stores user preferences for build tool setup.
@@ -39,6 +41,6 @@ export interface IConfigBuilder {
 	/** Output directory for built files */
 	outputDirectory: string;
 
-	/** The selected build tool (e.g., 'rollup') */
-	tool: string;
+	/** The selected build tool */
+	tool: EBuildTool;
 }
