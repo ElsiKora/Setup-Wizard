@@ -1,5 +1,3 @@
-import path from "node:path";
-
 /**
  * Interface for file system operations.
  * Provides methods for reading, writing, and managing files and directories.

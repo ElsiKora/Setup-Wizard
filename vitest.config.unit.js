@@ -13,7 +13,6 @@ export default defineConfig({
 	},
 	test: {
 		coverage: {
-			// eslint-disable-next-line @elsikora/typescript/naming-convention
 			all: true,
 			exclude: ["node_modules/", "dist/", "**/index.ts", "**/*.d.ts", "**/test/**", "**/*.interface.ts", "**/*.type.ts", "*.config.js", "*.config.ts", ".elsikora/**"],
 			include: ["src/**/*.ts"],
@@ -22,11 +21,9 @@ export default defineConfig({
 		},
 		environment: "node",
 		exclude: ["**/node_modules/**", "**/dist/**", "**/test/e2e/**"],
-		// eslint-disable-next-line @elsikora/typescript/naming-convention
 		globals: true,
 		include: ["test/unit/**/*.test.ts"],
 		root: ".",
-		// eslint-disable-next-line @elsikora/typescript/naming-convention
 		watch: false,
 	},
 });

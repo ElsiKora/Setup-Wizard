@@ -69,10 +69,10 @@ export class FrameworkService {
 	/**
 	 * Gets paths to lint based on framework configurations.
 	 * Currently returns the root directory, but could be extended to use framework-specific paths.
-	 * @param frameworks - Array of framework configurations
 	 * @returns Array of paths to lint
+	 * @param _frameworks
 	 */
-	getLintPaths(frameworks: Array<IFrameworkConfig>): Array<string> {
+	getLintPaths(_frameworks: Array<IFrameworkConfig>): Array<string> {
 		return ["./"];
 		// return Array.from(new Set(frameworks.flatMap((f) => f.lintPaths)));
 	}

@@ -8,6 +8,11 @@ export const COMMAND_FLAG_CONFIG: Record<EModule, ICommandFlagConfig> = {
 		fullFlag: "withBranchLint",
 		shortFlag: "b",
 	},
+	[EModule.BUILDER]: {
+		description: "Add build tool configuration",
+		fullFlag: "withBuilder",
+		shortFlag: "u",
+	},
 	[EModule.CI]: {
 		description: "Add GitHub CI configuration",
 		fullFlag: "withCI",
@@ -57,5 +62,10 @@ export const COMMAND_FLAG_CONFIG: Record<EModule, ICommandFlagConfig> = {
 		description: "Add Stylelint configuration",
 		fullFlag: "withStylelint",
 		shortFlag: "s",
+	},
+	[EModule.TYPESCRIPT]: {
+		description: "Add TypeScript configuration",
+		fullFlag: "withTypescript",
+		shortFlag: "y",
 	},
 };

@@ -239,12 +239,12 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	/**
 	 * Prompts the user for text input.
 	 * @param message - The prompt message to display
-	 * @param placeholder - Optional placeholder text
+	 * @param _placeholder - Optional placeholder text
 	 * @param initialValue - Optional initial value for the input
 	 * @param validate - Optional validation function for the input
 	 * @returns Promise resolving to the entered text
 	 */
-	async text(message: string, placeholder?: string, initialValue?: string, validate?: (value: string) => Error | string | undefined): Promise<string> {
+	async text(message: string, _placeholder?: string, initialValue?: string, validate?: (value: string) => Error | string | undefined): Promise<string> {
 		try {
 			const answer: { text: string } = await inquirer.prompt({
 				default: initialValue,

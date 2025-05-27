@@ -228,9 +228,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 				return SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameRequired;
 			}
 
-			if (value.includes(" ")) {
-				return SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError;
-			}
+			return value.includes(" ") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError : undefined;
 		});
 	}
 
@@ -246,9 +244,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 				return SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameRequired;
 			}
 
-			if (value.includes(" ")) {
-				return SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError;
-			}
+			return value.includes(" ") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError : undefined;
 		});
 	}
 
@@ -264,9 +260,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 				return SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameRequired;
 			}
 
-			if (value.includes(" ")) {
-				return SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError;
-			}
+			return value.includes(" ") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError : undefined;
 		});
 	}
 
@@ -282,9 +276,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 				return SEMANTIC_RELEASE_CONFIG_MESSAGES.channelNameRequired;
 			}
 
-			if (value.includes(" ")) {
-				return SEMANTIC_RELEASE_CONFIG_MESSAGES.channelNameSpacesError;
-			}
+			return value.includes(" ") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.channelNameSpacesError : undefined;
 		});
 	}
 
@@ -323,9 +315,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 						return SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlRequired;
 					}
 
-					if (!value.startsWith("https://") && !value.startsWith("http://")) {
-						return SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlStartError;
-					}
+					return !value.startsWith("https://") && !value.startsWith("http://") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlStartError : undefined;
 				});
 			}
 		} else {
@@ -334,9 +324,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 					return SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlRequired;
 				}
 
-				if (!value.startsWith("https://") && !value.startsWith("http://")) {
-					return SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlStartError;
-				}
+				return !value.startsWith("https://") && !value.startsWith("http://") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlStartError : undefined;
 			});
 		}
 

@@ -1,5 +1,6 @@
 export enum EModule {
 	BRANCH_LINT = "branch-lint",
+	BUILDER = "builder",
 	CI = "ci",
 	COMMITLINT = "commitlint",
 	ESLINT = "eslint",
@@ -10,4 +11,5 @@ export enum EModule {
 	PRETTIER = "prettier",
 	SEMANTIC_RELEASE = "semantic-release",
 	STYLELINT = "stylelint",
+	TYPESCRIPT = "typescript",
 }

@@ -40,6 +40,14 @@ export const ConfigMapper: {
 			if (Object.prototype.hasOwnProperty.call(config, key)) {
 				const value:
 					| { author?: string; isEnabled?: boolean; license?: ELicense; year?: number }
+					| {
+							baseUrl?: string;
+							isCleanArchitectureEnabled?: boolean;
+							isDecoratorsEnabled?: boolean;
+							isEnabled?: boolean;
+							outputDirectory?: string;
+							rootDirectory?: string;
+					  }
 					| { features?: Array<EEslintFeature>; isEnabled?: boolean }
 					| {
 							ides?: Array<EIde>;

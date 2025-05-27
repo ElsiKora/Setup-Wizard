@@ -4,6 +4,7 @@ import type { IFileSystemService } from "../../application/interface/file-system
 import type { IModuleService } from "../interface/module-service.interface";
 
 import { BranchLintModuleService } from "../../application/service/branch-lint-module.service";
+import { BuilderModuleService } from "../../application/service/builder-module.service";
 import { CiModuleService } from "../../application/service/ci-module.service";
 import { CommitlintModuleService } from "../../application/service/commitlint-module.service";
 import { EslintModuleService } from "../../application/service/eslint-module.service";
@@ -14,6 +15,7 @@ import { LintStagedModuleService } from "../../application/service/lint-staged-m
 import { PrettierModuleService } from "../../application/service/prettier-module.service";
 import { SemanticReleaseModuleService } from "../../application/service/semantic-release-module.service";
 import { StylelintModuleService } from "../../application/service/stylelint-module.service";
+import { TypescriptModuleService } from "../../application/service/typescript-module.service";
 import { EModule } from "../../domain/enum/module.enum";
 import { CosmicConfigService } from "../service/cosmi-config-config.service";
 
@@ -56,6 +58,10 @@ export class ModuleServiceMapper {
 				return new BranchLintModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
+			case EModule.BUILDER: {
+				return new BuilderModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
+			}
+
 			case EModule.CI: {
 				return new CiModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
@@ -94,6 +100,10 @@ export class ModuleServiceMapper {
 
 			case EModule.STYLELINT: {
 				return new StylelintModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
+			}
+
+			case EModule.TYPESCRIPT: {
+				return new TypescriptModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			default: {

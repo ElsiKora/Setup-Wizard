@@ -1,6 +1,7 @@
 import type { EModule } from "../../domain/enum/module.enum";
 
 import type { IBranchlint } from "./config/branch-lint.interface";
+import type { IConfigBuilder } from "./config/builder.interface";
 import type { IConfigCi } from "./config/ci.interface";
 import type { IConfigCommitlint } from "./config/commitlint.interface";
 import type { IConfigEslint } from "./config/eslint.interface";
@@ -11,10 +12,22 @@ import type { IConfigLintStaged } from "./config/lint-staged.interface";
 import type { IConfigPrettier } from "./config/prettier.interface";
 import type { IConfigSemanticRelease } from "./config/semantic-release.interface";
 import type { IConfigStylelint } from "./config/stylelint.interface";
+import type { IConfigTypescript } from "./config/typescript.interface";
 
+/**
+ * Configuration interface that includes all module configurations.
+ * Each property represents a module's configuration.
+ */
 export interface IConfig {
+	/** Branch lint configuration */
 	[EModule.BRANCH_LINT]?: IBranchlint;
+
+	/** Builder configuration */
+	[EModule.BUILDER]?: IConfigBuilder;
+
+	/** CI configuration */
 	[EModule.CI]?: IConfigCi;
+
 	[EModule.COMMITLINT]?: IConfigCommitlint;
 	[EModule.ESLINT]?: IConfigEslint;
 	[EModule.GITIGNORE]?: IConfigGitignore;
@@ -24,4 +37,5 @@ export interface IConfig {
 	[EModule.PRETTIER]?: IConfigPrettier;
 	[EModule.SEMANTIC_RELEASE]?: IConfigSemanticRelease;
 	[EModule.STYLELINT]?: IConfigStylelint;
+	[EModule.TYPESCRIPT]?: IConfigTypescript;
 }

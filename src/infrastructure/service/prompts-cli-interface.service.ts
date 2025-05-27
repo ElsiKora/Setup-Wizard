@@ -300,12 +300,12 @@ export class PromptsCliInterface implements ICliInterfaceService {
 	/**
 	 * Displays a text input prompt to the user.
 	 * @param message - The message to display to the user
-	 * @param placeholder - Optional placeholder text for the input field
+	 * @param _placeholder
 	 * @param initialValue - Optional initial value for the input field
 	 * @param validate - Optional validation function for the input
 	 * @returns Promise that resolves to the user's input text
 	 */
-	async text(message: string, placeholder?: string, initialValue?: string, validate?: (value: string) => Error | string | undefined): Promise<string> {
+	async text(message: string, _placeholder?: string, initialValue?: string, validate?: (value: string) => Error | string | undefined): Promise<string> {
 		// Convert the validate function to match prompts' expected format
 		const promptsValidate: ((value: string) => boolean | string) | undefined = validate
 			? // eslint-disable-next-line @elsikora/typescript/explicit-function-return-type
