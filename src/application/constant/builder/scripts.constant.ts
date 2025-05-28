@@ -89,7 +89,7 @@ export const BUILDER_CONFIG_SCRIPTS: IBuilderConfigScripts = {
 		name: "build:watch",
 	},
 	prebuild: {
-		command: (tool: EBuildTool, outputDirectory: string = "dist"): string => `rimraf ${outputDirectory}`,
+		command: (_tool: EBuildTool, outputDirectory: string = "dist"): string => `rimraf ${outputDirectory}`,
 		name: "prebuild",
 	},
 };
