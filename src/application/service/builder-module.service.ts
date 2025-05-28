@@ -15,6 +15,8 @@ import { BUILD_TOOL_CONFIG } from "../constant/builder/build-tool-config.constan
 import { BUILDER_CONFIG } from "../constant/builder/config.constant";
 import { BUILDER_CONFIG_FILE_NAMES } from "../constant/builder/file-names.constant";
 import { BUILDER_CONFIG_MESSAGES } from "../constant/builder/messages.constant";
+import { BUILDER_ROLLUP_PLUGIN_GENERATE_PACKAGE_JSON } from "../constant/builder/package-names.constant";
+import { BUILDER_CONFIG_SCRIPTS } from "../constant/builder/scripts.constant";
 import { BUILDER_CONFIG_SUMMARY } from "../constant/builder/summary.constant";
 
 import { PackageJsonService } from "./package-json.service";
@@ -567,7 +569,7 @@ export class BuilderModuleService implements IModuleService {
 
 			// Add package.json generation dependency if needed (Rollup-specific for now)
 			if (isPackageJsonGenerationEnabled && tool === EBuildTool.ROLLUP) {
-				optionalDeps.push("rollup-plugin-generate-package-json");
+				optionalDeps.push(BUILDER_ROLLUP_PLUGIN_GENERATE_PACKAGE_JSON);
 			}
 
 			if (optionalDeps.length > 0) {
@@ -602,13 +604,11 @@ export class BuilderModuleService implements IModuleService {
 	 * @param outputDirectory - The output directory
 	 */
 	private async setupScripts(tool: EBuildTool, isCleanEnabled: boolean, outputDirectory: string): Promise<void> {
-		const toolConfig: IBuildToolConfig = BUILD_TOOL_CONFIG[tool];
-
-		await this.PACKAGE_JSON_SERVICE.addScript("build", toolConfig.scripts.build);
-		await this.PACKAGE_JSON_SERVICE.addScript("build:watch", toolConfig.scripts.watch);
+		await this.PACKAGE_JSON_SERVICE.addScript(BUILDER_CONFIG_SCRIPTS.build.name, BUILDER_CONFIG_SCRIPTS.build.command(tool));
+		await this.PACKAGE_JSON_SERVICE.addScript(BUILDER_CONFIG_SCRIPTS.buildWatch.name, BUILDER_CONFIG_SCRIPTS.buildWatch.command(tool));
 
 		if (isCleanEnabled && outputDirectory) {
-			await this.PACKAGE_JSON_SERVICE.addScript("prebuild", `rimraf ${outputDirectory}`);
+			await this.PACKAGE_JSON_SERVICE.addScript(BUILDER_CONFIG_SCRIPTS.prebuild.name, BUILDER_CONFIG_SCRIPTS.prebuild.command(tool, outputDirectory));
 		}
 	}
 }

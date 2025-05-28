@@ -3,6 +3,23 @@ import type { IBuildToolConfig } from "../../../domain/interface/build-tool-conf
 import path from "node:path";
 
 import { EBuildTool } from "../../../domain/enum/build-tool.enum";
+import {
+	BUILDER_ESBUILD_PACKAGE_NAME,
+	BUILDER_PARCEL_PACKAGE_NAME,
+	BUILDER_ROLLUP_PACKAGE_NAME,
+	BUILDER_ROLLUP_PLUGIN_DTS_PATH_ALIAS,
+	BUILDER_ROLLUP_PLUGIN_TERSER,
+	BUILDER_ROLLUP_PLUGIN_TYPESCRIPT,
+	BUILDER_SWC_CLI_PACKAGE_NAME,
+	BUILDER_SWC_CORE_PACKAGE_NAME,
+	BUILDER_TSLIB_PACKAGE_NAME,
+	BUILDER_TURBOPACK_PACKAGE_NAME,
+	BUILDER_TYPESCRIPT_PACKAGE_NAME,
+	BUILDER_VITE_PACKAGE_NAME,
+	BUILDER_VITE_TSCONFIG_PATHS_PACKAGE_NAME,
+	BUILDER_WEBPACK_CLI_PACKAGE_NAME,
+	BUILDER_WEBPACK_PACKAGE_NAME,
+} from "../builder/package-names.constant";
 
 /**
  * Configuration for different build tools.
@@ -78,14 +95,14 @@ if (isWatch) {
 }
 `;
 		},
-		coreDependencies: ["esbuild"],
+		coreDependencies: [BUILDER_ESBUILD_PACKAGE_NAME],
 		defaultOutputDir: "./dist",
 		defaultOutputDirCli: "./bin",
 		description: "An extremely fast JavaScript bundler",
 		name: "esbuild",
 		optionalDependencies: {
 			minify: [], // Built-in
-			typescript: ["typescript"],
+			typescript: [BUILDER_TYPESCRIPT_PACKAGE_NAME],
 		},
 		scripts: {
 			build: "node esbuild.config.js",
@@ -107,14 +124,14 @@ if (isWatch) {
 }
 `;
 		},
-		coreDependencies: ["parcel"],
+		coreDependencies: [BUILDER_PARCEL_PACKAGE_NAME],
 		defaultOutputDir: "./dist",
 		defaultOutputDirCli: "./bin",
 		description: "The zero configuration build tool",
 		name: "Parcel",
 		optionalDependencies: {
 			minify: [], // Built-in
-			typescript: ["typescript"],
+			typescript: [BUILDER_TYPESCRIPT_PACKAGE_NAME],
 		},
 		scripts: {
 			build: "parcel build",
@@ -348,16 +365,16 @@ export default [
 `;
 			}
 		},
-		coreDependencies: ["rollup"],
+		coreDependencies: [BUILDER_ROLLUP_PACKAGE_NAME],
 		defaultOutputDir: "./dist",
 		defaultOutputDirCli: "./bin",
 		description: "Next-generation ES module bundler",
 		name: "Rollup",
 		optionalDependencies: {
-			decorators: ["tslib"],
-			minify: ["@rollup/plugin-terser"],
-			pathAlias: ["rollup-plugin-dts-path-alias"],
-			typescript: ["@rollup/plugin-typescript", "tslib"],
+			decorators: [BUILDER_TSLIB_PACKAGE_NAME],
+			minify: [BUILDER_ROLLUP_PLUGIN_TERSER],
+			pathAlias: [BUILDER_ROLLUP_PLUGIN_DTS_PATH_ALIAS],
+			typescript: [BUILDER_ROLLUP_PLUGIN_TYPESCRIPT, BUILDER_TSLIB_PACKAGE_NAME],
 		},
 		scripts: {
 			build: "rollup -c",
@@ -400,7 +417,7 @@ export default [
 }
 `;
 		},
-		coreDependencies: ["@swc/core", "@swc/cli"],
+		coreDependencies: [BUILDER_SWC_CORE_PACKAGE_NAME, BUILDER_SWC_CLI_PACKAGE_NAME],
 		defaultOutputDir: "./dist",
 		defaultOutputDirCli: "./bin",
 		description: "Super-fast TypeScript/JavaScript compiler",
@@ -438,14 +455,14 @@ export default [
 };
 `;
 		},
-		coreDependencies: ["@vercel/turbopack"],
+		coreDependencies: [BUILDER_TURBOPACK_PACKAGE_NAME],
 		defaultOutputDir: "./dist",
 		defaultOutputDirCli: "./bin",
 		description: "Incremental bundler optimized for JavaScript and TypeScript",
 		name: "Turbopack",
 		optionalDependencies: {
 			minify: [],
-			typescript: ["typescript"],
+			typescript: [BUILDER_TYPESCRIPT_PACKAGE_NAME],
 		},
 		scripts: {
 			build: "turbopack build",
@@ -505,22 +522,22 @@ export default defineConfig({
 });
 `;
 		},
-		coreDependencies: ["vite"],
+		coreDependencies: [BUILDER_VITE_PACKAGE_NAME],
 		defaultOutputDir: "./dist",
-		defaultOutputDirCli: "./dist",
+		defaultOutputDirCli: "./bin",
 		description: "Next generation frontend tooling",
 		name: "Vite",
 		optionalDependencies: {
 			minify: [], // Built-in
-			pathAlias: ["vite-tsconfig-paths"],
-			typescript: ["@vitejs/plugin-vue", "typescript"],
+			pathAlias: [BUILDER_VITE_TSCONFIG_PATHS_PACKAGE_NAME],
+			typescript: [], // Built-in
 		},
 		scripts: {
 			build: "vite build",
 			dev: "vite",
 			watch: "vite build --watch",
 		},
-		supportedFormats: ["es", "umd"],
+		supportedFormats: ["esm", "umd"],
 	},
 	[EBuildTool.WEBPACK]: {
 		canSupportCliApps: true,
@@ -626,21 +643,20 @@ module.exports = {
 };
 `;
 		},
-		coreDependencies: ["webpack", "webpack-cli"],
+		coreDependencies: [BUILDER_WEBPACK_PACKAGE_NAME, BUILDER_WEBPACK_CLI_PACKAGE_NAME],
 		defaultOutputDir: "./dist",
 		defaultOutputDirCli: "./bin",
 		description: "Static module bundler for modern JavaScript applications",
 		name: "Webpack",
 		optionalDependencies: {
-			minify: ["terser-webpack-plugin"],
-			pathAlias: ["tsconfig-paths-webpack-plugin"],
-			typescript: ["ts-loader", "typescript"],
+			minify: [], // Built-in
+			typescript: [BUILDER_TYPESCRIPT_PACKAGE_NAME],
 		},
 		scripts: {
 			build: "webpack --mode production",
 			dev: "webpack --mode development --watch",
 			watch: "webpack --mode development --watch",
 		},
-		supportedFormats: ["commonjs", "module", "umd"],
+		supportedFormats: ["esm", "cjs", "umd"],
 	},
 };

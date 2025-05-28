@@ -13,6 +13,8 @@ import { ETestingFramework } from "../../domain/enum/testing-framework.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
 import { TESTING_CONFIG } from "../constant/testing/config.constant";
 import { TESTING_CONFIG_MESSAGES } from "../constant/testing/messages.constant";
+import { TESTING_E2E_TEST_PATH, TESTING_UNIT_TEST_PATH, TESTING_VITEST_CONFIG_FILES } from "../constant/testing/package-names.constant";
+import { TESTING_CONFIG_SCRIPTS } from "../constant/testing/scripts.constant";
 import { TESTING_FRAMEWORK_CONFIG } from "../constant/testing/testing-framework-config.constant";
 
 import { PackageJsonService } from "./package-json.service";
@@ -153,11 +155,11 @@ export class TestingModuleService implements IModuleService {
 	 */
 	private async createTestDirectories(isUnitEnabled: boolean, isEndToEndEnabled: boolean): Promise<void> {
 		if (isUnitEnabled) {
-			await this.FILE_SYSTEM_SERVICE.createDirectory("test/unit", { isRecursive: true });
+			await this.FILE_SYSTEM_SERVICE.createDirectory(TESTING_UNIT_TEST_PATH, { isRecursive: true });
 		}
 
 		if (isEndToEndEnabled) {
-			await this.FILE_SYSTEM_SERVICE.createDirectory("test/e2e", { isRecursive: true });
+			await this.FILE_SYSTEM_SERVICE.createDirectory(TESTING_E2E_TEST_PATH, { isRecursive: true });
 		}
 	}
 
@@ -254,9 +256,7 @@ export class TestingModuleService implements IModuleService {
 		}
 
 		// Check for generic config files
-		const genericFiles: Array<string> = ["vitest.config.js", "vitest.config.ts", "vite.config.js", "vite.config.ts"];
-
-		for (const file of genericFiles) {
+		for (const file of TESTING_VITEST_CONFIG_FILES) {
 			if (await this.FILE_SYSTEM_SERVICE.isPathExists(file)) {
 				existingFiles.push(file);
 			}
@@ -354,21 +354,21 @@ export class TestingModuleService implements IModuleService {
 
 		// Unit test scripts
 		if (isUnitEnabled) {
-			await this.PACKAGE_JSON_SERVICE.addScript("test:unit", frameworkConfig.scripts.testUnit);
-			await this.PACKAGE_JSON_SERVICE.addScript("test:unit:watch", frameworkConfig.scripts.testUnitWatch);
+			await this.PACKAGE_JSON_SERVICE.addScript(TESTING_CONFIG_SCRIPTS.testUnit.name, TESTING_CONFIG_SCRIPTS.testUnit.command(framework, frameworkConfig.configFiles.unit));
+			await this.PACKAGE_JSON_SERVICE.addScript(TESTING_CONFIG_SCRIPTS.testUnitWatch.name, TESTING_CONFIG_SCRIPTS.testUnitWatch.command(framework, frameworkConfig.configFiles.unit));
 
 			if (isCoverageEnabled) {
-				await this.PACKAGE_JSON_SERVICE.addScript("test:unit:coverage", frameworkConfig.scripts.testUnitCoverage);
+				await this.PACKAGE_JSON_SERVICE.addScript(TESTING_CONFIG_SCRIPTS.testUnitCoverage.name, TESTING_CONFIG_SCRIPTS.testUnitCoverage.command(framework, frameworkConfig.configFiles.unit));
 			}
 		}
 
 		if (isEndToEndEnabled) {
-			await this.PACKAGE_JSON_SERVICE.addScript("test:e2e", frameworkConfig.scripts.testE2e);
-			await this.PACKAGE_JSON_SERVICE.addScript("test:e2e:watch", frameworkConfig.scripts.testE2eWatch);
+			await this.PACKAGE_JSON_SERVICE.addScript(TESTING_CONFIG_SCRIPTS.testE2e.name, TESTING_CONFIG_SCRIPTS.testE2e.command(framework, frameworkConfig.configFiles.e2e));
+			await this.PACKAGE_JSON_SERVICE.addScript(TESTING_CONFIG_SCRIPTS.testE2eWatch.name, TESTING_CONFIG_SCRIPTS.testE2eWatch.command(framework, frameworkConfig.configFiles.e2e));
 		}
 
 		if (isUnitEnabled && isEndToEndEnabled) {
-			await this.PACKAGE_JSON_SERVICE.addScript("test:all", "npm run test:unit && npm run test:e2e");
+			await this.PACKAGE_JSON_SERVICE.addScript(TESTING_CONFIG_SCRIPTS.testAll.name, TESTING_CONFIG_SCRIPTS.testAll.command());
 		}
 	}
 

@@ -1,12 +1,14 @@
+import { BUILDER_RIMRAF_PACKAGE_NAME, BUILDER_ROLLUP_PACKAGE_NAME, BUILDER_ROLLUP_PLUGIN_COMMONJS, BUILDER_ROLLUP_PLUGIN_DTS_PATH_ALIAS, BUILDER_ROLLUP_PLUGIN_GENERATE_PACKAGE_JSON, BUILDER_ROLLUP_PLUGIN_NODE_RESOLVE, BUILDER_ROLLUP_PLUGIN_TERSER, BUILDER_ROLLUP_PLUGIN_TYPESCRIPT } from "./package-names.constant";
+
 /**
  * Core dependencies required for Rollup build setup.
  */
-export const BUILDER_CONFIG_CORE_DEPENDENCIES: Readonly<Array<string>> = ["rollup", "@rollup/plugin-node-resolve", "@rollup/plugin-commonjs", "@rollup/plugin-typescript", "@rollup/plugin-terser", "rimraf"] as const;
+export const BUILDER_CONFIG_CORE_DEPENDENCIES: Readonly<Array<string>> = [BUILDER_ROLLUP_PACKAGE_NAME, BUILDER_ROLLUP_PLUGIN_NODE_RESOLVE, BUILDER_ROLLUP_PLUGIN_COMMONJS, BUILDER_ROLLUP_PLUGIN_TYPESCRIPT, BUILDER_ROLLUP_PLUGIN_TERSER, BUILDER_RIMRAF_PACKAGE_NAME] as const;
 
 /**
  * Optional dependencies for advanced Rollup features.
  */
 export const BUILDER_CONFIG_OPTIONAL_DEPENDENCIES: Readonly<{ packageJsonGeneration: string; pathAlias: string }> = {
-	packageJsonGeneration: "rollup-plugin-generate-package-json",
-	pathAlias: "rollup-plugin-dts-path-alias",
+	packageJsonGeneration: BUILDER_ROLLUP_PLUGIN_GENERATE_PACKAGE_JSON,
+	pathAlias: BUILDER_ROLLUP_PLUGIN_DTS_PATH_ALIAS,
 } as const;
