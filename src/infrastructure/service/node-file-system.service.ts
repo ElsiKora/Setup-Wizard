@@ -16,7 +16,11 @@ export class NodeFileSystemService implements IFileSystemService {
 	 * @returns Promise that resolves when the directory is created
 	 */
 	async createDirectory(directoryPath: string, options?: { isRecursive: boolean }): Promise<void> {
-		directoryPath = path.dirname(directoryPath);
+		// Check if directory already exists
+		if (await this.isPathExists(directoryPath)) {
+			return;
+		}
+
 		// eslint-disable-next-line @elsikora/typescript/naming-convention
 		await fs.mkdir(directoryPath, { recursive: options?.isRecursive });
 	}

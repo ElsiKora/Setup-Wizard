@@ -9,10 +9,15 @@ import type { IModuleSetupResult } from "../interface/module-setup-result.interf
 import { EModule } from "../../domain/enum/module.enum";
 import { EPackageJsonDependencyType } from "../../domain/enum/package-json-dependency-type.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
-import { COMMITLINT_CONFIG_CORE_DEPENDENCIES } from "../constant/commitlint-config-core-dependencies.constant";
-import { COMMITLINT_CONFIG_FILE_NAMES } from "../constant/commitlint-config-file-names.constant";
-import { COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT } from "../constant/commitlint-config-husky-commit-msg-script.constant";
-import { COMMITLINT_CONFIG } from "../constant/commitlint-config.constant";
+import { COMMITLINT_CONFIG } from "../constant/commitlint/config.constant";
+import { COMMITLINT_CONFIG_CORE_DEPENDENCIES } from "../constant/commitlint/core-dependencies.constant";
+import { COMMITLINT_CONFIG_FILE_NAMES } from "../constant/commitlint/file-names.constant";
+import { COMMITLINT_CONFIG_FILE_PATHS } from "../constant/commitlint/file-paths.constant";
+import { COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT } from "../constant/commitlint/husky-commit-msg-script.constant";
+import { COMMITLINT_CONFIG_HUSKY } from "../constant/commitlint/husky-config.constant";
+import { COMMITLINT_CONFIG_MESSAGES } from "../constant/commitlint/messages.constant";
+import { COMMITLINT_CONFIG_SCRIPTS } from "../constant/commitlint/scripts.constant";
+import { COMMITLINT_CONFIG_SUMMARY } from "../constant/commitlint/summary.constant";
 
 import { PackageJsonService } from "./package-json.service";
 
@@ -60,7 +65,7 @@ export class CommitlintModuleService implements IModuleService {
 		const existingFiles: Array<string> = await this.findExistingConfigFiles();
 
 		if (existingFiles.length > 0) {
-			const messageLines: Array<string> = ["Existing Commitlint/Commitizen configuration files detected:"];
+			const messageLines: Array<string> = [COMMITLINT_CONFIG_MESSAGES.existingFilesDetected];
 			messageLines.push("");
 
 			if (existingFiles.length > 0) {
@@ -69,14 +74,14 @@ export class CommitlintModuleService implements IModuleService {
 				}
 			}
 
-			messageLines.push("", "Do you want to delete them?");
+			messageLines.push("", COMMITLINT_CONFIG_MESSAGES.deleteFilesQuestion);
 
 			const shouldDelete: boolean = await this.CLI_INTERFACE_SERVICE.confirm(messageLines.join("\n"), true);
 
 			if (shouldDelete) {
 				await Promise.all(existingFiles.map((file: string) => this.FILE_SYSTEM_SERVICE.deleteFile(file)));
 			} else {
-				this.CLI_INTERFACE_SERVICE.warn("Existing Commitlint/Commitizen configuration files detected. Setup aborted.");
+				this.CLI_INTERFACE_SERVICE.warn(COMMITLINT_CONFIG_MESSAGES.existingFilesAborted);
 
 				return false;
 			}
@@ -104,7 +109,7 @@ export class CommitlintModuleService implements IModuleService {
 
 			return { wasInstalled: true };
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete Commitlint setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError(COMMITLINT_CONFIG_MESSAGES.failedSetupError, error);
 
 			throw error;
 		}
@@ -118,9 +123,9 @@ export class CommitlintModuleService implements IModuleService {
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Commitlint and Commitizen for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.COMMITLINT));
+			return await this.CLI_INTERFACE_SERVICE.confirm(COMMITLINT_CONFIG_MESSAGES.confirmSetup, await this.CONFIG_SERVICE.isModuleEnabled(EModule.COMMITLINT));
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
+			this.CLI_INTERFACE_SERVICE.handleError(COMMITLINT_CONFIG_MESSAGES.failedConfirmation, error);
 
 			return false;
 		}
@@ -130,16 +135,16 @@ export class CommitlintModuleService implements IModuleService {
 	 * Creates the Commitlint configuration file.
 	 */
 	private async createConfigs(): Promise<void> {
-		await this.FILE_SYSTEM_SERVICE.writeFile("commitlint.config.js", COMMITLINT_CONFIG, "utf8");
+		await this.FILE_SYSTEM_SERVICE.writeFile(COMMITLINT_CONFIG_FILE_PATHS.configFile, COMMITLINT_CONFIG, "utf8");
 	}
 
 	/**
 	 * Displays a summary of the setup results.
 	 */
 	private displaySetupSummary(): void {
-		const summary: Array<string> = ["Commitlint and Commitizen configuration has been created.", "", "Generated scripts:", "- npm run commit (for commitizen)", "", "Configuration files:", "- commitlint.config.js", "- .husky/commit-msg", "", "Husky git hooks have been set up to validate your commits.", "Use 'npm run commit' to create commits using the interactive commitizen interface."];
+		const summary: Array<string> = [COMMITLINT_CONFIG_MESSAGES.configurationCreated, "", COMMITLINT_CONFIG_MESSAGES.generatedScriptsLabel, COMMITLINT_CONFIG_SUMMARY.commitDescription, "", COMMITLINT_CONFIG_MESSAGES.configurationFilesLabel, COMMITLINT_CONFIG_SUMMARY.configFileDescription, COMMITLINT_CONFIG_SUMMARY.huskyCommitMsgDescription, "", COMMITLINT_CONFIG_MESSAGES.huskyGitHooksInfo, COMMITLINT_CONFIG_MESSAGES.commitizenDescription];
 
-		this.CLI_INTERFACE_SERVICE.note("Commitlint Setup", summary.join("\n"));
+		this.CLI_INTERFACE_SERVICE.note(COMMITLINT_CONFIG_MESSAGES.setupCompleteTitle, summary.join("\n"));
 	}
 
 	/**
@@ -155,8 +160,8 @@ export class CommitlintModuleService implements IModuleService {
 			}
 		}
 
-		if (await this.FILE_SYSTEM_SERVICE.isPathExists(".husky/commit-msg")) {
-			existingFiles.push(".husky/commit-msg");
+		if (await this.FILE_SYSTEM_SERVICE.isPathExists(COMMITLINT_CONFIG_FILE_PATHS.huskyCommitMsgHook)) {
+			existingFiles.push(COMMITLINT_CONFIG_FILE_PATHS.huskyCommitMsgHook);
 		}
 
 		return existingFiles;
@@ -167,7 +172,7 @@ export class CommitlintModuleService implements IModuleService {
 	 * Installs dependencies, creates configuration files, and configures git hooks.
 	 */
 	private async setupCommitlint(): Promise<void> {
-		this.CLI_INTERFACE_SERVICE.startSpinner("Setting up Commitlint and Commitizen configuration...");
+		this.CLI_INTERFACE_SERVICE.startSpinner(COMMITLINT_CONFIG_MESSAGES.settingUpSpinner);
 
 		try {
 			await this.PACKAGE_JSON_SERVICE.installPackages(COMMITLINT_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
@@ -176,10 +181,10 @@ export class CommitlintModuleService implements IModuleService {
 			await this.setupPackageJsonConfigs();
 			await this.setupScripts();
 
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Commitlint and Commitizen configuration completed successfully!");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(COMMITLINT_CONFIG_MESSAGES.configurationCompleted);
 			this.displaySetupSummary();
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Failed to setup Commitlint and Commitizen configuration");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(COMMITLINT_CONFIG_MESSAGES.failedSetupConfiguration);
 
 			throw error;
 		}
@@ -191,16 +196,16 @@ export class CommitlintModuleService implements IModuleService {
 	 */
 	private async setupHusky(): Promise<void> {
 		// Initialize husky
-		await this.COMMAND_SERVICE.execute("npx husky");
+		await this.COMMAND_SERVICE.execute(COMMITLINT_CONFIG_HUSKY.initCommand);
 
 		// Add prepare script if it doesn't exist
-		await this.PACKAGE_JSON_SERVICE.addScript("prepare", "husky");
+		await this.PACKAGE_JSON_SERVICE.addScript(COMMITLINT_CONFIG_SCRIPTS.prepare.name, COMMITLINT_CONFIG_SCRIPTS.prepare.command);
 
-		await this.COMMAND_SERVICE.execute("mkdir -p .husky");
+		await this.COMMAND_SERVICE.execute(COMMITLINT_CONFIG_HUSKY.mkdirCommand);
 
 		// Create commit-msg hook
-		await this.FILE_SYSTEM_SERVICE.writeFile(".husky/commit-msg", COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT, "utf8");
-		await this.COMMAND_SERVICE.execute("chmod +x .husky/commit-msg");
+		await this.FILE_SYSTEM_SERVICE.writeFile(COMMITLINT_CONFIG_FILE_PATHS.huskyCommitMsgHook, COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT, "utf8");
+		await this.COMMAND_SERVICE.execute(COMMITLINT_CONFIG_HUSKY.chmodCommand);
 	}
 
 	/**
@@ -211,7 +216,7 @@ export class CommitlintModuleService implements IModuleService {
 
 		packageJson.config ??= {};
 		packageJson.config.commitizen = {
-			path: "@elsikora/commitizen-plugin-commitlint-ai",
+			path: COMMITLINT_CONFIG_MESSAGES.commitizenPath,
 		};
 
 		await this.PACKAGE_JSON_SERVICE.set(packageJson);
@@ -222,6 +227,6 @@ export class CommitlintModuleService implements IModuleService {
 	 * Adds 'commit' script for starting the Commitizen CLI.
 	 */
 	private async setupScripts(): Promise<void> {
-		await this.PACKAGE_JSON_SERVICE.addScript("commit", "cz");
+		await this.PACKAGE_JSON_SERVICE.addScript(COMMITLINT_CONFIG_SCRIPTS.commit.name, COMMITLINT_CONFIG_SCRIPTS.commit.command);
 	}
 }

@@ -1,12 +1,36 @@
 {
 	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"outDir": "bin",
-		"strict": true,
+		"alwaysStrict": true,
+		"baseUrl": "./src",
+		"declaration": true,
+		"declarationMap": true,
 		"esModuleInterop": true,
-		"resolveJsonModule": true,
-		"moduleResolution": "bundler"
+		"forceConsistentCasingInFileNames": true,
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"outDir": "./dist",
+		"paths": {
+			"@application/*": ["application/*"],
+			"@domain/*": ["domain/*"],
+			"@infrastructure/*": ["infrastructure/*"],
+			"@presentation/*": ["presentation/*"]
+		},
+		"rootDir": "./src",
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
+		"strictBindCallApply": true,
+		"strictFunctionTypes": true,
+		"strictNullChecks": true,
+		"strictPropertyInitialization": true,
+		"target": "ESNext"
 	},
+	"exclude": ["node_modules", "dist"],
 	"include": ["src/**/*"]
 }

@@ -1,5 +1,5 @@
-import { LINT_STAGED_FEATURE_CONFIG } from "../../domain/constant/lint-staged-feature-config.constant";
-import { ELintStagedFeature } from "../../domain/enum/lint-staged-feature.enum";
+import { LINT_STAGED_FEATURE_CONFIG } from "../../../domain/constant/lint-staged-feature-config.constant";
+import { ELintStagedFeature } from "../../../domain/enum/lint-staged-feature.enum";
 
 /**
  * Configuration constant for lint-staged.

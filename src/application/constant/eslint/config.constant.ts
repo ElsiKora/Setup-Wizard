@@ -1,7 +1,7 @@
 /* eslint-disable @elsikora/typescript/no-magic-numbers */
-import type { EEslintFeature } from "../../domain/enum/eslint-feature.enum";
+import type { EEslintFeature } from "../../../domain/enum/eslint-feature.enum";
 
-import { ESLINT_FEATURE_CONFIG } from "../../domain/constant/eslint-feature-config.constant";
+import { ESLINT_FEATURE_CONFIG } from "../../../domain/constant/eslint-feature-config.constant";
 
 /**
  * Configuration constant for ESLint.
@@ -24,7 +24,19 @@ export const ESLINT_CONFIG: {
 	 * @returns String content for the ESLint configuration file
 	 */
 	template: (ignores: Array<string>, features: Array<EEslintFeature>) => {
-		const featureConfig: string = features.map((feature: EEslintFeature) => `  ${ESLINT_FEATURE_CONFIG[feature].configFlag}: true`).join(",\n");
+		const featureConfig: string = features
+			.map((feature: EEslintFeature) => {
+				const featureKey: keyof typeof ESLINT_FEATURE_CONFIG = feature;
+
+				if (!(featureKey in ESLINT_FEATURE_CONFIG)) {
+					throw new Error(`Unknown feature: ${feature}`);
+				}
+
+				const config: { configFlag: string } = ESLINT_FEATURE_CONFIG[featureKey];
+
+				return `  ${config.configFlag}: true`;
+			})
+			.join(",\n");
 
 		return `import { createConfig } from '@elsikora/eslint-config';
 

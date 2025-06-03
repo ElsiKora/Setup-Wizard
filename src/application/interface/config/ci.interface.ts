@@ -7,7 +7,7 @@ export interface IConfigCi {
 		Record<
 			ECiModule,
 			| {
-					[propName: string]: any;
+					[propName: string]: unknown;
 					isEnabled?: boolean;
 			  }
 			| boolean

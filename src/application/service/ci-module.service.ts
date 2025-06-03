@@ -101,9 +101,9 @@ export class CiModuleService implements IModuleService {
 				return { wasInstalled: false };
 			}
 
-			const moduleProperties: Record<string, any> = await this.setupSelectedModules(this.config?.moduleProperties ?? {});
+			const moduleProperties: Record<string, unknown> = await this.setupSelectedModules(this.config?.moduleProperties ?? {});
 
-			const customProperties: Record<string, any> = {
+			const customProperties: Record<string, unknown> = {
 				isNpmPackage: moduleType === ECiModuleType.NPM_ONLY,
 				moduleProperties,
 				modules: this.selectedModules,
@@ -143,8 +143,8 @@ export class CiModuleService implements IModuleService {
 	 * @param savedProperties - Previously saved properties for this module
 	 * @returns Promise resolving to a record of collected properties
 	 */
-	private async collectModuleProperties(module: ECiModule, savedProperties: Record<string, any> = {}): Promise<Record<string, any>> {
-		const properties: Record<string, any> = {};
+	private async collectModuleProperties(module: ECiModule, savedProperties: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+		const properties: Record<string, unknown> = {};
 
 		if (module === ECiModule.DEPENDABOT) {
 			const defaultBranch: string = (savedProperties.devBranchName as string) || "dev";
@@ -233,7 +233,7 @@ export class CiModuleService implements IModuleService {
 	 * @param moduleConfig - The module configuration object or boolean
 	 * @returns Record of module properties, or empty object if none found
 	 */
-	private extractModuleProperties(moduleConfig: boolean | Record<string, any> | undefined): Record<string, any> {
+	private extractModuleProperties(moduleConfig: boolean | Record<string, unknown> | undefined): Record<string, unknown> {
 		if (!moduleConfig) {
 			return {};
 		}
@@ -243,7 +243,7 @@ export class CiModuleService implements IModuleService {
 		}
 
 		if (typeof moduleConfig === "object" && "isEnabled" in moduleConfig) {
-			const { isEnabled, ...properties }: Record<string, any> = moduleConfig;
+			const { isEnabled, ...properties }: Record<string, unknown> = moduleConfig;
 
 			return properties;
 		}
@@ -338,14 +338,13 @@ export class CiModuleService implements IModuleService {
 	 * @param properties - Module-specific properties to use in configuration
 	 * @returns Promise resolving to an object indicating success or failure
 	 */
-	private async setupModule(module: ECiModule, properties: Record<string, any>): Promise<{ error?: Error; isSuccess: boolean; module: ECiModule }> {
+	private async setupModule(module: ECiModule, properties: Record<string, unknown>): Promise<{ error?: Error; isSuccess: boolean; module: ECiModule }> {
 		try {
 			const config: ICiConfig = CI_CONFIG[module];
 			// eslint-disable-next-line @elsikora/typescript/no-non-null-assertion
 			const providerConfig: ICiConfigContent = config.content[this.selectedProvider!];
 
 			if (!providerConfig) {
-				// eslint-disable-next-line @elsikora/typescript/restrict-template-expressions
 				throw new Error(`Provider ${this.selectedProvider} is not supported for ${config.name}`);
 			}
 
@@ -357,7 +356,7 @@ export class CiModuleService implements IModuleService {
 				});
 			}
 
-			const content: string = providerConfig.template(properties);
+			const content: string = providerConfig.template(properties as Record<string, string>);
 			await this.FILE_SYSTEM_SERVICE.writeFile(providerConfig.filePath, content);
 
 			return { isSuccess: true, module };
@@ -374,18 +373,17 @@ export class CiModuleService implements IModuleService {
 	 * @param savedProperties - Previously saved module properties
 	 * @returns Promise resolving to a record of module properties
 	 */
-	private async setupSelectedModules(savedProperties: Record<string, any> = {}): Promise<Record<string, any>> {
+	private async setupSelectedModules(savedProperties: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
 		if (!this.selectedProvider) {
 			throw new Error("Provider not selected");
 		}
 
 		try {
-			const moduleProperties: Record<string, any> = {};
+			const moduleProperties: Record<string, unknown> = {};
 
 			for (const module of this.selectedModules) {
-				// eslint-disable-next-line @elsikora/typescript/no-unsafe-argument
-				const savedModuleProperties: Record<string, any> = this.extractModuleProperties(savedProperties[module]);
-				const properties: Record<string, string> = await this.collectModuleProperties(module, savedModuleProperties);
+				const savedModuleProperties: Record<string, unknown> = this.extractModuleProperties(savedProperties[module] as boolean | Record<string, unknown> | undefined);
+				const properties: Record<string, unknown> = await this.collectModuleProperties(module, savedModuleProperties);
 
 				if (Object.keys(properties).length > 0) {
 					moduleProperties[module] = properties;
@@ -396,8 +394,7 @@ export class CiModuleService implements IModuleService {
 
 			const results: Array<Awaited<{ error?: Error; isSuccess: boolean; module: ECiModule }>> = await Promise.all(
 				this.selectedModules.map((module: ECiModule) => {
-					// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
-					const setupProperties: Record<string, any> = moduleProperties[module] ?? {};
+					const setupProperties: Record<string, unknown> = (moduleProperties[module] ?? {}) as Record<string, unknown>;
 
 					return this.setupModule(module, setupProperties);
 				}),

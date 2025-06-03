@@ -24,6 +24,7 @@ export enum EEslintFeature {
 	TANSTACK = "tanstack",
 	TYPEORM = "typeorm",
 	TYPESCRIPT = "typescript",
+	TYPESCRIPT_STRICT = "typescriptStrict",
 	UNICORN = "unicorn",
 	YAML = "yaml",
 }

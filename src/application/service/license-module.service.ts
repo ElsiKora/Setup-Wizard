@@ -12,7 +12,8 @@ import type { IModuleSetupResult } from "../interface/module-setup-result.interf
 import { LICENSE_CONFIG } from "../../domain/constant/license-config.constant";
 import { EModule } from "../../domain/enum/module.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
-import { LICENSE_FILE_NAMES } from "../constant/license-file-names.constant";
+import { LICENSE_FILE_NAMES } from "../constant/license/file-names.constant";
+import { LICENSE_CONFIG_MESSAGES } from "../constant/license/messages.constant";
 import { CliInterfaceServiceMapper } from "../mapper/cli-interface-service.mapper";
 
 import { PackageJsonService } from "./package-json.service";
@@ -68,26 +69,26 @@ export class LicenseModuleService implements IModuleService {
 				return true;
 			}
 
-			const shouldReplace: boolean = await this.CLI_INTERFACE_SERVICE.confirm(`An existing license file was found (${existingLicense}). Would you like to replace it?`);
+			const shouldReplace: boolean = await this.CLI_INTERFACE_SERVICE.confirm(LICENSE_CONFIG_MESSAGES.confirmReplaceExisting(existingLicense));
 
 			if (!shouldReplace) {
-				this.CLI_INTERFACE_SERVICE.warn("Keeping existing license file.");
+				this.CLI_INTERFACE_SERVICE.warn(LICENSE_CONFIG_MESSAGES.keepingExistingLicense);
 
 				return false;
 			}
 
 			try {
 				await this.FILE_SYSTEM_SERVICE.deleteFile(existingLicense);
-				this.CLI_INTERFACE_SERVICE.success("Deleted existing license file.");
+				this.CLI_INTERFACE_SERVICE.success(LICENSE_CONFIG_MESSAGES.deletedExistingLicense);
 
 				return true;
 			} catch (error) {
-				this.CLI_INTERFACE_SERVICE.handleError("Failed to delete existing license file", error);
+				this.CLI_INTERFACE_SERVICE.handleError(LICENSE_CONFIG_MESSAGES.failedDeleteExistingLicense, error);
 
 				return false;
 			}
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to check existing license setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError(LICENSE_CONFIG_MESSAGES.failedCheckExistingSetup, error);
 
 			return false;
 		}
@@ -126,7 +127,7 @@ export class LicenseModuleService implements IModuleService {
 
 			return { wasInstalled: setupResult.isSuccess };
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete license installation", error);
+			this.CLI_INTERFACE_SERVICE.handleError(LICENSE_CONFIG_MESSAGES.failedCompleteInstallation, error);
 
 			throw error;
 		}
@@ -140,9 +141,9 @@ export class LicenseModuleService implements IModuleService {
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to generate LICENSE for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.LICENSE));
+			return await this.CLI_INTERFACE_SERVICE.confirm(LICENSE_CONFIG_MESSAGES.confirmLicenseGeneration, await this.CONFIG_SERVICE.isModuleEnabled(EModule.LICENSE));
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
+			this.CLI_INTERFACE_SERVICE.handleError(LICENSE_CONFIG_MESSAGES.failedGetUserConfirmation, error);
 
 			return false;
 		}
@@ -162,7 +163,7 @@ export class LicenseModuleService implements IModuleService {
 			try {
 				packageAuthor = await this.PACKAGE_JSON_SERVICE.getProperty("author");
 			} catch {
-				this.CLI_INTERFACE_SERVICE.warn("Failed to get author from package.json, using saved or default");
+				this.CLI_INTERFACE_SERVICE.warn(LICENSE_CONFIG_MESSAGES.failedGetAuthorFromPackageJson);
 				packageAuthor = undefined;
 			}
 
@@ -182,15 +183,15 @@ export class LicenseModuleService implements IModuleService {
 				authorName = "Your Name";
 			}
 
-			authorName = await this.CLI_INTERFACE_SERVICE.text("Enter the copyright holder's name:", "Your Name", authorName);
+			authorName = await this.CLI_INTERFACE_SERVICE.text(LICENSE_CONFIG_MESSAGES.enterCopyrightHolderName, "Your Name", authorName);
 
-			this.CLI_INTERFACE_SERVICE.startSpinner("Generating license file...");
+			this.CLI_INTERFACE_SERVICE.startSpinner(LICENSE_CONFIG_MESSAGES.generatingLicenseSpinner);
 			const year: string = new Date().getFullYear().toString();
 			const licenseFileContent: string = LICENSE_CONFIG[license].template(year, authorName);
 
 			await this.FILE_SYSTEM_SERVICE.writeFile("LICENSE", licenseFileContent);
 			await this.PACKAGE_JSON_SERVICE.setProperty("license", license);
-			this.CLI_INTERFACE_SERVICE.stopSpinner("License file generated");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(LICENSE_CONFIG_MESSAGES.licenseFileGenerated);
 
 			return { author: authorName };
 		} catch (error) {
@@ -213,14 +214,14 @@ export class LicenseModuleService implements IModuleService {
 		const year: string = new Date().getFullYear().toString();
 
 		if (isSuccess && license) {
-			summary.push("Successfully created configuration:", `✓ LICENSE file (${LICENSE_CONFIG[license].name})`, ``, `Updated package.json "license" field`, "", "License details:", `- Type: ${LICENSE_CONFIG[license].name}`, `- Author: ${author ?? "Your Name"}`, `- Year: ${year}`, "");
+			summary.push(LICENSE_CONFIG_MESSAGES.successfulConfiguration, `✓ LICENSE file (${LICENSE_CONFIG[license].name})`, ``, LICENSE_CONFIG_MESSAGES.updatedPackageJsonField, "", LICENSE_CONFIG_MESSAGES.licenseDetails, `- Type: ${LICENSE_CONFIG[license].name}`, `- Author: ${author ?? "Your Name"}`, `- Year: ${year}`, "");
 		} else {
-			summary.push("Failed configuration:", `✗ LICENSE - ${error?.message ?? "Unknown error"}`);
+			summary.push(LICENSE_CONFIG_MESSAGES.failedConfiguration, `✗ LICENSE - ${error?.message ?? LICENSE_CONFIG_MESSAGES.unknownError}`);
 		}
 
-		summary.push("", "Remember to:", "- Review the generated LICENSE file", "- Include license information in your documentation");
+		summary.push("", LICENSE_CONFIG_MESSAGES.rememberToReview, "- Review the generated LICENSE file", "- Include license information in your documentation");
 
-		this.CLI_INTERFACE_SERVICE.note("License Setup Summary", summary.join("\n"));
+		this.CLI_INTERFACE_SERVICE.note(LICENSE_CONFIG_MESSAGES.licenseSetupSummaryTitle, summary.join("\n"));
 	}
 
 	/**
@@ -267,9 +268,9 @@ export class LicenseModuleService implements IModuleService {
 			const options: Array<ICliInterfaceServiceSelectOptions> = CliInterfaceServiceMapper.fromLicenseConfigsToSelectOptions(LICENSE_CONFIG);
 			const initialValue: ELicense | undefined = savedLicense ?? undefined;
 
-			return await this.CLI_INTERFACE_SERVICE.select("Select a license for your project:", options, initialValue);
+			return await this.CLI_INTERFACE_SERVICE.select(LICENSE_CONFIG_MESSAGES.selectLicensePrompt, options, initialValue);
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to select license", error);
+			this.CLI_INTERFACE_SERVICE.handleError(LICENSE_CONFIG_MESSAGES.failedSelectLicense, error);
 
 			throw error;
 		}

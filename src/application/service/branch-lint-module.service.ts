@@ -1,3 +1,5 @@
+import type { IPackageJson } from "../../domain/interface/package-json.interface";
+import type { TPackageJsonScripts } from "../../domain/type/package-json-scripts.type";
 import type { IModuleService } from "../../infrastructure/interface/module-service.interface";
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
@@ -8,14 +10,24 @@ import type { IModuleSetupResult } from "../interface/module-setup-result.interf
 import { EModule } from "../../domain/enum/module.enum";
 import { EPackageJsonDependencyType } from "../../domain/enum/package-json-dependency-type.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
-import { BRANCHLINT_CONFIG, BRANCHLINT_CONFIG_CORE_DEPENDENCIES, BRANCHLINT_CONFIG_FILE_NAMES, BRANCHLINT_CONFIG_HUSKY_PRE_PUSH_SCRIPT } from "../constant/branch-lint.constant";
+import { BRANCH_LINT_CONFIG_COMMANDS } from "../constant/branch-lint/commands.constant";
+import { BRANCH_LINT_CONFIG } from "../constant/branch-lint/config.constant";
+import { BRANCH_LINT_CONFIG_CORE_DEPENDENCIES } from "../constant/branch-lint/core-dependencies.constant";
+import { BRANCH_LINT_CONFIG_FILE_NAME } from "../constant/branch-lint/file-name.constant";
+import { BRANCH_LINT_CONFIG_FILE_NAMES } from "../constant/branch-lint/file-names.constant";
+import { BRANCH_LINT_CONFIG_HUSKY_PRE_PUSH_FILE_PATH } from "../constant/branch-lint/husky-pre-push-file-path.constant";
+import { BRANCH_LINT_CONFIG_HUSKY_PRE_PUSH_SCRIPT } from "../constant/branch-lint/husky-pre-push-script.constant";
+import { BRANCH_LINT_CONFIG_MESSAGES } from "../constant/branch-lint/messages.constant";
+import { BRANCH_LINT_CONFIG_PACKAGE_JSON_SCRIPT_NAMES } from "../constant/branch-lint/package-json-script-names.constant";
+import { BRANCH_LINT_CONFIG_SCRIPTS } from "../constant/branch-lint/scripts.constant";
+import { BRANCH_LINT_CONFIG_SUMMARY } from "../constant/branch-lint/summary.constant";
 
 import { PackageJsonService } from "./package-json.service";
 
 /**
- * Service for setting up and managing Commitlint and Commitizen configuration.
- * Provides functionality to enforce consistent commit message formats using Commitlint
- * and simplify commit creation using Commitizen.
+ * Service for setting up and managing branch-lint configuration.
+ * Provides functionality to enforce consistent branch naming conventions
+ * and simplify branch creation using an interactive interface.
  */
 export class BranchLintModuleService implements IModuleService {
 	/** CLI interface service for user interaction */
@@ -34,7 +46,7 @@ export class BranchLintModuleService implements IModuleService {
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
 
 	/**
-	 * Initializes a new instance of the CommitlintModuleService.
+	 * Initializes a new instance of the BranchLintModuleService.
 	 * @param cliInterfaceService - Service for CLI user interactions
 	 * @param fileSystemService - Service for file system operations
 	 * @param configService - Service for managing app configuration
@@ -54,25 +66,45 @@ export class BranchLintModuleService implements IModuleService {
 	 */
 	async handleExistingSetup(): Promise<boolean> {
 		const existingFiles: Array<string> = await this.findExistingConfigFiles();
+		const packageJson: IPackageJson = await this.PACKAGE_JSON_SERVICE.get();
+
+		// Check if package.json has branch-lint related configuration
+		const hasBranchScript: boolean = BRANCH_LINT_CONFIG_PACKAGE_JSON_SCRIPT_NAMES.some((scriptName: string) => packageJson.scripts?.[scriptName]);
+
+		if (hasBranchScript) {
+			existingFiles.push(BRANCH_LINT_CONFIG_MESSAGES.packageJsonBranchScript);
+		}
 
 		if (existingFiles.length > 0) {
-			const messageLines: Array<string> = ["Existing branch-lint configuration files detected:"];
+			const messageLines: Array<string> = [BRANCH_LINT_CONFIG_SUMMARY.existingFilesMessage];
 			messageLines.push("");
 
-			if (existingFiles.length > 0) {
-				for (const file of existingFiles) {
-					messageLines.push(`- ${file}`);
-				}
+			for (const file of existingFiles) {
+				messageLines.push(`- ${file}`);
 			}
 
-			messageLines.push("", "Do you want to delete them?");
+			messageLines.push("", BRANCH_LINT_CONFIG_SUMMARY.deleteFilesQuestion);
 
 			const shouldDelete: boolean = await this.CLI_INTERFACE_SERVICE.confirm(messageLines.join("\n"), true);
 
 			if (shouldDelete) {
-				await Promise.all(existingFiles.map((file: string) => this.FILE_SYSTEM_SERVICE.deleteFile(file)));
+				await Promise.all(existingFiles.filter((file: string) => !file.startsWith("package.json")).map((file: string) => this.FILE_SYSTEM_SERVICE.deleteFile(file)));
+
+				// Remove branch-lint scripts from package.json if needed
+				if (hasBranchScript && packageJson.scripts) {
+					const newScripts: TPackageJsonScripts = { ...packageJson.scripts };
+
+					for (const scriptName of BRANCH_LINT_CONFIG_PACKAGE_JSON_SCRIPT_NAMES) {
+						if (scriptName in newScripts) {
+							// eslint-disable-next-line @elsikora/typescript/no-dynamic-delete
+							delete newScripts[scriptName];
+						}
+					}
+					packageJson.scripts = newScripts;
+					await this.PACKAGE_JSON_SERVICE.set(packageJson);
+				}
 			} else {
-				this.CLI_INTERFACE_SERVICE.warn("Existing branch-lint configuration files detected. Setup aborted.");
+				this.CLI_INTERFACE_SERVICE.warn(BRANCH_LINT_CONFIG_SUMMARY.existingConfigWarning);
 
 				return false;
 			}
@@ -100,7 +132,7 @@ export class BranchLintModuleService implements IModuleService {
 
 			return { wasInstalled: true };
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete branch-lint setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError(BRANCH_LINT_CONFIG_SUMMARY.installErrorMessage, error);
 
 			throw error;
 		}
@@ -114,9 +146,9 @@ export class BranchLintModuleService implements IModuleService {
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Branch name linter for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.BRANCH_LINT));
+			return await this.CLI_INTERFACE_SERVICE.confirm(BRANCH_LINT_CONFIG_SUMMARY.confirmationQuestion, await this.CONFIG_SERVICE.isModuleEnabled(EModule.BRANCH_LINT));
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
+			this.CLI_INTERFACE_SERVICE.handleError(BRANCH_LINT_CONFIG_SUMMARY.confirmationErrorMessage, error);
 
 			return false;
 		}
@@ -126,16 +158,28 @@ export class BranchLintModuleService implements IModuleService {
 	 * Creates the branch-lint configuration file.
 	 */
 	private async createConfigs(): Promise<void> {
-		await this.FILE_SYSTEM_SERVICE.writeFile(".elsikora/git-branch-lint.config.js", BRANCHLINT_CONFIG, "utf8");
+		await this.FILE_SYSTEM_SERVICE.writeFile(BRANCH_LINT_CONFIG_FILE_NAME, BRANCH_LINT_CONFIG.template(), "utf8");
 	}
 
 	/**
 	 * Displays a summary of the setup results.
 	 */
 	private displaySetupSummary(): void {
-		const summary: Array<string> = ["Branch Lint configuration has been created.", "", "Generated scripts:", "- npm run branch (for create new branch)", "", "Configuration files:", "- .elsikora/git-branch-lint.config.js", "- .husky/pre-push", "", "Husky git hooks have been set up to validate your branch names.", "Use 'npm run branch' to create and switch to new branches using an interactive interface."];
+		const summary: Array<string> = [
+			BRANCH_LINT_CONFIG_MESSAGES.branchLintDescription,
+			"",
+			BRANCH_LINT_CONFIG_MESSAGES.generatedScriptsLabel,
+			`- npm run ${BRANCH_LINT_CONFIG_SCRIPTS.branch.name} ${BRANCH_LINT_CONFIG_MESSAGES.branchScriptDescription}`,
+			"",
+			BRANCH_LINT_CONFIG_MESSAGES.configurationFilesLabel,
+			`- ${BRANCH_LINT_CONFIG_FILE_NAME}`,
+			`- ${BRANCH_LINT_CONFIG_HUSKY_PRE_PUSH_FILE_PATH}`,
+			"",
+			BRANCH_LINT_CONFIG_MESSAGES.huskyHookSetupNote,
+			BRANCH_LINT_CONFIG_MESSAGES.branchCreationNote.replace("{script}", BRANCH_LINT_CONFIG_SCRIPTS.branch.name),
+		];
 
-		this.CLI_INTERFACE_SERVICE.note("Branch Lint Setup", summary.join("\n"));
+		this.CLI_INTERFACE_SERVICE.note(BRANCH_LINT_CONFIG_SUMMARY.title, summary.join("\n"));
 	}
 
 	/**
@@ -145,14 +189,14 @@ export class BranchLintModuleService implements IModuleService {
 	private async findExistingConfigFiles(): Promise<Array<string>> {
 		const existingFiles: Array<string> = [];
 
-		for (const file of BRANCHLINT_CONFIG_FILE_NAMES) {
+		for (const file of BRANCH_LINT_CONFIG_FILE_NAMES) {
 			if (await this.FILE_SYSTEM_SERVICE.isPathExists(file)) {
 				existingFiles.push(file);
 			}
 		}
 
-		if (await this.FILE_SYSTEM_SERVICE.isPathExists(".husky/pre-push")) {
-			existingFiles.push(".husky/pre-push");
+		if (await this.FILE_SYSTEM_SERVICE.isPathExists(BRANCH_LINT_CONFIG_HUSKY_PRE_PUSH_FILE_PATH)) {
+			existingFiles.push(BRANCH_LINT_CONFIG_HUSKY_PRE_PUSH_FILE_PATH);
 		}
 
 		return existingFiles;
@@ -163,18 +207,18 @@ export class BranchLintModuleService implements IModuleService {
 	 * Installs dependencies, creates configuration files, and configures git hooks.
 	 */
 	private async setupBranchLint(): Promise<void> {
-		this.CLI_INTERFACE_SERVICE.startSpinner("Setting up branch-lint configuration...");
+		this.CLI_INTERFACE_SERVICE.startSpinner(BRANCH_LINT_CONFIG_SUMMARY.setupStartMessage);
 
 		try {
-			await this.PACKAGE_JSON_SERVICE.installPackages(BRANCHLINT_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
+			await this.PACKAGE_JSON_SERVICE.installPackages(BRANCH_LINT_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
 			await this.createConfigs();
 			await this.setupHusky();
 			await this.setupScripts();
 
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Branch Lint configuration completed successfully!");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(BRANCH_LINT_CONFIG_SUMMARY.setupCompleteMessage);
 			this.displaySetupSummary();
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Failed to setup Branch Lint configuration");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(BRANCH_LINT_CONFIG_SUMMARY.setupFailedMessage);
 
 			throw error;
 		}
@@ -182,27 +226,27 @@ export class BranchLintModuleService implements IModuleService {
 
 	/**
 	 * Sets up Husky git hooks.
-	 * Initializes Husky, adds prepare script, and creates commit-msg and pre-push hooks.
+	 * Initializes Husky, adds prepare script, and creates pre-push hook.
 	 */
 	private async setupHusky(): Promise<void> {
 		// Initialize husky
-		await this.COMMAND_SERVICE.execute("npx husky");
+		await this.COMMAND_SERVICE.execute(BRANCH_LINT_CONFIG_COMMANDS.initHusky);
 
 		// Add prepare script if it doesn't exist
-		await this.PACKAGE_JSON_SERVICE.addScript("prepare", "husky");
+		await this.PACKAGE_JSON_SERVICE.addScript(BRANCH_LINT_CONFIG_SCRIPTS.prepare.name, BRANCH_LINT_CONFIG_SCRIPTS.prepare.command);
 
-		await this.COMMAND_SERVICE.execute("mkdir -p .husky");
+		await this.COMMAND_SERVICE.execute(BRANCH_LINT_CONFIG_COMMANDS.createHuskyDirectory);
 
 		// Create pre-push hook
-		await this.FILE_SYSTEM_SERVICE.writeFile(".husky/pre-push", BRANCHLINT_CONFIG_HUSKY_PRE_PUSH_SCRIPT, "utf8");
-		await this.COMMAND_SERVICE.execute("chmod +x .husky/pre-push");
+		await this.FILE_SYSTEM_SERVICE.writeFile(BRANCH_LINT_CONFIG_HUSKY_PRE_PUSH_FILE_PATH, BRANCH_LINT_CONFIG_HUSKY_PRE_PUSH_SCRIPT, "utf8");
+		await this.COMMAND_SERVICE.execute(BRANCH_LINT_CONFIG_COMMANDS.makePrePushExecutable(BRANCH_LINT_CONFIG_HUSKY_PRE_PUSH_FILE_PATH));
 	}
 
 	/**
 	 * Sets up npm scripts for Branch-lint.
-	 * Adds 'commit' script for using an interactive interface CLI.
+	 * Adds 'branch' script for using an interactive interface CLI.
 	 */
 	private async setupScripts(): Promise<void> {
-		await this.PACKAGE_JSON_SERVICE.addScript("branch", "npx @elsikora/git-branch-lint -b");
+		await this.PACKAGE_JSON_SERVICE.addScript(BRANCH_LINT_CONFIG_SCRIPTS.branch.name, BRANCH_LINT_CONFIG_SCRIPTS.branch.command);
 	}
 }

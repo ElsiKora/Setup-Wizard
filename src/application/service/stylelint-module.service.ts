@@ -8,12 +8,15 @@ import type { IModuleSetupResult } from "../interface/module-setup-result.interf
 import { EModule } from "../../domain/enum/module.enum";
 import { EPackageJsonDependencyType } from "../../domain/enum/package-json-dependency-type.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
-import { STYLELINT_CONFIG_CORE_DEPENDENCIES } from "../constant/stylelint-config-core-dependencies.constant";
-import { STYLELINT_CONFIG_FILE_NAME } from "../constant/stylelint-config-file-name.constant";
-import { STYLELINT_CONFIG_FILE_NAMES } from "../constant/stylelint-config-file-names.constant";
-import { STYLELINT_CONFIG_IGNORE_FILE_NAME } from "../constant/stylelint-config-ignore-file-name.constant";
-import { STYLELINT_CONFIG_IGNORE_PATHS } from "../constant/stylelint-config-ignore-paths.constant";
-import { STYLELINT_CONFIG } from "../constant/stylelint-config.constant";
+import { STYLELINT_CONFIG } from "../constant/stylelint/config.constant";
+import { STYLELINT_CONFIG_CORE_DEPENDENCIES } from "../constant/stylelint/core-dependencies.constant";
+import { STYLELINT_CONFIG_FILE_NAME } from "../constant/stylelint/file-name.constant";
+import { STYLELINT_CONFIG_FILE_NAMES } from "../constant/stylelint/file-names.constant";
+import { STYLELINT_CONFIG_IGNORE_FILE_NAME } from "../constant/stylelint/ignore-file-name.constant";
+import { STYLELINT_CONFIG_IGNORE_PATHS } from "../constant/stylelint/ignore-paths.constant";
+import { STYLELINT_CONFIG_MESSAGES } from "../constant/stylelint/messages.constant";
+import { STYLELINT_CONFIG_SCRIPTS } from "../constant/stylelint/scripts.constant";
+import { STYLELINT_CONFIG_SUMMARY } from "../constant/stylelint/summary.constant";
 
 import { PackageJsonService } from "./package-json.service";
 
@@ -61,7 +64,7 @@ export class StylelintModuleService implements IModuleService {
 		const existingFiles: Array<string> = await this.findExistingConfigFiles();
 
 		if (existingFiles.length > 0) {
-			const messageLines: Array<string> = ["Existing Stylelint configuration files detected:"];
+			const messageLines: Array<string> = [STYLELINT_CONFIG_MESSAGES.existingFilesDetected];
 			messageLines.push("");
 
 			if (existingFiles.length > 0) {
@@ -70,14 +73,14 @@ export class StylelintModuleService implements IModuleService {
 				}
 			}
 
-			messageLines.push("", "Do you want to delete them?");
+			messageLines.push("", STYLELINT_CONFIG_MESSAGES.deleteFilesQuestion);
 
 			const shouldDelete: boolean = await this.CLI_INTERFACE_SERVICE.confirm(messageLines.join("\n"), true);
 
 			if (shouldDelete) {
 				await Promise.all(existingFiles.map((file: string) => this.FILE_SYSTEM_SERVICE.deleteFile(file)));
 			} else {
-				this.CLI_INTERFACE_SERVICE.warn("Existing Stylelint configuration files detected. Setup aborted.");
+				this.CLI_INTERFACE_SERVICE.warn(STYLELINT_CONFIG_MESSAGES.existingFilesAborted);
 
 				return false;
 			}
@@ -105,7 +108,7 @@ export class StylelintModuleService implements IModuleService {
 
 			return { wasInstalled: true };
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete Stylelint setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError(STYLELINT_CONFIG_MESSAGES.failedSetupError, error);
 
 			throw error;
 		}
@@ -119,9 +122,9 @@ export class StylelintModuleService implements IModuleService {
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Stylelint for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.STYLELINT));
+			return await this.CLI_INTERFACE_SERVICE.confirm(STYLELINT_CONFIG_MESSAGES.confirmSetup, await this.CONFIG_SERVICE.isModuleEnabled(EModule.STYLELINT));
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
+			this.CLI_INTERFACE_SERVICE.handleError(STYLELINT_CONFIG_MESSAGES.failedConfirmation, error);
 
 			return false;
 		}
@@ -142,9 +145,9 @@ export class StylelintModuleService implements IModuleService {
 	 * Lists generated scripts and configuration files.
 	 */
 	private displaySetupSummary(): void {
-		const summary: Array<string> = ["Stylelint configuration has been created.", "", "Generated scripts:", "- npm run lint:style", "- npm run lint:style:fix", "", "You can customize the configuration in these files:", `- ${STYLELINT_CONFIG_FILE_NAME}`, `- ${STYLELINT_CONFIG_IGNORE_FILE_NAME}`];
+		const summary: Array<string> = [STYLELINT_CONFIG_MESSAGES.stylelintConfigCreated, "", STYLELINT_CONFIG_MESSAGES.generatedScriptsLabel, STYLELINT_CONFIG_SUMMARY.lintStyleDescription, STYLELINT_CONFIG_SUMMARY.lintStyleFixDescription, "", STYLELINT_CONFIG_SUMMARY.customizeFilesLabel, `- ${STYLELINT_CONFIG_FILE_NAME}`, `- ${STYLELINT_CONFIG_IGNORE_FILE_NAME}`];
 
-		this.CLI_INTERFACE_SERVICE.note("Stylelint Setup", summary.join("\n"));
+		this.CLI_INTERFACE_SERVICE.note(STYLELINT_CONFIG_MESSAGES.setupCompleteTitle, summary.join("\n"));
 	}
 
 	/**
@@ -168,8 +171,8 @@ export class StylelintModuleService implements IModuleService {
 	 * Adds scripts for linting and fixing CSS/SCSS files.
 	 */
 	private async setupScripts(): Promise<void> {
-		await this.PACKAGE_JSON_SERVICE.addScript("lint:style", 'stylelint "**/*.{css,scss}"');
-		await this.PACKAGE_JSON_SERVICE.addScript("lint:style:fix", 'stylelint "**/*.{css,scss}" --fix');
+		await this.PACKAGE_JSON_SERVICE.addScript(STYLELINT_CONFIG_SCRIPTS.lintStyle.name, STYLELINT_CONFIG_SCRIPTS.lintStyle.command);
+		await this.PACKAGE_JSON_SERVICE.addScript(STYLELINT_CONFIG_SCRIPTS.lintStyleFix.name, STYLELINT_CONFIG_SCRIPTS.lintStyleFix.command);
 	}
 
 	/**
@@ -177,17 +180,17 @@ export class StylelintModuleService implements IModuleService {
 	 * Installs dependencies, creates config files, and adds npm scripts.
 	 */
 	private async setupStylelint(): Promise<void> {
-		this.CLI_INTERFACE_SERVICE.startSpinner("Setting up Stylelint configuration...");
+		this.CLI_INTERFACE_SERVICE.startSpinner(STYLELINT_CONFIG_MESSAGES.settingUpSpinner);
 
 		try {
 			await this.PACKAGE_JSON_SERVICE.installPackages(STYLELINT_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
 			await this.createConfigs();
 			await this.setupScripts();
 
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Stylelint configuration completed successfully!");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(STYLELINT_CONFIG_MESSAGES.setupCompleteSpinner);
 			this.displaySetupSummary();
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Failed to setup Stylelint configuration");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(STYLELINT_CONFIG_MESSAGES.failedSetupSpinner);
 
 			throw error;
 		}

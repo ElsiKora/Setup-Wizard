@@ -1,8 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CommitlintModuleService } from "../../../../src/application/service/commitlint-module.service";
 import { EModule } from "../../../../src/domain/enum/module.enum";
-import { COMMITLINT_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/commitlint-config-core-dependencies.constant";
-import { COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT } from "../../../../src/application/constant/commitlint-config-husky-commit-msg-script.constant";
+import { COMMITLINT_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/commitlint/core-dependencies.constant";
+import { COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT } from "../../../../src/application/constant/commitlint/husky-commit-msg-script.constant";
+import { COMMITLINT_CONFIG_MESSAGES } from "../../../../src/application/constant/commitlint/messages.constant";
+import { COMMITLINT_CONFIG_FILE_PATHS } from "../../../../src/application/constant/commitlint/file-paths.constant";
+import { COMMITLINT_CONFIG_HUSKY } from "../../../../src/application/constant/commitlint/husky-config.constant";
+import { COMMITLINT_CONFIG_SCRIPTS } from "../../../../src/application/constant/commitlint/scripts.constant";
 import { EPackageJsonDependencyType } from "../../../../src/domain/enum/package-json-dependency-type.enum";
 
 describe("CommitlintModuleService", () => {
@@ -69,7 +73,7 @@ describe("CommitlintModuleService", () => {
 			const result = await commitlintService.shouldInstall();
 
 			expect(result).toBe(true);
-			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith("Do you want to set up Commitlint and Commitizen for your project?", true);
+			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith(COMMITLINT_CONFIG_MESSAGES.confirmSetup, true);
 		});
 
 		it("should return false when user declines installation", async () => {
@@ -115,14 +119,14 @@ describe("CommitlintModuleService", () => {
 
 		it("should return false when user declines to delete existing files", async () => {
 			// Mock finding config files
-			vi.spyOn(commitlintService as any, "findExistingConfigFiles").mockResolvedValue(["commitlint.config.js"]);
+			vi.spyOn(commitlintService as any, "findExistingConfigFiles").mockResolvedValue([COMMITLINT_CONFIG_FILE_PATHS.configFile]);
 
 			mockCliInterfaceService.confirm.mockResolvedValueOnce(false);
 
 			const result = await commitlintService.handleExistingSetup();
 
 			expect(result).toBe(false);
-			expect(mockCliInterfaceService.warn).toHaveBeenCalled();
+			expect(mockCliInterfaceService.warn).toHaveBeenCalledWith(COMMITLINT_CONFIG_MESSAGES.existingFilesAborted);
 			expect(mockFileSystemService.deleteFile).not.toHaveBeenCalled();
 		});
 	});
@@ -201,18 +205,18 @@ describe("CommitlintModuleService", () => {
 		it("createConfigs should write configuration file", async () => {
 			await (commitlintService as any).createConfigs();
 
-			expect(mockFileSystemService.writeFile).toHaveBeenCalledWith("commitlint.config.js", expect.any(String), "utf8");
+			expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(COMMITLINT_CONFIG_FILE_PATHS.configFile, expect.any(String), "utf8");
 		});
 
 		it("setupHusky should initialize husky and create git hooks", async () => {
 			await (commitlintService as any).setupHusky();
 
-			expect(mockCommandService.execute).toHaveBeenCalledWith("npx husky");
-			expect(mockPackageJsonService.addScript).toHaveBeenCalledWith("prepare", "husky");
-			expect(mockCommandService.execute).toHaveBeenCalledWith("mkdir -p .husky");
+			expect(mockCommandService.execute).toHaveBeenCalledWith(COMMITLINT_CONFIG_HUSKY.initCommand);
+			expect(mockPackageJsonService.addScript).toHaveBeenCalledWith(COMMITLINT_CONFIG_SCRIPTS.prepare.name, COMMITLINT_CONFIG_SCRIPTS.prepare.command);
+			expect(mockCommandService.execute).toHaveBeenCalledWith(COMMITLINT_CONFIG_HUSKY.mkdirCommand);
 
-			expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(".husky/commit-msg", COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT, "utf8");
-			expect(mockCommandService.execute).toHaveBeenCalledWith("chmod +x .husky/commit-msg");
+			expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(COMMITLINT_CONFIG_FILE_PATHS.huskyCommitMsgHook, COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT, "utf8");
+			expect(mockCommandService.execute).toHaveBeenCalledWith(COMMITLINT_CONFIG_HUSKY.chmodCommand);
 		});
 
 		it("setupPackageJsonConfigs should add commitizen config to package.json", async () => {
@@ -224,7 +228,7 @@ describe("CommitlintModuleService", () => {
 			expect(mockPackageJsonService.set).toHaveBeenCalledWith({
 				config: {
 					commitizen: {
-						path: "@elsikora/commitizen-plugin-commitlint-ai",
+						path: COMMITLINT_CONFIG_MESSAGES.commitizenPath,
 					},
 				},
 			});
@@ -233,7 +237,7 @@ describe("CommitlintModuleService", () => {
 		it("setupScripts should add commit script", async () => {
 			await (commitlintService as any).setupScripts();
 
-			expect(mockPackageJsonService.addScript).toHaveBeenCalledWith("commit", "cz");
+			expect(mockPackageJsonService.addScript).toHaveBeenCalledWith(COMMITLINT_CONFIG_SCRIPTS.commit.name, COMMITLINT_CONFIG_SCRIPTS.commit.command);
 		});
 
 		it("findExistingConfigFiles should return file paths for existing config files", async () => {

@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CommitlintModuleService } from "../../../../src/application/service/commitlint-module.service";
 import { EModule } from "../../../../src/domain/enum/module.enum";
-import { COMMITLINT_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/commitlint-config-core-dependencies.constant";
-import { COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT } from "../../../../src/application/constant/commitlint-config-husky-commit-msg-script.constant";
-import { COMMITLINT_CONFIG_FILE_NAMES } from "../../../../src/application/constant/commitlint-config-file-names.constant";
+import { COMMITLINT_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/commitlint/core-dependencies.constant";
+import { COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT } from "../../../../src/application/constant/commitlint/husky-commit-msg-script.constant";
+import { COMMITLINT_CONFIG_FILE_NAMES } from "../../../../src/application/constant/commitlint/file-names.constant";
 import { EPackageJsonDependencyType } from "../../../../src/domain/enum/package-json-dependency-type.enum";
+import { createMockCLIInterfaceService, createMockConfigService, createMockFileSystemService } from "../../../helpers/test-utils";
 
 /**
  * Enhanced test file specifically designed to improve line and function coverage
