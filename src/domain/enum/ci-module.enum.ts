@@ -5,4 +5,5 @@ export enum ECiModule {
 	RELEASE = "release",
 	RELEASE_NPM = "release-npm",
 	SNYK = "snyk",
+	TEST = "test",
 }

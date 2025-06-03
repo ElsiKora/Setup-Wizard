@@ -1,10 +1,9 @@
-/* eslint-disable @elsikora/unicorn/no-process-exit,@elsikora/typescript/no-unsafe-member-access,@elsikora/typescript/no-unsafe-call,@elsikora/typescript/no-unsafe-return,@elsikora/sonar/function-return-type */
+/* eslint-disable @elsikora/unicorn/no-process-exit,@elsikora/sonar/function-return-type */
 import type { ICliInterfaceService } from "../../application/interface/cli-interface-service.interface";
 import type { ICliInterfaceServiceSelectOptions } from "../../domain/interface/cli-interface-service-select-options.interface";
 
 import chalk from "chalk";
 // @ts-ignore
-// eslint-disable-next-line @elsikora/node/no-extraneous-import
 import inquirer from "inquirer";
 // @ts-ignore
 import ora from "ora";
@@ -17,7 +16,7 @@ import ora from "ora";
 export class InquirerCliInterface implements ICliInterfaceService {
 	// @ts-ignore
 	/** Spinner for showing loading/processing states */
-	private readonly SPINNER: any;
+	private readonly SPINNER: { start(text?: string): void; stop(): void };
 
 	/**
 	 * Initializes a new instance of the InquirerCliInterface.
@@ -31,6 +30,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	 * Clears the console screen.
 	 */
 	clear(): void {
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.clear();
 	}
 
@@ -42,8 +42,8 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	 */
 	async confirm(message: string, isConfirmedByDefault: boolean = false): Promise<boolean> {
 		try {
-			// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
-			const answer: any = await inquirer.prompt({
+			// eslint-disable-next-line @elsikora/typescript/naming-convention
+			const answer: { confirmation: boolean } = await inquirer.prompt({
 				// eslint-disable-next-line @elsikora/typescript/naming-convention
 				default: isConfirmedByDefault,
 				message,
@@ -75,7 +75,8 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	 * @returns Promise resolving to an array of selected values
 	 */
 	async groupMultiselect<T>(message: string, options: Record<string, Array<ICliInterfaceServiceSelectOptions>>, isRequired: boolean = false, initialValues?: Array<string>): Promise<Array<T>> {
-		const choices: Array<any> = [];
+		// eslint-disable-next-line @elsikora/typescript/naming-convention
+		const choices: Array<{ checked: boolean; name: string; value: string }> = [];
 
 		for (const [group, groupOptions] of Object.entries(options)) {
 			for (const opt of groupOptions) {
@@ -89,17 +90,16 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		}
 
 		try {
-			// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
-			const answer: any = await inquirer.prompt({
+			const answer: { selection: Array<T> } = (await inquirer.prompt({
 				choices,
 				message: `${message} (space to select)`,
 				name: "selection",
 				type: "checkbox",
 				// @ts-ignore
-				validate: isRequired ? (input: Array<any> | string): boolean | string | undefined => input.length > 0 || "You must select at least one option" : undefined,
-			});
+				validate: isRequired ? (input: Array<unknown> | string): boolean | string | undefined => input.length > 0 || "You must select at least one option" : undefined,
+			})) as { selection: Array<T> };
 
-			return answer.selection as Array<T>;
+			return answer.selection;
 		} catch {
 			this.error("Operation cancelled by user");
 			process.exit(0);
@@ -121,6 +121,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	 * @param message - The information message to display
 	 */
 	info(message: string): void {
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.log(chalk.blue(message));
 	}
 
@@ -129,6 +130,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	 * @param message - The message to log
 	 */
 	log(message: string): void {
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.log(message);
 	}
 
@@ -150,17 +152,16 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		}));
 
 		try {
-			// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
-			const answer: any = await inquirer.prompt({
+			const answer: { selection: Array<T> } = (await inquirer.prompt({
 				choices,
 				message: `${message} (space to select)`,
 				name: "selection",
 				type: "checkbox",
 				// @ts-ignore
-				validate: isRequired ? (input: Array<any> | string): boolean | string | undefined => input.length > 0 || "You must select at least one option" : undefined,
-			});
+				validate: isRequired ? (input: Array<unknown> | string): boolean | string | undefined => input.length > 0 || "You must select at least one option" : undefined,
+			})) as { selection: Array<T> };
 
-			return answer.selection as Array<T>;
+			return answer.selection;
 		} catch {
 			this.error("Operation cancelled by user");
 			process.exit(0);
@@ -173,7 +174,9 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	 * @param message - The message content of the note
 	 */
 	note(title: string, message: string): void {
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.log(chalk.bold(title));
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.log(message);
 	}
 
@@ -188,16 +191,15 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		const choices: Array<{ name: string; value: string }> = options.map((opt: ICliInterfaceServiceSelectOptions) => ({ name: opt.label, value: opt.value }));
 
 		try {
-			// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
-			const answer: any = await inquirer.prompt({
+			const answer: { selection: T } = (await inquirer.prompt({
 				choices,
 				default: initialValue,
 				message,
 				name: "selection",
 				type: "list",
-			});
+			})) as { selection: T };
 
-			return answer.selection as T;
+			return answer.selection;
 		} catch {
 			this.error("Operation cancelled by user");
 			process.exit(0);
@@ -220,6 +222,7 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		this.SPINNER.stop();
 
 		if (message) {
+			// eslint-disable-next-line @elsikora/javascript/no-console
 			console.log(message);
 		}
 	}
@@ -229,21 +232,21 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	 * @param message - The success message to display
 	 */
 	success(message: string): void {
+		// eslint-disable-next-line @elsikora/javascript/no-console
 		console.log(chalk.green(message));
 	}
 
 	/**
 	 * Prompts the user for text input.
 	 * @param message - The prompt message to display
-	 * @param placeholder - Optional placeholder text
+	 * @param _placeholder - Optional placeholder text
 	 * @param initialValue - Optional initial value for the input
 	 * @param validate - Optional validation function for the input
 	 * @returns Promise resolving to the entered text
 	 */
-	async text(message: string, placeholder?: string, initialValue?: string, validate?: (value: string) => Error | string | undefined): Promise<string> {
+	async text(message: string, _placeholder?: string, initialValue?: string, validate?: (value: string) => Error | string | undefined): Promise<string> {
 		try {
-			// eslint-disable-next-line @elsikora/typescript/no-unsafe-assignment
-			const answer: any = await inquirer.prompt({
+			const answer: { text: string } = await inquirer.prompt({
 				default: initialValue,
 				message,
 				name: "text",
@@ -275,6 +278,6 @@ export class InquirerCliInterface implements ICliInterfaceService {
 	 * @param message - The warning message to display
 	 */
 	warn(message: string): void {
-		console.log(chalk.yellow(message));
+		console.warn(chalk.yellow(message));
 	}
 }

@@ -14,10 +14,11 @@ import { ELintStagedFeature } from "../../domain/enum/lint-staged-feature.enum";
 import { EModule } from "../../domain/enum/module.enum";
 import { EPackageJsonDependencyType } from "../../domain/enum/package-json-dependency-type.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
-import { LINT_STAGED_CONFIG_FILE_NAMES } from "../constant/lint-staged-config-file-names.constant";
-import { LINT_STAGED_CONFIG_HUSKY_PRE_COMMIT_SCRIPT } from "../constant/lint-staged-config-husky-pre-commit-script.constant";
-import { LINT_STAGED_CONFIG } from "../constant/lint-staged-config.constant";
-import { LINT_STAGED_CORE_DEPENDENCIES } from "../constant/lint-staged-core-dependencies.constant";
+import { LINT_STAGED_CONFIG } from "../constant/lint-staged/config.constant";
+import { LINT_STAGED_CORE_DEPENDENCIES } from "../constant/lint-staged/core-dependencies.constant";
+import { LINT_STAGED_CONFIG_FILE_NAMES } from "../constant/lint-staged/file-names.constant";
+import { LINT_STAGED_CONFIG_HUSKY_PRE_COMMIT_SCRIPT } from "../constant/lint-staged/husky-pre-commit-script.constant";
+import { LINT_STAGED_CONFIG_MESSAGES } from "../constant/lint-staged/messages.constant";
 
 import { PackageJsonService } from "./package-json.service";
 
@@ -72,30 +73,30 @@ export class LintStagedModuleService implements IModuleService {
 		const packageJson: IPackageJson = await this.PACKAGE_JSON_SERVICE.get();
 
 		if (packageJson["lint-staged"]) {
-			existingFiles.push("package.json (lint-staged config)");
+			existingFiles.push(LINT_STAGED_CONFIG_MESSAGES.packageJsonConfig);
 		}
 
 		if (existingFiles.length > 0) {
-			const messageLines: Array<string> = ["Existing lint-staged configuration files detected:"];
+			const messageLines: Array<string> = [LINT_STAGED_CONFIG_MESSAGES.existingFilesDetected];
 			messageLines.push("");
 
 			for (const file of existingFiles) {
 				messageLines.push(`- ${file}`);
 			}
 
-			messageLines.push("", "Do you want to delete them?");
+			messageLines.push("", LINT_STAGED_CONFIG_MESSAGES.deleteFilesQuestion);
 
 			const shouldDelete: boolean = await this.CLI_INTERFACE_SERVICE.confirm(messageLines.join("\n"), true);
 
 			if (shouldDelete) {
-				await Promise.all(existingFiles.filter((file: string) => file !== "package.json (lint-staged config)").map((file: string) => this.FILE_SYSTEM_SERVICE.deleteFile(file)));
+				await Promise.all(existingFiles.filter((file: string) => file !== LINT_STAGED_CONFIG_MESSAGES.packageJsonConfig).map((file: string) => this.FILE_SYSTEM_SERVICE.deleteFile(file)));
 
 				if (packageJson["lint-staged"]) {
 					delete packageJson["lint-staged"];
 					await this.PACKAGE_JSON_SERVICE.set(packageJson);
 				}
 			} else {
-				this.CLI_INTERFACE_SERVICE.warn("Existing lint-staged configuration files detected. Setup aborted.");
+				this.CLI_INTERFACE_SERVICE.warn(LINT_STAGED_CONFIG_MESSAGES.existingFilesAborted);
 
 				return false;
 			}
@@ -132,7 +133,7 @@ export class LintStagedModuleService implements IModuleService {
 				wasInstalled: true,
 			};
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete lint-staged setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError(LINT_STAGED_CONFIG_MESSAGES.failedSetupError, error);
 
 			throw error;
 		}
@@ -146,9 +147,9 @@ export class LintStagedModuleService implements IModuleService {
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up lint-staged with Husky pre-commit hooks?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.LINT_STAGED));
+			return await this.CLI_INTERFACE_SERVICE.confirm(LINT_STAGED_CONFIG_MESSAGES.confirmSetup, await this.CONFIG_SERVICE.isModuleEnabled(EModule.LINT_STAGED));
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
+			this.CLI_INTERFACE_SERVICE.handleError(LINT_STAGED_CONFIG_MESSAGES.failedConfirmation, error);
 
 			return false;
 		}
@@ -172,22 +173,22 @@ export class LintStagedModuleService implements IModuleService {
 		const requiredPackages: Array<string> = selectedFeatures.flatMap((feature: ELintStagedFeature) => LINT_STAGED_FEATURE_CONFIG[feature].requiredPackages);
 
 		const summary: Array<string> = [
-			"lint-staged configuration has been created.",
+			LINT_STAGED_CONFIG_MESSAGES.configurationCreated,
 			"",
-			"Configuration files:",
+			LINT_STAGED_CONFIG_MESSAGES.configurationFilesLabel,
 			"- lint-staged.config.js",
 			"- .husky/pre-commit",
 			"",
-			"Selected linting tools:",
+			LINT_STAGED_CONFIG_MESSAGES.selectedToolsLabel,
 			...selectedFeatures.map((feature: ELintStagedFeature) => `- ${LINT_STAGED_FEATURE_CONFIG[feature].label}`),
 			"",
-			"Required packages (please ensure these are installed):",
+			LINT_STAGED_CONFIG_MESSAGES.requiredPackagesLabel,
 			...requiredPackages.map((packageName: string) => `- ${packageName}`),
 			"",
-			"Husky git hooks have been set up to run lint-staged before commits.",
+			LINT_STAGED_CONFIG_MESSAGES.huskyHookSetup,
 		];
 
-		this.CLI_INTERFACE_SERVICE.note("lint-staged Setup", summary.join("\n"));
+		this.CLI_INTERFACE_SERVICE.note(LINT_STAGED_CONFIG_MESSAGES.setupCompleteTitle, summary.join("\n"));
 	}
 
 	/**
@@ -240,17 +241,17 @@ export class LintStagedModuleService implements IModuleService {
 
 			const initialValues: Array<string> = hasValidSavedFeatures ? savedFeatures : [];
 
-			this.selectedFeatures = await this.CLI_INTERFACE_SERVICE.multiselect<ELintStagedFeature>("Select which linting tools to include:", options, true, initialValues);
+			this.selectedFeatures = await this.CLI_INTERFACE_SERVICE.multiselect<ELintStagedFeature>(LINT_STAGED_CONFIG_MESSAGES.selectFeaturesPrompt, options, true, initialValues);
 
-			this.CLI_INTERFACE_SERVICE.startSpinner("Setting up lint-staged configuration...");
+			this.CLI_INTERFACE_SERVICE.startSpinner(LINT_STAGED_CONFIG_MESSAGES.settingUpSpinner);
 			await this.PACKAGE_JSON_SERVICE.installPackages(LINT_STAGED_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
 			await this.createConfigs(this.selectedFeatures);
 			await this.setupHusky();
 
-			this.CLI_INTERFACE_SERVICE.stopSpinner("lint-staged configuration completed successfully!");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(LINT_STAGED_CONFIG_MESSAGES.configurationCompleted);
 			this.displaySetupSummary(this.selectedFeatures);
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Failed to setup lint-staged configuration");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(LINT_STAGED_CONFIG_MESSAGES.failedSetupSpinner);
 
 			throw error;
 		}

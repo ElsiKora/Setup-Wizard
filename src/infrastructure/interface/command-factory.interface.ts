@@ -18,7 +18,7 @@ export interface ICommandFactory {
 	 * @param options - Command-specific options and arguments
 	 * @returns An instance of the specified command
 	 */
-	createCommand(name: ECommand, options: any): ICommand;
+	createCommand(name: ECommand, options: unknown): ICommand;
 
 	/** File system service for file operations */
 	FILE_SYSTEM_SERVICE: IFileSystemService;

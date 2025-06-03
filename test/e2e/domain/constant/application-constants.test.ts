@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { LINT_STAGED_CONFIG } from "../../../../bin/application/constant/lint-staged-config.constant.js";
-import { SEMANTIC_RELEASE_CONFIG } from "../../../../bin/application/constant/semantic-release-config.constant.js";
-import { ESLINT_CONFIG } from "../../../../bin/application/constant/elint-config.constant.js";
+import { LINT_STAGED_CONFIG } from "../../../../bin/application/constant/lint-staged/config.constant.js";
+import { SEMANTIC_RELEASE_CONFIG } from "../../../../bin/application/constant/semantic-release/config.constant.js";
+import { ESLINT_CONFIG } from "../../../../bin/application/constant/eslint/config.constant.js";
 import { ELintStagedFeature } from "../../../../bin/domain/enum/lint-staged-feature.enum.js";
 import { EEslintFeature } from "../../../../bin/domain/enum/eslint-feature.enum.js";
 

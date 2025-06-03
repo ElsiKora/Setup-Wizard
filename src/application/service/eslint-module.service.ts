@@ -18,14 +18,18 @@ import { EFramework } from "../../domain/enum/framework.enum";
 import { EModule } from "../../domain/enum/module.enum";
 import { EPackageJsonDependencyType } from "../../domain/enum/package-json-dependency-type.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
-import { ESLINT_CONFIG } from "../constant/elint-config.constant";
-import { ESLINT_CONFIG_CORE_DEPENDENCIES } from "../constant/eslint-config-core-dependencies.constant";
-import { ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME } from "../constant/eslint-config-elsikora-package-name.constant";
-import { ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION } from "../constant/eslint-config-eslint-minimum-required-version.constant";
-import { ESLINT_CONFIG_ESLINT_PACKAGE_NAME } from "../constant/eslint-config-eslint-package-name.costant";
-import { ESLINT_CONFIG_FILE_NAME } from "../constant/eslint-config-file-name.constant";
-import { ESLINT_CONFIG_FILE_NAMES } from "../constant/eslint-config-file-names.constant";
-import { ESLINT_CONFIG_IGNORE_PATHS } from "../constant/eslint-config-ignore-paths.constant";
+import { ESLINT_CONFIG } from "../constant/eslint/config.constant";
+import { ESLINT_CONFIG_CORE_DEPENDENCIES } from "../constant/eslint/core-dependencies.constant";
+import { ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME } from "../constant/eslint/elsikora-package-name.constant";
+import { ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION } from "../constant/eslint/eslint-minimum-required-version.constant";
+import { ESLINT_CONFIG_ESLINT_PACKAGE_NAME } from "../constant/eslint/eslint-package-name.constant";
+import { ESLINT_CONFIG_FILE_NAME } from "../constant/eslint/file-name.constant";
+import { ESLINT_CONFIG_FILE_NAMES } from "../constant/eslint/file-names.constant";
+import { ESLINT_CONFIG_IGNORE_PATHS } from "../constant/eslint/ignore-paths.constant";
+import { ESLINT_CONFIG_MESSAGES } from "../constant/eslint/messages.constant";
+import { ESLINT_CONFIG_PACKAGE_JSON_SCRIPT_NAMES } from "../constant/eslint/package-json-script-names.constant";
+import { ESLINT_CONFIG_SCRIPTS } from "../constant/eslint/scripts.constant";
+import { ESLINT_CONFIG_SUMMARY } from "../constant/eslint/summary.constant";
 
 import { FrameworkService } from "./framework.service";
 import { PackageJsonService } from "./package-json.service";
@@ -99,20 +103,20 @@ export class EslintModuleService implements IModuleService {
 			const majorVersion: number = eslintVersion.majorVersion;
 
 			if (majorVersion < ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION) {
-				this.CLI_INTERFACE_SERVICE.info(`Detected ESLint version ${String(majorVersion)}, which is lower than required version ${String(ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION)}.`);
+				this.CLI_INTERFACE_SERVICE.info(ESLINT_CONFIG_MESSAGES.eslintVersionLower(String(majorVersion), String(ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION)));
 
-				const shouldRemove: boolean = await this.CLI_INTERFACE_SERVICE.confirm(`Do you want to remove ESLint version ${String(majorVersion)} and install the latest version?`, true);
+				const shouldRemove: boolean = await this.CLI_INTERFACE_SERVICE.confirm(ESLINT_CONFIG_MESSAGES.removeEslintVersion(String(majorVersion)), true);
 
 				if (!shouldRemove) {
-					this.CLI_INTERFACE_SERVICE.warn("ESLint update cancelled. Setup cannot proceed with the current version.");
+					this.CLI_INTERFACE_SERVICE.warn(ESLINT_CONFIG_MESSAGES.eslintUpdateCancelled);
 
 					return false;
 				}
 
-				this.CLI_INTERFACE_SERVICE.startSpinner("Uninstalling ESLint...");
+				this.CLI_INTERFACE_SERVICE.startSpinner(ESLINT_CONFIG_MESSAGES.uninstallingEslint);
 
 				await this.PACKAGE_JSON_SERVICE.uninstallPackages(ESLINT_CONFIG_ESLINT_PACKAGE_NAME);
-				this.CLI_INTERFACE_SERVICE.stopSpinner("ESLint uninstalled successfully.");
+				this.CLI_INTERFACE_SERVICE.stopSpinner(ESLINT_CONFIG_MESSAGES.eslintUninstalledSuccessfully);
 			}
 		}
 
@@ -128,10 +132,10 @@ export class EslintModuleService implements IModuleService {
 		const hasConfig: boolean = await this.PACKAGE_JSON_SERVICE.isExistsDependency(ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME);
 
 		if (hasConfig) {
-			const shouldUninstall: boolean = await this.CLI_INTERFACE_SERVICE.confirm("An existing ElsiKora ESLint configuration is detected. Would you like to uninstall it?", true);
+			const shouldUninstall: boolean = await this.CLI_INTERFACE_SERVICE.confirm(ESLINT_CONFIG_MESSAGES.existingConfigDetected, true);
 
 			if (!shouldUninstall) {
-				this.CLI_INTERFACE_SERVICE.warn("Existing ElsiKora ESLint configuration detected. Setup aborted.");
+				this.CLI_INTERFACE_SERVICE.warn(ESLINT_CONFIG_MESSAGES.existingConfigAborted);
 
 				return false;
 			}
@@ -143,13 +147,12 @@ export class EslintModuleService implements IModuleService {
 
 		if (existingFiles.length > 0) {
 			const filesList: string = existingFiles.map((f: string) => `- ${f}`).join("\n");
-			const message: string = `Existing ESLint configuration files detected:\n${filesList}\n\nDo you want to delete them?`;
-			const shouldDelete: boolean = await this.CLI_INTERFACE_SERVICE.confirm(message, true);
+			const shouldDelete: boolean = await this.CLI_INTERFACE_SERVICE.confirm(ESLINT_CONFIG_MESSAGES.existingFilesDetected(filesList), true);
 
 			if (shouldDelete) {
 				await Promise.all(existingFiles.map((file: string) => this.FILE_SYSTEM_SERVICE.deleteFile(file)));
 			} else {
-				this.CLI_INTERFACE_SERVICE.warn("Existing ESLint configuration files detected. Setup aborted.");
+				this.CLI_INTERFACE_SERVICE.warn(ESLINT_CONFIG_MESSAGES.existingFilesAborted);
 
 				return false;
 			}
@@ -186,7 +189,7 @@ export class EslintModuleService implements IModuleService {
 			this.selectedFeatures = await this.selectFeatures(savedFeatures);
 
 			if (this.selectedFeatures.length === 0) {
-				this.CLI_INTERFACE_SERVICE.warn("No features selected.");
+				this.CLI_INTERFACE_SERVICE.warn(ESLINT_CONFIG_MESSAGES.noFeaturesSelected);
 
 				return { wasInstalled: false };
 			}
@@ -204,7 +207,7 @@ export class EslintModuleService implements IModuleService {
 				wasInstalled: true,
 			};
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete ESLint setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError(ESLINT_CONFIG_MESSAGES.eslintSetupFailed, error);
 
 			throw error;
 		}
@@ -218,9 +221,9 @@ export class EslintModuleService implements IModuleService {
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up ESLint for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.ESLINT));
+			return await this.CLI_INTERFACE_SERVICE.confirm(ESLINT_CONFIG_MESSAGES.setupEslintPrompt, await this.CONFIG_SERVICE.isModuleEnabled(EModule.ESLINT));
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
+			this.CLI_INTERFACE_SERVICE.handleError(ESLINT_CONFIG_MESSAGES.failedUserConfirmation, error);
 
 			return false;
 		}
@@ -259,19 +262,19 @@ export class EslintModuleService implements IModuleService {
 	 * Identifies frameworks like React, Angular, TypeScript, etc.
 	 */
 	private async detectFrameworks(): Promise<void> {
-		this.CLI_INTERFACE_SERVICE.startSpinner("Detecting frameworks...");
+		this.CLI_INTERFACE_SERVICE.startSpinner(ESLINT_CONFIG_MESSAGES.detectingFrameworks);
 
 		try {
 			this.detectedFrameworks = await this.FRAMEWORK_SERVICE.detect();
 
 			if (this.detectedFrameworks.length > 0) {
 				const frameworkNames: string = this.detectedFrameworks.map((f: IFrameworkConfig) => f.displayName).join(", ");
-				this.CLI_INTERFACE_SERVICE.info(`Detected frameworks: ${frameworkNames}`);
+				this.CLI_INTERFACE_SERVICE.info(ESLINT_CONFIG_MESSAGES.detectedFrameworks(frameworkNames));
 			}
 
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Framework detection completed");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(ESLINT_CONFIG_MESSAGES.frameworkDetectionCompleted);
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Failed to detect frameworks");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(ESLINT_CONFIG_MESSAGES.failedDetectFrameworks);
 
 			throw error;
 		}
@@ -300,8 +303,25 @@ export class EslintModuleService implements IModuleService {
 			}
 		}
 
+		// Check if TypeScript is detected
+		let hasTypeScript: boolean = false;
+
 		for (const [feature, config] of Object.entries(ESLINT_FEATURE_CONFIG)) {
-			if (config.detect?.some((packageName: string) => packageName in dependencies)) {
+			if ((feature === String(EEslintFeature.TYPESCRIPT) || feature === String(EEslintFeature.TYPESCRIPT_STRICT)) && config.detect?.some((packageName: string) => packageName in dependencies)) {
+				hasTypeScript = true;
+
+				break;
+			}
+		}
+
+		// If TypeScript is detected, prefer TYPESCRIPT_STRICT over TYPESCRIPT
+		if (hasTypeScript) {
+			detectedFeatures.add(EEslintFeature.TYPESCRIPT_STRICT);
+		}
+
+		// Add other features with detect property (excluding TypeScript features as we handled them above)
+		for (const [feature, config] of Object.entries(ESLINT_FEATURE_CONFIG)) {
+			if (feature !== String(EEslintFeature.TYPESCRIPT) && feature !== String(EEslintFeature.TYPESCRIPT_STRICT) && config.detect?.some((packageName: string) => packageName in dependencies)) {
 				detectedFeatures.add(feature as EEslintFeature);
 			}
 		}
@@ -318,7 +338,7 @@ export class EslintModuleService implements IModuleService {
 
 		const packageJsonScriptsKeys: Array<string> = packageJsonScripts ? Object.keys(packageJsonScripts) : [];
 
-		const generatedScripts: Array<string> = ["lint", "lint:fix", "lint:watch", "lint:types", "lint:types:fix", "lint:all", "lint:all:fix"].filter((script: string) => packageJsonScriptsKeys.includes(script));
+		const generatedScripts: Array<string> = ESLINT_CONFIG_PACKAGE_JSON_SCRIPT_NAMES.filter((script: string) => packageJsonScriptsKeys.includes(script));
 
 		const frameworksList: Array<string> =
 			this.detectedFrameworks.length > 0
@@ -327,17 +347,17 @@ export class EslintModuleService implements IModuleService {
 
 						return `- ${framework.displayName}${description}`;
 					})
-				: ["No frameworks detected"];
+				: [ESLINT_CONFIG_MESSAGES.noFrameworksDetected];
 
 		const featuresList: Array<string> = this.selectedFeatures.map((feature: EEslintFeature) => `- ${feature}: ${ESLINT_FEATURE_CONFIG[feature].description}`);
 
-		const frameworkConfigs: Array<string> = this.detectedFrameworks.length > 0 ? [`Lint Paths: ${this.FRAMEWORK_SERVICE.getLintPaths(this.detectedFrameworks).join(", ")}`] : ["No framework-specific configurations"];
+		const frameworkConfigs: Array<string> = this.detectedFrameworks.length > 0 ? [`${ESLINT_CONFIG_MESSAGES.lintPaths} ${this.FRAMEWORK_SERVICE.getLintPaths(this.detectedFrameworks).join(", ")}`] : [ESLINT_CONFIG_MESSAGES.noFrameworkConfigurations];
 
 		const scriptsList: Array<string> = generatedScripts.map((script: string) => `- npm run ${script}`);
 
-		const summary: Array<string> = ["ESLint configuration has been created.", "", "Detected Frameworks:", ...frameworksList, "", "Installed features:", ...featuresList, "", "Framework-specific configurations:", ...frameworkConfigs, "", "Generated scripts:", ...scriptsList, "", "You can customize the configuration in these file:", `- ${ESLINT_CONFIG_FILE_NAME}`];
+		const summary: Array<string> = [ESLINT_CONFIG_MESSAGES.eslintConfigCreated, "", ESLINT_CONFIG_MESSAGES.frameworksLabel, ...frameworksList, "", ESLINT_CONFIG_MESSAGES.installedFeaturesLabel, ...featuresList, "", ESLINT_CONFIG_MESSAGES.frameworkConfigurationsLabel, ...frameworkConfigs, "", ESLINT_CONFIG_MESSAGES.generatedScriptsLabel, ...scriptsList, "", ESLINT_CONFIG_MESSAGES.customizeInFile, `- ${ESLINT_CONFIG_FILE_NAME}`];
 
-		this.CLI_INTERFACE_SERVICE.note("ESLint Setup", summary.join("\n"));
+		this.CLI_INTERFACE_SERVICE.note(ESLINT_CONFIG_SUMMARY.title, summary.join("\n"));
 	}
 
 	/**
@@ -364,7 +384,7 @@ export class EslintModuleService implements IModuleService {
 	private generateLintCommand(): string {
 		const lintPaths: Array<string> = this.FRAMEWORK_SERVICE.getLintPaths(this.detectedFrameworks);
 
-		return `eslint ${lintPaths.length > 0 ? lintPaths.join(" ") : "."}`;
+		return ESLINT_CONFIG_SCRIPTS.lint.command(lintPaths);
 	}
 
 	/**
@@ -375,7 +395,7 @@ export class EslintModuleService implements IModuleService {
 	private generateLintFixCommand(): string {
 		const lintPaths: Array<string> = this.FRAMEWORK_SERVICE.getLintPaths(this.detectedFrameworks);
 
-		return `eslint --fix ${lintPaths.length > 0 ? lintPaths.join(" ") : "."}`;
+		return ESLINT_CONFIG_SCRIPTS.lintFix.command(lintPaths);
 	}
 
 	/**
@@ -410,22 +430,39 @@ export class EslintModuleService implements IModuleService {
 		const hasValidSavedFeatures: boolean = savedFeatures.length > 0 && savedFeatures.every((feature: EEslintFeature) => Object.values(EEslintFeature).includes(feature));
 
 		if (!hasValidSavedFeatures && detectedFeatures.length > 1) {
-			shouldUseDetected = await this.CLI_INTERFACE_SERVICE.confirm(`Detected features: ${detectedFeatures.join(", ")}. Would you like to include these features?`, true);
+			shouldUseDetected = await this.CLI_INTERFACE_SERVICE.confirm(ESLINT_CONFIG_MESSAGES.detectedFeatures(detectedFeatures.join(", ")), true);
 		}
 
 		const groupedOptions: Record<string, Array<ICliInterfaceServiceSelectOptions>> = {};
 
 		for (const group of ESLINT_FEATURE_GROUPS) {
-			groupedOptions[group.name] = group.features.map((feature: EEslintFeature) => ({
-				label: `${feature} - ${ESLINT_FEATURE_CONFIG[feature].description}`,
-				value: feature,
-			}));
+			groupedOptions[group.name] = group.features.map((feature: EEslintFeature) => {
+				let label: string = `${feature} - ${ESLINT_FEATURE_CONFIG[feature].description}`;
+
+				// Add note about mutual exclusivity for TypeScript options
+				if (feature === EEslintFeature.TYPESCRIPT || feature === EEslintFeature.TYPESCRIPT_STRICT) {
+					label += " (choose one)";
+				}
+
+				return {
+					label,
+					value: feature,
+				};
+			});
 		}
 
 		const defaultFeatures: Array<EEslintFeature> = shouldUseDetected ? detectedFeatures : [];
 		const initialValues: Array<string> = hasValidSavedFeatures ? savedFeatures : defaultFeatures;
 
-		return await this.CLI_INTERFACE_SERVICE.groupMultiselect<EEslintFeature>("Select the features you want to enable:", groupedOptions, true, initialValues);
+		let selectedFeatures: Array<EEslintFeature> = await this.CLI_INTERFACE_SERVICE.groupMultiselect<EEslintFeature>(ESLINT_CONFIG_MESSAGES.selectFeatures, groupedOptions, true, initialValues);
+
+		// Handle mutual exclusivity of TypeScript and TypeScript Strict
+		if (selectedFeatures.includes(EEslintFeature.TYPESCRIPT) && selectedFeatures.includes(EEslintFeature.TYPESCRIPT_STRICT)) {
+			this.CLI_INTERFACE_SERVICE.info(ESLINT_CONFIG_MESSAGES.typescriptStrictSelected);
+			selectedFeatures = selectedFeatures.filter((feature: EEslintFeature) => feature !== EEslintFeature.TYPESCRIPT);
+		}
+
+		return selectedFeatures;
 	}
 
 	/**
@@ -433,19 +470,19 @@ export class EslintModuleService implements IModuleService {
 	 * Adds scripts for linting, fixing, watching, and type checking.
 	 */
 	private async setupScripts(): Promise<void> {
-		await this.PACKAGE_JSON_SERVICE.addScript("lint", this.generateLintCommand());
-		await this.PACKAGE_JSON_SERVICE.addScript("lint:fix", this.generateLintFixCommand());
+		await this.PACKAGE_JSON_SERVICE.addScript(ESLINT_CONFIG_SCRIPTS.lint.name, this.generateLintCommand());
+		await this.PACKAGE_JSON_SERVICE.addScript(ESLINT_CONFIG_SCRIPTS.lintFix.name, this.generateLintFixCommand());
 
 		if (this.detectedFrameworks.some((framework: IFrameworkConfig) => framework.isSupportWatch)) {
 			const lintPaths: Array<string> = this.FRAMEWORK_SERVICE.getLintPaths(this.detectedFrameworks);
-			await this.PACKAGE_JSON_SERVICE.addScript("lint:watch", `npx eslint-watch ${lintPaths.join(" ")}`);
+			await this.PACKAGE_JSON_SERVICE.addScript(ESLINT_CONFIG_SCRIPTS.lintWatch.name, ESLINT_CONFIG_SCRIPTS.lintWatch.command(lintPaths));
 		}
 
 		if (this.detectedFrameworks.some((framework: IFrameworkConfig) => framework.name === EFramework.TYPESCRIPT)) {
-			await this.PACKAGE_JSON_SERVICE.addScript("lint:types", "tsc --noEmit");
-			await this.PACKAGE_JSON_SERVICE.addScript("lint:types:fix", "tsc --noEmit --skipLibCheck");
-			await this.PACKAGE_JSON_SERVICE.addScript("lint:all", "npm run lint && npm run lint:types");
-			await this.PACKAGE_JSON_SERVICE.addScript("lint:all:fix", "npm run lint:fix && npm run lint:types:fix");
+			await this.PACKAGE_JSON_SERVICE.addScript(ESLINT_CONFIG_SCRIPTS.lintTypes.name, ESLINT_CONFIG_SCRIPTS.lintTypes.command([]));
+			await this.PACKAGE_JSON_SERVICE.addScript(ESLINT_CONFIG_SCRIPTS.lintTypesFix.name, ESLINT_CONFIG_SCRIPTS.lintTypesFix.command([]));
+			await this.PACKAGE_JSON_SERVICE.addScript(ESLINT_CONFIG_SCRIPTS.lintAll.name, ESLINT_CONFIG_SCRIPTS.lintAll.command([]));
+			await this.PACKAGE_JSON_SERVICE.addScript(ESLINT_CONFIG_SCRIPTS.lintAllFix.name, ESLINT_CONFIG_SCRIPTS.lintAllFix.command([]));
 		}
 	}
 
@@ -454,7 +491,7 @@ export class EslintModuleService implements IModuleService {
 	 * Installs dependencies, creates config files, and sets up scripts.
 	 */
 	private async setupSelectedFeatures(): Promise<void> {
-		this.CLI_INTERFACE_SERVICE.startSpinner("Setting up ESLint configuration...");
+		this.CLI_INTERFACE_SERVICE.startSpinner(ESLINT_CONFIG_MESSAGES.settingUpConfig);
 
 		try {
 			const packages: Array<string> = this.collectDependencies();
@@ -462,10 +499,10 @@ export class EslintModuleService implements IModuleService {
 			await this.createConfig();
 			await this.setupScripts();
 
-			this.CLI_INTERFACE_SERVICE.stopSpinner("ESLint configuration completed successfully!");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(ESLINT_CONFIG_MESSAGES.configurationCompleted);
 			await this.displaySetupSummary();
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Failed to setup ESLint configuration");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(ESLINT_CONFIG_MESSAGES.failedSetupConfig);
 
 			throw error;
 		}
@@ -475,13 +512,13 @@ export class EslintModuleService implements IModuleService {
 	 * Uninstalls existing ESLint configuration packages.
 	 */
 	private async uninstallExistingConfig(): Promise<void> {
-		this.CLI_INTERFACE_SERVICE.startSpinner("Uninstalling existing ESLint configuration...");
+		this.CLI_INTERFACE_SERVICE.startSpinner(ESLINT_CONFIG_MESSAGES.uninstallingConfig);
 
 		try {
 			await this.PACKAGE_JSON_SERVICE.uninstallPackages([ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME, ESLINT_CONFIG_ESLINT_PACKAGE_NAME]);
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Existing ESLint configuration uninstalled successfully!");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(ESLINT_CONFIG_MESSAGES.existingConfigUninstalled);
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Failed to uninstall existing ESLint configuration");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(ESLINT_CONFIG_MESSAGES.failedUninstallConfig);
 
 			throw error;
 		}
@@ -495,16 +532,21 @@ export class EslintModuleService implements IModuleService {
 	private validateFeatureSelection(): boolean {
 		const errors: Array<string> = [];
 
+		// Check if both TYPESCRIPT and TYPESCRIPT_STRICT are selected
+		if (this.selectedFeatures.includes(EEslintFeature.TYPESCRIPT) && this.selectedFeatures.includes(EEslintFeature.TYPESCRIPT_STRICT)) {
+			errors.push(ESLINT_CONFIG_MESSAGES.cannotEnableBothTypescript);
+		}
+
 		for (const feature of this.selectedFeatures) {
 			const config: IEslintFeatureConfig = ESLINT_FEATURE_CONFIG[feature];
 
 			if (config.isRequiresTypescript && !this.detectedFrameworks.some((framework: IFrameworkConfig) => framework.name === EFramework.TYPESCRIPT)) {
-				errors.push(`${feature} requires TypeScript, but TypeScript is not detected in your project.`);
+				errors.push(ESLINT_CONFIG_MESSAGES.featureRequiresTypescript(feature));
 			}
 		}
 
 		if (errors.length > 0) {
-			this.CLI_INTERFACE_SERVICE.warn("Configuration cannot proceed due to the following errors:\n" + errors.map((error: string) => `- ${error}`).join("\n"));
+			this.CLI_INTERFACE_SERVICE.warn(ESLINT_CONFIG_MESSAGES.configurationCannotProceed + errors.map((error: string) => `- ${error}`).join("\n"));
 
 			return false;
 		}

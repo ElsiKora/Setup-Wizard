@@ -10,10 +10,14 @@ import type { IModuleSetupResult } from "../interface/module-setup-result.interf
 import { EModule } from "../../domain/enum/module.enum";
 import { EPackageJsonDependencyType } from "../../domain/enum/package-json-dependency-type.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
-import { SEMANTIC_RELEASE_CONFIG_CORE_DEPENDENCIES } from "../constant/semantic-release-config-core-dependencies.constant";
-import { SEMANTIC_RELEASE_CONFIG_FILE_NAME } from "../constant/semantic-release-config-file-name.constant";
-import { SEMANTIC_RELEASE_CONFIG_FILE_NAMES } from "../constant/semantic-release-config-file-names.constant";
-import { SEMANTIC_RELEASE_CONFIG } from "../constant/semantic-release-config.constant";
+import { SEMANTIC_RELEASE_CONFIG_CHANGELOG_PATHS } from "../constant/semantic-release/changelog-paths.constant";
+import { SEMANTIC_RELEASE_CONFIG } from "../constant/semantic-release/config.constant";
+import { SEMANTIC_RELEASE_CONFIG_CORE_DEPENDENCIES } from "../constant/semantic-release/core-dependencies.constant";
+import { SEMANTIC_RELEASE_CONFIG_FILE_NAME } from "../constant/semantic-release/file-name.constant";
+import { SEMANTIC_RELEASE_CONFIG_FILE_NAMES } from "../constant/semantic-release/file-names.constant";
+import { SEMANTIC_RELEASE_CONFIG_MESSAGES } from "../constant/semantic-release/messages.constant";
+import { SEMANTIC_RELEASE_CONFIG_SCRIPTS } from "../constant/semantic-release/scripts.constant";
+import { SEMANTIC_RELEASE_CONFIG_SUMMARY } from "../constant/semantic-release/summary.constant";
 
 import { PackageJsonService } from "./package-json.service";
 
@@ -64,7 +68,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 		const existingFiles: Array<string> = await this.findExistingConfigFiles();
 
 		if (existingFiles.length > 0) {
-			const messageLines: Array<string> = ["Existing Semantic Release configuration files detected:"];
+			const messageLines: Array<string> = [SEMANTIC_RELEASE_CONFIG_MESSAGES.existingFilesDetected];
 			messageLines.push("");
 
 			if (existingFiles.length > 0) {
@@ -73,14 +77,14 @@ export class SemanticReleaseModuleService implements IModuleService {
 				}
 			}
 
-			messageLines.push("", "Do you want to delete them?");
+			messageLines.push("", SEMANTIC_RELEASE_CONFIG_MESSAGES.deleteFilesQuestion);
 
 			const shouldDelete: boolean = await this.CLI_INTERFACE_SERVICE.confirm(messageLines.join("\n"), true);
 
 			if (shouldDelete) {
 				await Promise.all(existingFiles.map((file: string) => this.FILE_SYSTEM_SERVICE.deleteFile(file)));
 			} else {
-				this.CLI_INTERFACE_SERVICE.warn("Existing Semantic Release configuration files detected. Setup aborted.");
+				this.CLI_INTERFACE_SERVICE.warn(SEMANTIC_RELEASE_CONFIG_MESSAGES.existingFilesAborted);
 
 				return false;
 			}
@@ -113,7 +117,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 				wasInstalled: true,
 			};
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete Semantic Release setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError(SEMANTIC_RELEASE_CONFIG_MESSAGES.failedSetupError, error);
 
 			throw error;
 		}
@@ -127,9 +131,9 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Semantic Release for automated versioning and publishing?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.SEMANTIC_RELEASE));
+			return await this.CLI_INTERFACE_SERVICE.confirm(SEMANTIC_RELEASE_CONFIG_MESSAGES.confirmSetup, await this.CONFIG_SERVICE.isModuleEnabled(EModule.SEMANTIC_RELEASE));
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
+			this.CLI_INTERFACE_SERVICE.handleError(SEMANTIC_RELEASE_CONFIG_MESSAGES.failedConfirmation, error);
 
 			return false;
 		}
@@ -159,19 +163,34 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @param developBranch - Optional development branch name for backmerge
 	 */
 	private displaySetupSummary(mainBranch: string, preReleaseBranch?: string, preReleaseChannel?: string, isBackmergeEnabled: boolean = false, developBranch?: string): void {
-		const summary: Array<string> = ["Semantic Release configuration has been created.", "", "Release branches:", `- Main release branch: ${mainBranch}`];
+		const summary: Array<string> = [SEMANTIC_RELEASE_CONFIG_MESSAGES.configurationCreated, "", SEMANTIC_RELEASE_CONFIG_MESSAGES.releaseBranchesLabel, `${SEMANTIC_RELEASE_CONFIG_MESSAGES.mainReleaseBranchLabel} ${mainBranch}`];
 
 		if (preReleaseBranch && preReleaseChannel) {
-			summary.push(`- Pre-release branch: ${preReleaseBranch} (channel: ${preReleaseChannel})`);
+			summary.push(SEMANTIC_RELEASE_CONFIG_MESSAGES.preReleaseBranchLabel(preReleaseBranch, preReleaseChannel));
 		}
 
 		if (isBackmergeEnabled && developBranch) {
-			summary.push(`- Backmerge enabled: Changes from ${mainBranch} will be automatically merged to ${developBranch} after release`);
+			summary.push(SEMANTIC_RELEASE_CONFIG_MESSAGES.backmergeEnabledInfo(mainBranch, developBranch));
 		}
 
-		summary.push("", "Generated scripts:", "- npm run release", "", "Configuration files:", `- ${SEMANTIC_RELEASE_CONFIG_FILE_NAME}`, "", "Changelog location:", "- CHANGELOG.md", "", "Note: To use Semantic Release effectively, you should:", "1. Configure CI/CD in your repository", "2. Set up required access tokens (GITHUB_TOKEN, NPM_TOKEN)", "3. Use conventional commits (works with the Commitlint setup)");
+		summary.push(
+			"",
+			SEMANTIC_RELEASE_CONFIG_MESSAGES.generatedScriptsLabel,
+			SEMANTIC_RELEASE_CONFIG_MESSAGES.releaseScriptDescription,
+			"",
+			SEMANTIC_RELEASE_CONFIG_MESSAGES.configurationFilesLabel,
+			`- ${SEMANTIC_RELEASE_CONFIG_FILE_NAME}`,
+			"",
+			SEMANTIC_RELEASE_CONFIG_MESSAGES.changelogLocationLabel,
+			`- ${SEMANTIC_RELEASE_CONFIG_MESSAGES.changelogLocation}`,
+			"",
+			SEMANTIC_RELEASE_CONFIG_MESSAGES.noteEffectiveUsage,
+			SEMANTIC_RELEASE_CONFIG_MESSAGES.noteInstruction1,
+			SEMANTIC_RELEASE_CONFIG_MESSAGES.noteInstruction2,
+			SEMANTIC_RELEASE_CONFIG_MESSAGES.noteInstruction3,
+		);
 
-		this.CLI_INTERFACE_SERVICE.note("Semantic Release Setup", summary.join("\n"));
+		this.CLI_INTERFACE_SERVICE.note(SEMANTIC_RELEASE_CONFIG_MESSAGES.setupCompleteTitle, summary.join("\n"));
 	}
 
 	/**
@@ -187,14 +206,11 @@ export class SemanticReleaseModuleService implements IModuleService {
 			}
 		}
 
-		// Check for CHANGELOG.md in the root directory
-		if (await this.FILE_SYSTEM_SERVICE.isPathExists("CHANGELOG.md")) {
-			existingFiles.push("CHANGELOG.md");
-		}
-
-		// Also check for legacy docs/CHANGELOG.md
-		if (await this.FILE_SYSTEM_SERVICE.isPathExists("docs/CHANGELOG.md")) {
-			existingFiles.push("docs/CHANGELOG.md");
+		// Check for CHANGELOG paths
+		for (const changelogPath of SEMANTIC_RELEASE_CONFIG_CHANGELOG_PATHS) {
+			if (await this.FILE_SYSTEM_SERVICE.isPathExists(changelogPath)) {
+				existingFiles.push(changelogPath);
+			}
 		}
 
 		return existingFiles;
@@ -205,16 +221,14 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @returns Promise resolving to the development branch name
 	 */
 	private async getDevelopBranch(): Promise<string> {
-		const initialBranch: string = this.config?.developBranch ?? "dev";
+		const initialBranch: string = this.config?.developBranch ?? SEMANTIC_RELEASE_CONFIG_SUMMARY.devBranchDefault;
 
-		return await this.CLI_INTERFACE_SERVICE.text("Enter the name of your development branch for backmerge:", "dev", initialBranch, (value: string) => {
+		return await this.CLI_INTERFACE_SERVICE.text(SEMANTIC_RELEASE_CONFIG_MESSAGES.developBranchPrompt, SEMANTIC_RELEASE_CONFIG_SUMMARY.devBranchDefault, initialBranch, (value: string) => {
 			if (!value) {
-				return "Branch name is required";
+				return SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameRequired;
 			}
 
-			if (value.includes(" ")) {
-				return "Branch name cannot contain spaces";
-			}
+			return value.includes(" ") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError : undefined;
 		});
 	}
 
@@ -223,16 +237,14 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @returns Promise resolving to the main branch name
 	 */
 	private async getMainBranch(): Promise<string> {
-		const initialBranch: string = this.config?.mainBranch ?? "main";
+		const initialBranch: string = this.config?.mainBranch ?? SEMANTIC_RELEASE_CONFIG_SUMMARY.mainBranchDefault;
 
-		return await this.CLI_INTERFACE_SERVICE.text("Enter the name of your main release branch:", "main", initialBranch, (value: string) => {
+		return await this.CLI_INTERFACE_SERVICE.text(SEMANTIC_RELEASE_CONFIG_MESSAGES.mainBranchPrompt, SEMANTIC_RELEASE_CONFIG_SUMMARY.mainBranchDefault, initialBranch, (value: string) => {
 			if (!value) {
-				return "Branch name is required";
+				return SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameRequired;
 			}
 
-			if (value.includes(" ")) {
-				return "Branch name cannot contain spaces";
-			}
+			return value.includes(" ") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError : undefined;
 		});
 	}
 
@@ -241,16 +253,14 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @returns Promise resolving to the pre-release branch name
 	 */
 	private async getPreReleaseBranch(): Promise<string> {
-		const initialBranch: string = this.config?.preReleaseBranch ?? "dev";
+		const initialBranch: string = this.config?.preReleaseBranch ?? SEMANTIC_RELEASE_CONFIG_SUMMARY.devBranchDefault;
 
-		return await this.CLI_INTERFACE_SERVICE.text("Enter the name of your pre-release branch:", "dev", initialBranch, (value: string) => {
+		return await this.CLI_INTERFACE_SERVICE.text(SEMANTIC_RELEASE_CONFIG_MESSAGES.preReleaseBranchPrompt, SEMANTIC_RELEASE_CONFIG_SUMMARY.devBranchDefault, initialBranch, (value: string) => {
 			if (!value) {
-				return "Branch name is required";
+				return SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameRequired;
 			}
 
-			if (value.includes(" ")) {
-				return "Branch name cannot contain spaces";
-			}
+			return value.includes(" ") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.branchNameSpacesError : undefined;
 		});
 	}
 
@@ -259,16 +269,14 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * @returns Promise resolving to the pre-release channel name
 	 */
 	private async getPreReleaseChannel(): Promise<string> {
-		const initialChannel: string = this.config?.preReleaseChannel ?? "beta";
+		const initialChannel: string = this.config?.preReleaseChannel ?? SEMANTIC_RELEASE_CONFIG_SUMMARY.preReleaseChannelDefault;
 
-		return await this.CLI_INTERFACE_SERVICE.text("Enter the pre-release channel name (e.g., beta, alpha, next):", "beta", initialChannel, (value: string) => {
+		return await this.CLI_INTERFACE_SERVICE.text(SEMANTIC_RELEASE_CONFIG_MESSAGES.preReleaseChannelPrompt, SEMANTIC_RELEASE_CONFIG_SUMMARY.preReleaseChannelDefault, initialChannel, (value: string) => {
 			if (!value) {
-				return "Channel name is required";
+				return SEMANTIC_RELEASE_CONFIG_MESSAGES.channelNameRequired;
 			}
 
-			if (value.includes(" ")) {
-				return "Channel name cannot contain spaces";
-			}
+			return value.includes(" ") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.channelNameSpacesError : undefined;
 		});
 	}
 
@@ -299,28 +307,24 @@ export class SemanticReleaseModuleService implements IModuleService {
 		}
 
 		if (savedRepoUrl) {
-			const shouldUseFoundedUrl: boolean = await this.CLI_INTERFACE_SERVICE.confirm(`Found repository URL: ${savedRepoUrl}\nIs this correct?`, true);
+			const shouldUseFoundedUrl: boolean = await this.CLI_INTERFACE_SERVICE.confirm(SEMANTIC_RELEASE_CONFIG_MESSAGES.foundRepositoryUrl(savedRepoUrl), true);
 
 			if (!shouldUseFoundedUrl) {
-				savedRepoUrl = await this.CLI_INTERFACE_SERVICE.text("Enter your repository URL (e.g., https://github.com/username/repo):", undefined, savedRepoUrl, (value: string) => {
+				savedRepoUrl = await this.CLI_INTERFACE_SERVICE.text(SEMANTIC_RELEASE_CONFIG_MESSAGES.enterRepositoryUrl, undefined, savedRepoUrl, (value: string) => {
 					if (!value) {
-						return "Repository URL is required";
+						return SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlRequired;
 					}
 
-					if (!value.startsWith("https://") && !value.startsWith("http://")) {
-						return "Repository URL must start with 'https://' or 'http://'";
-					}
+					return !value.startsWith("https://") && !value.startsWith("http://") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlStartError : undefined;
 				});
 			}
 		} else {
-			savedRepoUrl = await this.CLI_INTERFACE_SERVICE.text("Enter your repository URL (e.g., https://github.com/username/repo):", undefined, undefined, (value: string) => {
+			savedRepoUrl = await this.CLI_INTERFACE_SERVICE.text(SEMANTIC_RELEASE_CONFIG_MESSAGES.enterRepositoryUrl, undefined, undefined, (value: string) => {
 				if (!value) {
-					return "Repository URL is required";
+					return SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlRequired;
 				}
 
-				if (!value.startsWith("https://") && !value.startsWith("http://")) {
-					return "Repository URL must start with 'https://' or 'http://'";
-				}
+				return !value.startsWith("https://") && !value.startsWith("http://") ? SEMANTIC_RELEASE_CONFIG_MESSAGES.repositoryUrlStartError : undefined;
 			});
 		}
 
@@ -336,7 +340,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	private async isBackmergeEnabled(mainBranch: string): Promise<boolean> {
 		const isConfirmedByDefault: boolean = this.config?.isBackmergeEnabled === true;
 
-		return await this.CLI_INTERFACE_SERVICE.confirm(`Do you want to enable automatic backmerge from ${mainBranch} to development branch after release?`, isConfirmedByDefault);
+		return await this.CLI_INTERFACE_SERVICE.confirm(SEMANTIC_RELEASE_CONFIG_MESSAGES.confirmBackmerge(mainBranch), isConfirmedByDefault);
 	}
 
 	/**
@@ -346,7 +350,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	private async isPrereleaseEnabledChannel(): Promise<boolean> {
 		const isConfirmedByDefault: boolean = this.config?.isPrereleaseEnabled === true;
 
-		return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to configure a pre-release channel for development branches?", isConfirmedByDefault);
+		return await this.CLI_INTERFACE_SERVICE.confirm(SEMANTIC_RELEASE_CONFIG_MESSAGES.confirmPrereleaseChannel, isConfirmedByDefault);
 	}
 
 	/**
@@ -354,7 +358,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 * Adds scripts for running semantic-release and CI processes.
 	 */
 	private async setupScripts(): Promise<void> {
-		await this.PACKAGE_JSON_SERVICE.addScript("release", "semantic-release");
+		await this.PACKAGE_JSON_SERVICE.addScript(SEMANTIC_RELEASE_CONFIG_SCRIPTS.release.name, SEMANTIC_RELEASE_CONFIG_SCRIPTS.release.command);
 	}
 
 	/**
@@ -365,7 +369,7 @@ export class SemanticReleaseModuleService implements IModuleService {
 	 */
 	private async setupSemanticRelease(): Promise<Record<string, string>> {
 		try {
-			const parameters: Record<string, any> = {};
+			const parameters: Record<string, unknown> = {};
 
 			const repositoryUrl: string = await this.getRepositoryUrl();
 			parameters.repositoryUrl = repositoryUrl;
@@ -399,17 +403,17 @@ export class SemanticReleaseModuleService implements IModuleService {
 				parameters.developBranch = developBranch;
 			}
 
-			this.CLI_INTERFACE_SERVICE.startSpinner("Setting up Semantic Release configuration...");
+			this.CLI_INTERFACE_SERVICE.startSpinner(SEMANTIC_RELEASE_CONFIG_MESSAGES.settingUpSpinner);
 			await this.PACKAGE_JSON_SERVICE.installPackages(SEMANTIC_RELEASE_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
 			await this.createConfigs(repositoryUrl, mainBranch, preReleaseBranch, preReleaseChannel, isBackmergeEnabled, developBranch);
 			await this.setupScripts();
 
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Semantic Release configuration completed successfully!");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(SEMANTIC_RELEASE_CONFIG_MESSAGES.configurationCompleted);
 			this.displaySetupSummary(mainBranch, preReleaseBranch, preReleaseChannel, isBackmergeEnabled, developBranch);
 
-			return parameters;
+			return parameters as Record<string, string>;
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Failed to setup Semantic Release configuration");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(SEMANTIC_RELEASE_CONFIG_MESSAGES.failedSetupConfiguration);
 
 			throw error;
 		}

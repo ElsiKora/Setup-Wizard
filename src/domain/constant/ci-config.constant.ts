@@ -1,5 +1,5 @@
 /* eslint-disable @elsikora/typescript/no-unsafe-argument */
-/* eslint-disable @elsikora/typescript/no-unsafe-assignment */
+
 import type { ICiConfig } from "../interface/ci-config.interface";
 
 import { ECiModuleType } from "../enum/ci-module-type.enum";
@@ -143,9 +143,9 @@ jobs:
 			[ECiProvider.GITHUB]: {
 				filePath: ".github/workflows/release.yml",
 				template: (properties: object = {}) => {
-					const mainBranch: string = (properties as Record<string, any>).mainBranch ?? "main";
-					const preReleaseBranch: string | undefined = (properties as Record<string, any>).preReleaseBranch;
-					const isPrerelease: boolean = (properties as Record<string, any>).isPrerelease ?? false;
+					const mainBranch: string = ((properties as Record<string, unknown>).mainBranch as string) ?? "main";
+					const preReleaseBranch: string | undefined = (properties as Record<string, unknown>).preReleaseBranch as string | undefined;
+					const isPrerelease: boolean = ((properties as Record<string, unknown>).isPrerelease as boolean) ?? false;
 
 					const branches: Array<string> = [`- ${mainBranch}`];
 
@@ -208,9 +208,9 @@ jobs:
 			[ECiProvider.GITHUB]: {
 				filePath: ".github/workflows/release.yml",
 				template: (properties: object = {}) => {
-					const mainBranch: string = (properties as Record<string, any>).mainBranch ?? "main";
-					const preReleaseBranch: string | undefined = (properties as Record<string, any>).preReleaseBranch;
-					const isPrerelease: boolean = (properties as Record<string, any>).isPrerelease ?? false;
+					const mainBranch: string = ((properties as Record<string, unknown>).mainBranch as string) ?? "main";
+					const preReleaseBranch: string | undefined = (properties as Record<string, unknown>).preReleaseBranch as string | undefined;
+					const isPrerelease: boolean = ((properties as Record<string, unknown>).isPrerelease as boolean) ?? false;
 
 					const branches: Array<string> = [`- ${mainBranch}`];
 
@@ -326,6 +326,63 @@ jobs:
 		},
 		description: "Runs Snyk security scan.",
 		name: "Snyk",
+		type: ECiModuleType.UNIVERSAL,
+	},
+	[ECiModule.TEST]: {
+		content: {
+			[ECiProvider.GITHUB]: {
+				filePath: ".github/workflows/test.yml",
+				template: (properties: object = {}) => {
+					let content: string = `name: Test
+
+env:
+  NODE_VERSION: 20
+
+on: push
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: \${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            coverage/
+            reports/
+`;
+
+					for (const [key, value] of Object.entries(properties)) {
+						content = content.replaceAll(new RegExp(`{{${key}}}`, "g"), value);
+					}
+
+					return content;
+				},
+			},
+		},
+		description: "Runs automated tests.",
+		name: "Test",
 		type: ECiModuleType.UNIVERSAL,
 	},
 };

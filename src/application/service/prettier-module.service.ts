@@ -8,12 +8,15 @@ import type { IModuleSetupResult } from "../interface/module-setup-result.interf
 import { EModule } from "../../domain/enum/module.enum";
 import { EPackageJsonDependencyType } from "../../domain/enum/package-json-dependency-type.enum";
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
-import { PRETTIER_CONFIG_CORE_DEPENDENCIES } from "../constant/prettier-config-core-dependencies.constant";
-import { PRETTIER_CONFIG_FILE_NAME } from "../constant/prettier-config-file-name.config";
-import { PRETTIER_CONFIG_FILE_NAMES } from "../constant/prettier-config-file-names.constant";
-import { PRETTIER_CONFIG_IGNORE_FILE_NAME } from "../constant/prettier-config-ignore-file-name.constant";
-import { PRETTIER_CONFIG_IGNORE_PATHS } from "../constant/prettier-config-ignore-paths.constant";
-import { PRETTIER_CONFIG } from "../constant/prettier-config.constant";
+import { PRETTIER_CONFIG_FILE_NAME } from "../constant/prettier/config-file-name.constant";
+import { PRETTIER_CONFIG } from "../constant/prettier/config.constant";
+import { PRETTIER_CONFIG_CORE_DEPENDENCIES } from "../constant/prettier/core-dependencies.constant";
+import { PRETTIER_CONFIG_FILE_NAMES } from "../constant/prettier/file-names.constant";
+import { PRETTIER_CONFIG_IGNORE_FILE_NAME } from "../constant/prettier/ignore-file-name.constant";
+import { PRETTIER_CONFIG_IGNORE_PATHS } from "../constant/prettier/ignore-paths.constant";
+import { PRETTIER_CONFIG_MESSAGES } from "../constant/prettier/messages.constant";
+import { PRETTIER_CONFIG_SCRIPTS } from "../constant/prettier/scripts.constant";
+import { PRETTIER_CONFIG_SUMMARY } from "../constant/prettier/summary.constant";
 
 import { PackageJsonService } from "./package-json.service";
 
@@ -61,7 +64,7 @@ export class PrettierModuleService implements IModuleService {
 		const existingFiles: Array<string> = await this.findExistingConfigFiles();
 
 		if (existingFiles.length > 0) {
-			const messageLines: Array<string> = ["Existing Prettier configuration files detected:"];
+			const messageLines: Array<string> = [PRETTIER_CONFIG_MESSAGES.existingFilesDetected];
 			messageLines.push("");
 
 			if (existingFiles.length > 0) {
@@ -70,14 +73,14 @@ export class PrettierModuleService implements IModuleService {
 				}
 			}
 
-			messageLines.push("", "Do you want to delete them?");
+			messageLines.push("", PRETTIER_CONFIG_MESSAGES.deleteFilesQuestion);
 
 			const shouldDelete: boolean = await this.CLI_INTERFACE_SERVICE.confirm(messageLines.join("\n"), true);
 
 			if (shouldDelete) {
 				await Promise.all(existingFiles.map((file: string) => this.FILE_SYSTEM_SERVICE.deleteFile(file)));
 			} else {
-				this.CLI_INTERFACE_SERVICE.warn("Existing Prettier configuration files detected. Setup aborted.");
+				this.CLI_INTERFACE_SERVICE.warn(PRETTIER_CONFIG_MESSAGES.existingFilesAborted);
 
 				return false;
 			}
@@ -105,7 +108,7 @@ export class PrettierModuleService implements IModuleService {
 
 			return { wasInstalled: true };
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to complete Prettier setup", error);
+			this.CLI_INTERFACE_SERVICE.handleError(PRETTIER_CONFIG_MESSAGES.failedSetupError, error);
 
 			throw error;
 		}
@@ -119,9 +122,9 @@ export class PrettierModuleService implements IModuleService {
 	 */
 	async shouldInstall(): Promise<boolean> {
 		try {
-			return await this.CLI_INTERFACE_SERVICE.confirm("Do you want to set up Prettier for your project?", await this.CONFIG_SERVICE.isModuleEnabled(EModule.PRETTIER));
+			return await this.CLI_INTERFACE_SERVICE.confirm(PRETTIER_CONFIG_MESSAGES.confirmSetup, await this.CONFIG_SERVICE.isModuleEnabled(EModule.PRETTIER));
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.handleError("Failed to get user confirmation", error);
+			this.CLI_INTERFACE_SERVICE.handleError(PRETTIER_CONFIG_MESSAGES.failedConfirmation, error);
 
 			return false;
 		}
@@ -142,9 +145,9 @@ export class PrettierModuleService implements IModuleService {
 	 * Lists generated scripts and configuration files.
 	 */
 	private displaySetupSummary(): void {
-		const summary: Array<string> = ["Prettier configuration has been created.", "", "Generated scripts:", "- npm run format", "- npm run format:fix", "", "You can customize the configuration in these files:", `- ${PRETTIER_CONFIG_FILE_NAME}`, `- ${PRETTIER_CONFIG_IGNORE_FILE_NAME}`];
+		const summary: Array<string> = [PRETTIER_CONFIG_MESSAGES.prettierConfigCreated, "", PRETTIER_CONFIG_MESSAGES.generatedScriptsLabel, PRETTIER_CONFIG_SUMMARY.formatDescription, PRETTIER_CONFIG_SUMMARY.formatFixDescription, "", PRETTIER_CONFIG_SUMMARY.customizeFilesLabel, `- ${PRETTIER_CONFIG_FILE_NAME}`, `- ${PRETTIER_CONFIG_IGNORE_FILE_NAME}`];
 
-		this.CLI_INTERFACE_SERVICE.note("Prettier Setup", summary.join("\n"));
+		this.CLI_INTERFACE_SERVICE.note(PRETTIER_CONFIG_MESSAGES.setupCompleteTitle, summary.join("\n"));
 	}
 
 	/**
@@ -168,17 +171,17 @@ export class PrettierModuleService implements IModuleService {
 	 * Installs dependencies, creates config files, and adds npm scripts.
 	 */
 	private async setupPrettier(): Promise<void> {
-		this.CLI_INTERFACE_SERVICE.startSpinner("Setting up Prettier configuration...");
+		this.CLI_INTERFACE_SERVICE.startSpinner(PRETTIER_CONFIG_MESSAGES.settingUpSpinner);
 
 		try {
 			await this.PACKAGE_JSON_SERVICE.installPackages(PRETTIER_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
 			await this.createConfigs();
 			await this.setupScripts();
 
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Prettier configuration completed successfully!");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(PRETTIER_CONFIG_MESSAGES.setupCompleteSpinner);
 			this.displaySetupSummary();
 		} catch (error) {
-			this.CLI_INTERFACE_SERVICE.stopSpinner("Failed to setup Prettier configuration");
+			this.CLI_INTERFACE_SERVICE.stopSpinner(PRETTIER_CONFIG_MESSAGES.failedSetupSpinner);
 
 			throw error;
 		}
@@ -189,7 +192,7 @@ export class PrettierModuleService implements IModuleService {
 	 * Adds scripts for checking and fixing code formatting.
 	 */
 	private async setupScripts(): Promise<void> {
-		await this.PACKAGE_JSON_SERVICE.addScript("format", "prettier --check .");
-		await this.PACKAGE_JSON_SERVICE.addScript("format:fix", "prettier --write .");
+		await this.PACKAGE_JSON_SERVICE.addScript(PRETTIER_CONFIG_SCRIPTS.format.name, PRETTIER_CONFIG_SCRIPTS.format.command);
+		await this.PACKAGE_JSON_SERVICE.addScript(PRETTIER_CONFIG_SCRIPTS.formatFix.name, PRETTIER_CONFIG_SCRIPTS.formatFix.command);
 	}
 }
