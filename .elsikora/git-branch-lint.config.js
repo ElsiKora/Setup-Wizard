@@ -1,7 +1,7 @@
 export default {
 	branches: {
-		bugfix: { description: "🆕 Integration of new functionality", title: "Feature" },
-		feature: { description: "🐞 Fixing issues in existing functionality", title: "Bugfix" },
+		bugfix: { description: "🐞 Fixing issues in existing functionality", title: "Bugfix" },
+		feature: { description: "🆕 Integration of new functionality", title: "Feature" },
 		hotfix: { description: "🚑 Critical fixes for urgent issues", title: "Hotfix" },
 		release: { description: "📦 Preparing a new release version", title: "Release" },
 		support: { description: "🛠️ Support and maintenance tasks", title: "Support" },
