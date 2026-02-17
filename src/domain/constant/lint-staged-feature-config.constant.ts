@@ -18,4 +18,9 @@ export const LINT_STAGED_FEATURE_CONFIG: Record<ELintStagedFeature, ILintStagedF
 		label: "Stylelint - CSS/SCSS linter",
 		requiredPackages: ["stylelint"],
 	},
+	[ELintStagedFeature.TYPESCRIPT]: {
+		fileExtensions: ["ts", "tsx"],
+		label: "TypeScript - Type checking",
+		requiredPackages: ["tsc-files"],
+	},
 };

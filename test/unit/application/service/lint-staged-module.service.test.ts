@@ -382,11 +382,29 @@ describe("LintStagedModuleService", () => {
 			await (lintStagedService as any).setupLintStaged([]);
 
 			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalled();
-			expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(LINT_STAGED_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
+			// Should install core dependencies + feature-specific packages
+			const installedPackages = mockPackageJsonService.installPackages.mock.calls[0][0];
+			expect(installedPackages).toEqual(expect.arrayContaining(LINT_STAGED_CORE_DEPENDENCIES));
+			expect(installedPackages).toEqual(expect.arrayContaining(["prettier", "eslint"]));
 			expect(lintStagedService["createConfigs"]).toHaveBeenCalled();
 			expect(lintStagedService["setupHusky"]).toHaveBeenCalled();
 			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalled();
 			expect(lintStagedService["displaySetupSummary"]).toHaveBeenCalled();
+		});
+
+		it("should install tsc-files when TypeScript feature is selected", async () => {
+			// Mock internal methods
+			vi.spyOn(lintStagedService as any, "createConfigs").mockResolvedValue(undefined);
+			vi.spyOn(lintStagedService as any, "setupHusky").mockResolvedValue(undefined);
+			vi.spyOn(lintStagedService as any, "displaySetupSummary").mockReturnValue(undefined);
+
+			mockCliInterfaceService.multiselect.mockResolvedValueOnce([ELintStagedFeature.TYPESCRIPT]);
+
+			await (lintStagedService as any).setupLintStaged([]);
+
+			const installedPackages = mockPackageJsonService.installPackages.mock.calls[0][0];
+			expect(installedPackages).toEqual(expect.arrayContaining([...LINT_STAGED_CORE_DEPENDENCIES, "tsc-files"]));
+			expect(new Set(installedPackages).size).toBe(installedPackages.length);
 		});
 
 		it("should use saved features when valid", async () => {
@@ -441,8 +459,8 @@ describe("LintStagedModuleService", () => {
 
 			await (lintStagedService as any).setupLintStaged([]);
 
-			// Should still continue with the setup
-			expect(mockPackageJsonService.installPackages).toHaveBeenCalled();
+			// Should still continue with the setup, installing only core dependencies
+			expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(LINT_STAGED_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
 			expect(lintStagedService["createConfigs"]).toHaveBeenCalledWith([]);
 			expect(lintStagedService["setupHusky"]).toHaveBeenCalled();
 			expect(lintStagedService["displaySetupSummary"]).toHaveBeenCalledWith([]);
@@ -468,6 +486,7 @@ describe("LintStagedModuleService", () => {
 			const writtenContent = mockFileSystemService.writeFile.mock.calls[0][1];
 			expect(writtenContent).not.toContain("prettier --write");
 			expect(writtenContent).not.toContain("styleFiles");
+			expect(writtenContent).not.toContain("tsFiles");
 			// Verify we're accessing the LINT_STAGED_FEATURE_CONFIG
 			expect(writtenContent).toContain("eslint --fix --max-warnings=0 --no-warn-ignored");
 		});
@@ -480,25 +499,41 @@ describe("LintStagedModuleService", () => {
 			const writtenContent = mockFileSystemService.writeFile.mock.calls[0][1];
 			expect(writtenContent).not.toContain("prettier --write");
 			expect(writtenContent).not.toContain("eslintFiles");
+			expect(writtenContent).not.toContain("tsFiles");
 			// Verify we're accessing the LINT_STAGED_FEATURE_CONFIG
 			expect(writtenContent).toContain("stylelint --fix");
 		});
 
+		it("should write configuration file with only TypeScript", async () => {
+			await (lintStagedService as any).createConfigs([ELintStagedFeature.TYPESCRIPT]);
+
+			expect(mockFileSystemService.writeFile).toHaveBeenCalledWith("lint-staged.config.js", expect.stringContaining("const tsFiles = files.filter"), "utf8");
+			// Verify the generated content includes typescript but not others
+			const writtenContent = mockFileSystemService.writeFile.mock.calls[0][1];
+			expect(writtenContent).not.toContain("prettier --write");
+			expect(writtenContent).not.toContain("eslintFiles");
+			expect(writtenContent).not.toContain("styleFiles");
+			// Verify we're accessing the LINT_STAGED_FEATURE_CONFIG
+			expect(writtenContent).toContain("tsc-files --noEmit");
+		});
+
 		it("should write configuration file with all features enabled", async () => {
-			await (lintStagedService as any).createConfigs([ELintStagedFeature.PRETTIER, ELintStagedFeature.ESLINT, ELintStagedFeature.STYLELINT]);
+			await (lintStagedService as any).createConfigs([ELintStagedFeature.PRETTIER, ELintStagedFeature.ESLINT, ELintStagedFeature.STYLELINT, ELintStagedFeature.TYPESCRIPT]);
 
 			// Verify all features are included in the configuration
 			const writtenContent = mockFileSystemService.writeFile.mock.calls[0][1];
 			expect(writtenContent).toContain('commands.push("prettier --write --ignore-unknown")');
 			expect(writtenContent).toContain("const eslintFiles = files.filter");
 			expect(writtenContent).toContain("eslint --fix --max-warnings=0 --no-warn-ignored");
+			expect(writtenContent).toContain("const tsFiles = files.filter");
+			expect(writtenContent).toContain("tsc-files --noEmit");
 			expect(writtenContent).toContain("const styleFiles = files.filter");
 			expect(writtenContent).toContain("stylelint --fix");
 		});
 
 		it("should directly access all properties in selectedFeatures array", async () => {
-			// Test with all three features to ensure each branch is covered
-			const allFeatures = [ELintStagedFeature.PRETTIER, ELintStagedFeature.ESLINT, ELintStagedFeature.STYLELINT];
+			// Test with all features to ensure each branch is covered
+			const allFeatures = [ELintStagedFeature.PRETTIER, ELintStagedFeature.ESLINT, ELintStagedFeature.STYLELINT, ELintStagedFeature.TYPESCRIPT];
 
 			// Call createConfigs with all features
 			await (lintStagedService as any).createConfigs(allFeatures);
@@ -507,14 +542,18 @@ describe("LintStagedModuleService", () => {
 			const fileContent = mockFileSystemService.writeFile.mock.calls[0][1];
 
 			// Verify coverage of specific branches
-			// For PRETTIER (lines 298-303)
+			// For PRETTIER
 			expect(fileContent).toContain('commands.push("prettier --write --ignore-unknown")');
 
-			// For ESLINT (lines 304-309)
+			// For ESLINT
 			expect(fileContent).toContain("const eslintFiles = files.filter");
 			expect(fileContent).toContain("eslint --fix --max-warnings=0 --no-warn-ignored");
 
-			// For STYLELINT (lines 310-316)
+			// For TYPESCRIPT
+			expect(fileContent).toContain("const tsFiles = files.filter");
+			expect(fileContent).toContain("tsc-files --noEmit");
+
+			// For STYLELINT
 			expect(fileContent).toContain("const styleFiles = files.filter");
 			expect(fileContent).toContain("stylelint --fix");
 		});

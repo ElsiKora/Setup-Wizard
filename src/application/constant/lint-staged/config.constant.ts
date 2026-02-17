@@ -39,15 +39,25 @@ export const LINT_STAGED_CONFIG: {
           return hasValidExtension && !hasNoExtension;
         });
 
-		const tsFiles = files.filter((file) => /\\.(ts|tsx)$/.test(file));
-
         if (eslintFiles.length > 0) {
           commands.push(\`eslint --fix --max-warnings=0 --no-warn-ignored \${eslintFiles.join(" ")}\`);
-        }
-		
-		if (tsFiles.length > 0) {
-   		  commands.push(\`tsc-files --noEmit --skipLibCheck --incremental false global.d.ts \${tsFiles.join(" ")}\`);
-  		}`);
+        }`);
+		}
+
+		if (features.includes(ELintStagedFeature.TYPESCRIPT)) {
+			const extensions: Array<string> = LINT_STAGED_FEATURE_CONFIG[ELintStagedFeature.TYPESCRIPT].fileExtensions;
+			fileFilters.push(`
+        const tsFiles = files.filter((fileName) => {
+          const validExtensions = ${JSON.stringify(extensions)};
+          const fileExtension = fileName.split(".").pop();
+          const hasValidExtension = validExtensions.includes(fileExtension);
+          const hasNoExtension = !fileName.includes(".");
+          return hasValidExtension && !hasNoExtension;
+        });
+
+        if (tsFiles.length > 0) {
+          commands.push(\`tsc-files --noEmit --skipLibCheck --incremental false global.d.ts \${tsFiles.join(" ")}\`);
+        }`);
 		}
 
 		if (features.includes(ELintStagedFeature.STYLELINT)) {
