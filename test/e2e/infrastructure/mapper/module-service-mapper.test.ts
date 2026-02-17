@@ -16,10 +16,12 @@ import { SemanticReleaseModuleService } from "bin/application/service/semantic-r
 // Mock the CosmicConfigService to avoid actual dependency
 vi.mock("bin/infrastructure/service/cosmi-config-config.service.js", () => {
 	return {
-		CosmicConfigService: vi.fn().mockImplementation(() => ({
-			getConfig: vi.fn(),
-			saveConfig: vi.fn(),
-		})),
+		CosmicConfigService: vi.fn(function MockCosmicConfigService(this: any) {
+			return {
+				getConfig: vi.fn(),
+				saveConfig: vi.fn(),
+			};
+		}),
 	};
 });
 

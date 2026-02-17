@@ -9,12 +9,14 @@ import { AnalyzeCommandRegistrar } from "../../src/presentation/registrar/analyz
 // Mock all dependencies
 vi.mock("commander", () => {
 	return {
-		Command: vi.fn().mockImplementation(() => ({
-			name: vi.fn().mockReturnThis(),
-			description: vi.fn().mockReturnThis(),
-			version: vi.fn().mockReturnThis(),
-			parse: vi.fn(),
-		})),
+		Command: vi.fn(function MockCommand(this: any) {
+			return {
+				name: vi.fn().mockReturnThis(),
+				description: vi.fn().mockReturnThis(),
+				version: vi.fn().mockReturnThis(),
+				parse: vi.fn(),
+			};
+		}),
 	};
 });
 
@@ -22,14 +24,18 @@ vi.mock("../../src/infrastructure/service/prompts-cli-interface.service");
 vi.mock("../../src/infrastructure/service/node-file-system.service");
 vi.mock("../../src/infrastructure/factory/command.factory");
 vi.mock("../../src/presentation/registrar/init.registrar", () => ({
-	InitCommandRegistrar: vi.fn().mockImplementation(() => ({
-		execute: vi.fn(),
-	})),
+	InitCommandRegistrar: vi.fn(function MockInitCommandRegistrar(this: any) {
+		return {
+			execute: vi.fn(),
+		};
+	}),
 }));
 vi.mock("../../src/presentation/registrar/analyze.registrar", () => ({
-	AnalyzeCommandRegistrar: vi.fn().mockImplementation(() => ({
-		execute: vi.fn(),
-	})),
+	AnalyzeCommandRegistrar: vi.fn(function MockAnalyzeCommandRegistrar(this: any) {
+		return {
+			execute: vi.fn(),
+		};
+	}),
 }));
 
 describe("Index entry point", () => {
@@ -53,7 +59,7 @@ describe("Index entry point", () => {
 		expect(Command).toHaveBeenCalledTimes(1);
 
 		// Get the Command instance
-		const commandInstance = (Command as unknown as jest.Mock).mock.results[0].value;
+		const commandInstance = (Command as unknown as { mock: { results: Array<{ value: any }> } }).mock.results[0].value;
 
 		// Check program was set up correctly
 		expect(commandInstance.name).toHaveBeenCalledWith("@elsikora/setup-wizard");
@@ -70,8 +76,8 @@ describe("Index entry point", () => {
 		expect(AnalyzeCommandRegistrar).toHaveBeenCalledTimes(1);
 
 		// Check execute was called on registrars
-		const initRegistrarInstance = (InitCommandRegistrar as unknown as jest.Mock).mock.results[0].value;
-		const analyzeRegistrarInstance = (AnalyzeCommandRegistrar as unknown as jest.Mock).mock.results[0].value;
+		const initRegistrarInstance = (InitCommandRegistrar as unknown as { mock: { results: Array<{ value: any }> } }).mock.results[0].value;
+		const analyzeRegistrarInstance = (AnalyzeCommandRegistrar as unknown as { mock: { results: Array<{ value: any }> } }).mock.results[0].value;
 
 		expect(initRegistrarInstance.execute).toHaveBeenCalledTimes(1);
 		expect(analyzeRegistrarInstance.execute).toHaveBeenCalledTimes(1);

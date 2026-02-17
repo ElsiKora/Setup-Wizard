@@ -6,21 +6,23 @@ import { ConfigMapper } from "../../../../src/application/mapper/config.mapper";
 
 // Mock dependencies
 vi.mock("../../../../src/infrastructure/mapper/module-service.mapper", () => ({
-	ModuleServiceMapper: vi.fn().mockImplementation(() => ({
-		getModuleService: vi.fn().mockImplementation((module) => {
-			if (module === EModule.ESLINT)
+	ModuleServiceMapper: vi.fn(function MockModuleServiceMapper(this: any) {
+		return {
+			getModuleService: vi.fn().mockImplementation((module) => {
+				if (module === EModule.ESLINT)
+					return {
+						install: vi.fn().mockResolvedValue({ wasInstalled: true }),
+					};
+				if (module === EModule.PRETTIER)
+					return {
+						install: vi.fn().mockResolvedValue({ wasInstalled: true }),
+					};
 				return {
-					install: vi.fn().mockResolvedValue({ wasInstalled: true }),
+					install: vi.fn().mockResolvedValue({ wasInstalled: false }),
 				};
-			if (module === EModule.PRETTIER)
-				return {
-					install: vi.fn().mockResolvedValue({ wasInstalled: true }),
-				};
-			return {
-				install: vi.fn().mockResolvedValue({ wasInstalled: false }),
-			};
-		}),
-	})),
+			}),
+		};
+	}),
 }));
 
 vi.mock("../../../../src/application/mapper/config.mapper", () => ({
@@ -31,14 +33,16 @@ vi.mock("../../../../src/application/mapper/config.mapper", () => ({
 }));
 
 vi.mock("../../../../src/infrastructure/service/cosmi-config-config.service", () => ({
-	CosmicConfigService: vi.fn().mockImplementation(() => ({
-		exists: vi.fn(),
-		get: vi.fn(),
-		set: vi.fn(),
-		merge: vi.fn().mockResolvedValue(undefined),
-		getModuleConfig: vi.fn(),
-		isModuleEnabled: vi.fn(),
-	})),
+	CosmicConfigService: vi.fn(function MockCosmicConfigService(this: any) {
+		return {
+			exists: vi.fn(),
+			get: vi.fn(),
+			set: vi.fn(),
+			merge: vi.fn().mockResolvedValue(undefined),
+			getModuleConfig: vi.fn(),
+			isModuleEnabled: vi.fn(),
+		};
+	}),
 }));
 
 describe("InitCommand", () => {
@@ -173,56 +177,51 @@ describe("InitCommand", () => {
 			expect(ConfigMapper.fromSetupResultsToConfig).toHaveBeenCalled();
 		});
 
-		it(
-			"should install all modules when no specific modules are enabled",
-			async () => {
-				// Skip this test for now - we've already verified the coverage with our original test
-				// The original test was causing issues with mocking Object.values but that's OK
-				// We're still getting the coverage we need by running the skipped test body
+		it.skip("should install all modules when no specific modules are enabled", async () => {
+			// Skip this test for now - we've already verified the coverage with our original test
+			// The original test was causing issues with mocking Object.values but that's OK
+			// We're still getting the coverage we need by running the skipped test body
 
-				// Create command with no modules enabled
-				const emptyProperties = {
-					eslint: false,
-					prettier: false,
-					stylelint: false,
-					commitlint: false,
-					"semantic-release": false,
-					"lint-staged": false,
-					license: false,
-					ci: false,
-					ide: false,
-					gitignore: false,
-					interactive: true,
-					configPath: "./setup-wizard.config.js",
-				};
+			// Create command with no modules enabled
+			const emptyProperties = {
+				eslint: false,
+				prettier: false,
+				stylelint: false,
+				commitlint: false,
+				"semantic-release": false,
+				"lint-staged": false,
+				license: false,
+				ci: false,
+				ide: false,
+				gitignore: false,
+				interactive: true,
+				configPath: "./setup-wizard.config.js",
+			};
 
-				const command = new InitCommand(emptyProperties, mockCliInterfaceService as any, mockFileSystemService as any);
+			const command = new InitCommand(emptyProperties, mockCliInterfaceService as any, mockFileSystemService as any);
 
-				// Mock config doesn't exist
-				(command as any).CONFIG_SERVICE.exists.mockResolvedValue(false);
+			// Mock config doesn't exist
+			(command as any).CONFIG_SERVICE.exists.mockResolvedValue(false);
 
-				// Create a spy to monitor the moduleServiceMapper.getModuleService calls
-				const mockModuleServiceMapperInstance = {
-					getModuleService: vi.fn().mockImplementation(() => ({
-						install: vi.fn().mockResolvedValue({ wasInstalled: true }),
-					})),
-				};
+			// Create a spy to monitor the moduleServiceMapper.getModuleService calls
+			const mockModuleServiceMapperInstance = {
+				getModuleService: vi.fn().mockImplementation(() => ({
+					install: vi.fn().mockResolvedValue({ wasInstalled: true }),
+				})),
+			};
 
-				vi.mocked(ModuleServiceMapper).mockImplementation(() => mockModuleServiceMapperInstance as any);
+			vi.mocked(ModuleServiceMapper).mockImplementation(function MockModuleServiceMapperOverride(this: any) {
+				return mockModuleServiceMapperInstance as any;
+			});
 
-				await command.execute();
+			await command.execute();
 
-				// Verify that getModuleService was called multiple times
-				expect(mockModuleServiceMapperInstance.getModuleService).toHaveBeenCalled();
+			// Verify that getModuleService was called multiple times
+			expect(mockModuleServiceMapperInstance.getModuleService).toHaveBeenCalled();
 
-				// Verify config is merged
-				expect((command as any).CONFIG_SERVICE.merge).toHaveBeenCalled();
-			},
-			{
-				// Mark test as only for coverage, not validation
-				skip: true,
-			},
-		);
+			// Verify config is merged
+			expect((command as any).CONFIG_SERVICE.merge).toHaveBeenCalled();
+		});
 
 		// This test specifically targets line 76 in init.command.ts
 		it("should directly test Object.values(EModule) access", async () => {
@@ -266,7 +265,9 @@ describe("InitCommand", () => {
 					install: vi.fn().mockResolvedValue({}),
 				}),
 			};
-			vi.mocked(ModuleServiceMapper).mockImplementation(() => mockModuleServiceMapper as any);
+			vi.mocked(ModuleServiceMapper).mockImplementation(function MockModuleServiceMapperOverride(this: any) {
+				return mockModuleServiceMapper as any;
+			});
 
 			// Execute the command - just to maintain coverage percentage
 			await command.execute();
@@ -356,7 +357,9 @@ describe("InitCommand", () => {
 				})),
 			};
 
-			vi.mocked(ModuleServiceMapper).mockImplementation(() => mockServiceMapper as any);
+			vi.mocked(ModuleServiceMapper).mockImplementation(function MockModuleServiceMapperOverride(this: any) {
+				return mockServiceMapper as any;
+			});
 
 			await command.execute();
 
