@@ -35,13 +35,9 @@ export class AnalyzeCommandRegistrar implements ICommandRegistrar {
 	execute(): Command {
 		return this.PROGRAM.command(ECommand.ANALYZE)
 			.description(
-				`Analyze project structure and dependencies')
+				`Analyze project structure and dependencies.
 
-This command will check is project has all instruments from Setup-Wizard.
-
-Options:
-  -e, --hasEslint    Checks for ESLint configuration
-  -p, --hasPrettier     Checks for Prettier configuration`,
+This command checks whether the project has all Setup-Wizard tools configured.`,
 			)
 			.option("-e, --hasEslint", "Checks for ESLint configuration")
 			.option("-p, --hasPrettier", "Checks for Prettier configuration")
