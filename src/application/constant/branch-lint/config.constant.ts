@@ -31,7 +31,7 @@ export const BRANCH_LINT_CONFIG: {
   rules: {
     "branch-max-length": 50,
     "branch-min-length": 5,
-    "branch-pattern": "${branchPattern}",
+    "branch-name-pattern": "${branchPattern}",
     "branch-prohibited": ["main", "master", "release"],
     "branch-subject-pattern": "[a-z0-9-]+",
   },
