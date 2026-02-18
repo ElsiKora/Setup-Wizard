@@ -1,3 +1,21 @@
+# [2.8.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.7.0...v2.8.0) (2026-02-18)
+
+
+### Bug Fixes
+
+* **branch-lint:** rename branch-pattern to branch-name-pattern and bump prlint version ([1a59f03](https://github.com/ElsiKora/Setup-Wizard/commit/1a59f03a25c35aa00a12d60f637eaedfc61cad16))
+* **config:** correct swapped descriptions for bugfix and feature branches ([b539297](https://github.com/ElsiKora/Setup-Wizard/commit/b5392977f120cf3f9a91f445b20fb18d0b910b0c))
+* **config:** correct swapped descriptions for bugfix and feature branches ([259b38f](https://github.com/ElsiKora/Setup-Wizard/commit/259b38f0263d01b7fdfd812601fb914877d6e290))
+
+
+### Features
+
+* **commitlint:** add ticket id extraction and normalization support ([e754a4d](https://github.com/ElsiKora/Setup-Wizard/commit/e754a4db690ae5bee05f31767700a32a2bcfc470))
+* **lint-staged:** add separate typescript type checking support in lint-staged config ([ebe6f98](https://github.com/ElsiKora/Setup-Wizard/commit/ebe6f98a34a1220e231a7f3add9af7cead9dc7c5))
+* **lint-staged:** add typescript type checking to pre-commit hooks ([6a1f6c1](https://github.com/ElsiKora/Setup-Wizard/commit/6a1f6c1bb05268eab0d460536ecc371262ae9624))
+* **lint-staged:** add typescript type checking to pre-commit hooks ([4705855](https://github.com/ElsiKora/Setup-Wizard/commit/470585588b3a61cd4f87de79dd3d22b3ac8102bc))
+* **prlint:** add prlint module for pull request linting and validation ([321b823](https://github.com/ElsiKora/Setup-Wizard/commit/321b82399b1d4c7bb9a57b4850d576a7919302d4))
+
 # [2.7.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.6.0...v2.7.0) (2025-06-03)
 
 ## Features
