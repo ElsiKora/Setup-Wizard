@@ -1,5 +1,4 @@
 export const BRANCH_LINT_CONFIG_FILE_NAMES: Array<string> = [
-	".elsikora/git-branch-lint.config.js",
 	`.elsikora/.git-branch-lintrc`,
 	`.elsikora/.git-branch-lintrc.json`,
 	`.elsikora/.git-branch-lintrc.yaml`,

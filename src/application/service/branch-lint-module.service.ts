@@ -4,6 +4,7 @@ import type { IModuleService } from "../../infrastructure/interface/module-servi
 import type { ICliInterfaceService } from "../interface/cli-interface-service.interface";
 import type { ICommandService } from "../interface/command-service.interface";
 import type { IConfigService } from "../interface/config-service.interface";
+import type { IBranchlint } from "../interface/config/branch-lint.interface";
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
@@ -44,6 +45,9 @@ export class BranchLintModuleService implements IModuleService {
 
 	/** Service for managing package.json */
 	readonly PACKAGE_JSON_SERVICE: PackageJsonService;
+
+	/** Cached branch-lint module configuration */
+	private config: IBranchlint | null = null;
 
 	/**
 	 * Initializes a new instance of the BranchLintModuleService.
@@ -120,6 +124,8 @@ export class BranchLintModuleService implements IModuleService {
 	 */
 	async install(): Promise<IModuleSetupResult> {
 		try {
+			this.config = await this.CONFIG_SERVICE.getModuleConfig<IBranchlint>(EModule.BRANCH_LINT);
+
 			if (!(await this.shouldInstall())) {
 				return { wasInstalled: false };
 			}
@@ -128,13 +134,36 @@ export class BranchLintModuleService implements IModuleService {
 				return { wasInstalled: false };
 			}
 
-			await this.setupBranchLint();
+			const isTicketIdEnabled: boolean = await this.shouldEnableTicketId();
+			await this.setupBranchLint(isTicketIdEnabled);
 
-			return { wasInstalled: true };
+			return {
+				customProperties: {
+					isTicketIdEnabled,
+				},
+				wasInstalled: true,
+			};
 		} catch (error) {
 			this.CLI_INTERFACE_SERVICE.handleError(BRANCH_LINT_CONFIG_SUMMARY.installErrorMessage, error);
 
 			throw error;
+		}
+	}
+
+	/**
+	 * Determines whether optional ticket-id placeholder should be enabled.
+	 * Uses saved module configuration as default value.
+	 * @returns Promise resolving to true when ticket-id placeholder should be enabled
+	 */
+	async shouldEnableTicketId(): Promise<boolean> {
+		const isTicketIdEnabledByDefault: boolean = this.config?.isTicketIdEnabled ?? true;
+
+		try {
+			return await this.CLI_INTERFACE_SERVICE.confirm(BRANCH_LINT_CONFIG_SUMMARY.ticketIdConfirmationQuestion, isTicketIdEnabledByDefault);
+		} catch (error) {
+			this.CLI_INTERFACE_SERVICE.handleError(BRANCH_LINT_CONFIG_SUMMARY.ticketIdConfirmationErrorMessage, error);
+
+			return isTicketIdEnabledByDefault;
 		}
 	}
 
@@ -156,15 +185,19 @@ export class BranchLintModuleService implements IModuleService {
 
 	/**
 	 * Creates the branch-lint configuration file.
+	 * @param isTicketIdEnabled - Whether optional ticket-id placeholder should be enabled
 	 */
-	private async createConfigs(): Promise<void> {
-		await this.FILE_SYSTEM_SERVICE.writeFile(BRANCH_LINT_CONFIG_FILE_NAME, BRANCH_LINT_CONFIG.template(), "utf8");
+	private async createConfigs(isTicketIdEnabled: boolean): Promise<void> {
+		await this.FILE_SYSTEM_SERVICE.writeFile(BRANCH_LINT_CONFIG_FILE_NAME, BRANCH_LINT_CONFIG.template(isTicketIdEnabled), "utf8");
 	}
 
 	/**
 	 * Displays a summary of the setup results.
+	 * @param isTicketIdEnabled - Whether optional ticket-id placeholder is enabled
 	 */
-	private displaySetupSummary(): void {
+	private displaySetupSummary(isTicketIdEnabled: boolean): void {
+		const branchPattern: string = isTicketIdEnabled ? BRANCH_LINT_CONFIG_MESSAGES.branchPatternEnabledValue : BRANCH_LINT_CONFIG_MESSAGES.branchPatternDisabledValue;
+
 		const summary: Array<string> = [
 			BRANCH_LINT_CONFIG_MESSAGES.branchLintDescription,
 			"",
@@ -174,6 +207,8 @@ export class BranchLintModuleService implements IModuleService {
 			BRANCH_LINT_CONFIG_MESSAGES.configurationFilesLabel,
 			`- ${BRANCH_LINT_CONFIG_FILE_NAME}`,
 			`- ${BRANCH_LINT_CONFIG_HUSKY_PRE_PUSH_FILE_PATH}`,
+			"",
+			`${BRANCH_LINT_CONFIG_MESSAGES.branchPatternLabel} ${branchPattern}`,
 			"",
 			BRANCH_LINT_CONFIG_MESSAGES.huskyHookSetupNote,
 			BRANCH_LINT_CONFIG_MESSAGES.branchCreationNote.replace("{script}", BRANCH_LINT_CONFIG_SCRIPTS.branch.name),
@@ -205,18 +240,19 @@ export class BranchLintModuleService implements IModuleService {
 	/**
 	 * Sets up branch-lint.
 	 * Installs dependencies, creates configuration files, and configures git hooks.
+	 * @param isTicketIdEnabled - Whether optional ticket-id placeholder should be enabled
 	 */
-	private async setupBranchLint(): Promise<void> {
+	private async setupBranchLint(isTicketIdEnabled: boolean): Promise<void> {
 		this.CLI_INTERFACE_SERVICE.startSpinner(BRANCH_LINT_CONFIG_SUMMARY.setupStartMessage);
 
 		try {
 			await this.PACKAGE_JSON_SERVICE.installPackages(BRANCH_LINT_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
-			await this.createConfigs();
+			await this.createConfigs(isTicketIdEnabled);
 			await this.setupHusky();
 			await this.setupScripts();
 
 			this.CLI_INTERFACE_SERVICE.stopSpinner(BRANCH_LINT_CONFIG_SUMMARY.setupCompleteMessage);
-			this.displaySetupSummary();
+			this.displaySetupSummary(isTicketIdEnabled);
 		} catch (error) {
 			this.CLI_INTERFACE_SERVICE.stopSpinner(BRANCH_LINT_CONFIG_SUMMARY.setupFailedMessage);
 

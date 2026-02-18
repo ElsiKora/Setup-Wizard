@@ -29,6 +29,7 @@ describe("NodeCommandService", () => {
 
 		// Create mock CLI interface service
 		mockCliInterfaceService = {
+			error: vi.fn(),
 			warn: vi.fn(),
 			info: vi.fn(),
 			success: vi.fn(),
@@ -88,7 +89,7 @@ describe("NodeCommandService", () => {
 			await nodeCommandService.execute("npm install package");
 
 			// Verify the handling process
-			expect(mockCliInterfaceService.warn).toHaveBeenCalledWith("npm command exection failed.");
+			expect(mockCliInterfaceService.warn).toHaveBeenCalledWith("npm command execution failed.");
 			expect(mockCliInterfaceService.select).toHaveBeenCalled();
 			expect(mockCliInterfaceService.info).toHaveBeenCalledWith("Retrying with --force flag...");
 			expect(mockExecAsync).toHaveBeenCalledWith("npm install package --force");
@@ -154,7 +155,7 @@ describe("NodeCommandService", () => {
 			await nodeCommandService.execute("npm ci");
 
 			// Verify the handling process
-			expect(mockCliInterfaceService.warn).toHaveBeenCalledWith("npm command exection failed.");
+			expect(mockCliInterfaceService.warn).toHaveBeenCalledWith("npm command execution failed.");
 			expect(mockCliInterfaceService.select).toHaveBeenCalled();
 			expect(mockExecAsync).toHaveBeenCalledWith("npm ci --force");
 		});

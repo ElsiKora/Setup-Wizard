@@ -10,6 +10,7 @@ import type { IConfigIde } from "./config/ide.interface";
 import type { IConfigLicense } from "./config/license.interface";
 import type { IConfigLintStaged } from "./config/lint-staged.interface";
 import type { IConfigPrettier } from "./config/prettier.interface";
+import type { IConfigPrlint } from "./config/prlint.interface";
 import type { IConfigSemanticRelease } from "./config/semantic-release.interface";
 import type { IConfigStylelint } from "./config/stylelint.interface";
 import type { IConfigTesting } from "./config/testing.interface";
@@ -30,6 +31,7 @@ export interface IConfig {
 	[EModule.LICENSE]?: IConfigLicense;
 	[EModule.LINT_STAGED]?: IConfigLintStaged;
 	[EModule.PRETTIER]?: IConfigPrettier;
+	[EModule.PRLINT]?: IConfigPrlint;
 	[EModule.SEMANTIC_RELEASE]?: IConfigSemanticRelease;
 	[EModule.STYLELINT]?: IConfigStylelint;
 	[EModule.TESTING]?: IConfigTesting;

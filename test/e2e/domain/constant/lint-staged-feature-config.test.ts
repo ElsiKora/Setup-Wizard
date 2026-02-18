@@ -55,4 +55,12 @@ describe("LINT_STAGED_FEATURE_CONFIG E2E test", () => {
 		expect(stylelintConfig.fileExtensions).toContain("scss");
 		expect(stylelintConfig.requiredPackages).toContain("stylelint");
 	});
+
+	it("should have correct configuration for TypeScript feature", () => {
+		const typescriptConfig = LINT_STAGED_FEATURE_CONFIG[ELintStagedFeature.TYPESCRIPT];
+		expect(typescriptConfig.label).toContain("TypeScript");
+		expect(typescriptConfig.fileExtensions).toContain("ts");
+		expect(typescriptConfig.fileExtensions).toContain("tsx");
+		expect(typescriptConfig.requiredPackages).toContain("tsc-files");
+	});
 });

@@ -1,10 +1,9 @@
 # [2.7.0](https://github.com/ElsiKora/Setup-Wizard/compare/v2.6.0...v2.7.0) (2025-06-03)
 
+## Features
 
-### Features
-
-* **modules:** add testing module with support for multiple test frameworks ([02c4f23](https://github.com/ElsiKora/Setup-Wizard/commit/02c4f2311045f7582a5cf4f3f3d319eb0f6c9117))
-* **modules:** add typescript and builder module support with rollup integration ([8c2aa98](https://github.com/ElsiKora/Setup-Wizard/commit/8c2aa986b1b09ebd46fd755ebab2ea85ff2162e6))
+- **modules:** add testing module with support for multiple test frameworks ([02c4f23](https://github.com/ElsiKora/Setup-Wizard/commit/02c4f2311045f7582a5cf4f3f3d319eb0f6c9117))
+- **modules:** add typescript and builder module support with rollup integration ([8c2aa98](https://github.com/ElsiKora/Setup-Wizard/commit/8c2aa986b1b09ebd46fd755ebab2ea85ff2162e6))
 
 # Changelog
 

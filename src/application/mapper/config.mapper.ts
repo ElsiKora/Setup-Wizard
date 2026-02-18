@@ -56,6 +56,33 @@ export const ConfigMapper: {
 							isEnabled?: boolean;
 					  }
 					| {
+							generation?: {
+								model?: string;
+								provider?: string;
+								retries?: number;
+								validationRetries?: number;
+							};
+							github?: {
+								base?: string;
+								isDraft?: boolean;
+								prohibitedBranches?: Array<string>;
+							};
+							isEnabled?: boolean;
+							isScriptsEnabled?: boolean;
+							lint?: {
+								forbiddenPlaceholders?: Array<string>;
+								requiredSections?: Array<string>;
+								titlePattern?: string;
+							};
+							ticket?: {
+								missingBranchLintBehavior?: string;
+								normalization?: string;
+								pattern?: string;
+								patternFlags?: string;
+								source?: string;
+							};
+					  }
+					| {
 							ides?: Array<EIde>;
 							isEnabled?: boolean;
 					  }

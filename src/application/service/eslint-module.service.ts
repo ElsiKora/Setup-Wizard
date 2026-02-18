@@ -307,7 +307,9 @@ export class EslintModuleService implements IModuleService {
 		let hasTypeScript: boolean = false;
 
 		for (const [feature, config] of Object.entries(ESLINT_FEATURE_CONFIG)) {
-			if ((feature === String(EEslintFeature.TYPESCRIPT) || feature === String(EEslintFeature.TYPESCRIPT_STRICT)) && config.detect?.some((packageName: string) => packageName in dependencies)) {
+			const eslintFeature: EEslintFeature = feature as EEslintFeature;
+
+			if ((eslintFeature === EEslintFeature.TYPESCRIPT || eslintFeature === EEslintFeature.TYPESCRIPT_STRICT) && config.detect?.some((packageName: string) => packageName in dependencies)) {
 				hasTypeScript = true;
 
 				break;
@@ -321,8 +323,10 @@ export class EslintModuleService implements IModuleService {
 
 		// Add other features with detect property (excluding TypeScript features as we handled them above)
 		for (const [feature, config] of Object.entries(ESLINT_FEATURE_CONFIG)) {
-			if (feature !== String(EEslintFeature.TYPESCRIPT) && feature !== String(EEslintFeature.TYPESCRIPT_STRICT) && config.detect?.some((packageName: string) => packageName in dependencies)) {
-				detectedFeatures.add(feature as EEslintFeature);
+			const eslintFeature: EEslintFeature = feature as EEslintFeature;
+
+			if (eslintFeature !== EEslintFeature.TYPESCRIPT && eslintFeature !== EEslintFeature.TYPESCRIPT_STRICT && config.detect?.some((packageName: string) => packageName in dependencies)) {
+				detectedFeatures.add(eslintFeature);
 			}
 		}
 
