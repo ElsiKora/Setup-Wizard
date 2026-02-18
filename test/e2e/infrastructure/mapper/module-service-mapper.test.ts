@@ -12,14 +12,17 @@ import { CommitlintModuleService } from "bin/application/service/commitlint-modu
 import { IdeModuleService } from "bin/application/service/ide-module.service.js";
 import { LintStagedModuleService } from "bin/application/service/lint-staged-module.service.js";
 import { SemanticReleaseModuleService } from "bin/application/service/semantic-release-module.service.js";
+import { PrlintModuleService } from "bin/application/service/prlint-module.service.js";
 
 // Mock the CosmicConfigService to avoid actual dependency
 vi.mock("bin/infrastructure/service/cosmi-config-config.service.js", () => {
 	return {
-		CosmicConfigService: vi.fn().mockImplementation(() => ({
-			getConfig: vi.fn(),
-			saveConfig: vi.fn(),
-		})),
+		CosmicConfigService: vi.fn(function MockCosmicConfigService(this: any) {
+			return {
+				getConfig: vi.fn(),
+				saveConfig: vi.fn(),
+			};
+		}),
 	};
 });
 
@@ -124,6 +127,11 @@ describe("Module Service Mapper E2E test", () => {
 	it("should return Semantic Release module service for Semantic Release module type", () => {
 		const service = moduleServiceMapper.getModuleService(EModule.SEMANTIC_RELEASE);
 		expect(service).toBeInstanceOf(SemanticReleaseModuleService);
+	});
+
+	it("should return PRLint module service for PRLint module type", () => {
+		const service = moduleServiceMapper.getModuleService(EModule.PRLINT);
+		expect(service).toBeInstanceOf(PrlintModuleService);
 	});
 
 	it("should throw an error for unsupported module types", () => {

@@ -9,6 +9,7 @@ export enum EModule {
 	LICENSE = "license",
 	LINT_STAGED = "lint-staged",
 	PRETTIER = "prettier",
+	PRLINT = "prlint",
 	SEMANTIC_RELEASE = "semantic-release",
 	STYLELINT = "stylelint",
 	TESTING = "testing",

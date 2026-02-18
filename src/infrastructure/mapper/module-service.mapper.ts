@@ -13,6 +13,7 @@ import { IdeModuleService } from "../../application/service/ide-module.service";
 import { LicenseModuleService } from "../../application/service/license-module.service";
 import { LintStagedModuleService } from "../../application/service/lint-staged-module.service";
 import { PrettierModuleService } from "../../application/service/prettier-module.service";
+import { PrlintModuleService } from "../../application/service/prlint-module.service";
 import { SemanticReleaseModuleService } from "../../application/service/semantic-release-module.service";
 import { StylelintModuleService } from "../../application/service/stylelint-module.service";
 import { TestingModuleService } from "../../application/service/testing-module.service";
@@ -93,6 +94,10 @@ export class ModuleServiceMapper {
 
 			case EModule.PRETTIER: {
 				return new PrettierModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
+			}
+
+			case EModule.PRLINT: {
+				return new PrlintModuleService(this.CLI_INTERFACE_SERVICE, this.FILE_SYSTEM_SERVICE, this.CONFIG_SERVICE);
 			}
 
 			case EModule.SEMANTIC_RELEASE: {

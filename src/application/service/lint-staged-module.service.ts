@@ -156,6 +156,23 @@ export class LintStagedModuleService implements IModuleService {
 	}
 
 	/**
+	 * Collects all required npm dependencies for selected lint-staged features.
+	 * @param selectedFeatures - Selected lint-staged features
+	 * @returns Array of package names to install
+	 */
+	private collectDependencies(selectedFeatures: Array<ELintStagedFeature>): Array<string> {
+		const dependencies: Set<string> = new Set<string>(LINT_STAGED_CORE_DEPENDENCIES);
+
+		for (const feature of selectedFeatures) {
+			for (const packageName of LINT_STAGED_FEATURE_CONFIG[feature].requiredPackages) {
+				dependencies.add(packageName);
+			}
+		}
+
+		return [...dependencies];
+	}
+
+	/**
 	 * Creates the lint-staged configuration file.
 	 * @param selectedFeatures - Array of selected lint-staged features
 	 */
@@ -170,7 +187,7 @@ export class LintStagedModuleService implements IModuleService {
 	 * @param selectedFeatures - Array of selected lint-staged features
 	 */
 	private displaySetupSummary(selectedFeatures: Array<ELintStagedFeature>): void {
-		const requiredPackages: Array<string> = selectedFeatures.flatMap((feature: ELintStagedFeature) => LINT_STAGED_FEATURE_CONFIG[feature].requiredPackages);
+		const requiredPackages: Array<string> = [...new Set<string>(selectedFeatures.flatMap((feature: ELintStagedFeature) => LINT_STAGED_FEATURE_CONFIG[feature].requiredPackages))];
 
 		const summary: Array<string> = [
 			LINT_STAGED_CONFIG_MESSAGES.configurationCreated,
@@ -244,7 +261,8 @@ export class LintStagedModuleService implements IModuleService {
 			this.selectedFeatures = await this.CLI_INTERFACE_SERVICE.multiselect<ELintStagedFeature>(LINT_STAGED_CONFIG_MESSAGES.selectFeaturesPrompt, options, true, initialValues);
 
 			this.CLI_INTERFACE_SERVICE.startSpinner(LINT_STAGED_CONFIG_MESSAGES.settingUpSpinner);
-			await this.PACKAGE_JSON_SERVICE.installPackages(LINT_STAGED_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
+			const dependencies: Array<string> = this.collectDependencies(this.selectedFeatures);
+			await this.PACKAGE_JSON_SERVICE.installPackages(dependencies, "latest", EPackageJsonDependencyType.DEV);
 			await this.createConfigs(this.selectedFeatures);
 			await this.setupHusky();
 

@@ -6,47 +6,75 @@ import type { IConfigService } from "../../../../src/application/interface/confi
 
 // Mock the dependencies before importing the ModuleServiceMapper
 vi.mock("../../../../src/infrastructure/service/cosmi-config-config.service", () => ({
-	CosmicConfigService: vi.fn(),
+	CosmicConfigService: vi.fn(function MockCosmicConfigService(this: any) {
+		return {};
+	}),
 }));
 
 vi.mock("../../../../src/application/service/ci-module.service", () => ({
-	CiModuleService: vi.fn(),
+	CiModuleService: vi.fn(function MockCiModuleService(this: any) {
+		return {};
+	}),
 }));
 
 vi.mock("../../../../src/application/service/commitlint-module.service", () => ({
-	CommitlintModuleService: vi.fn(),
+	CommitlintModuleService: vi.fn(function MockCommitlintModuleService(this: any) {
+		return {};
+	}),
 }));
 
 vi.mock("../../../../src/application/service/eslint-module.service", () => ({
-	EslintModuleService: vi.fn(),
+	EslintModuleService: vi.fn(function MockEslintModuleService(this: any) {
+		return {};
+	}),
 }));
 
 vi.mock("../../../../src/application/service/gitignore-module.service", () => ({
-	GitignoreModuleService: vi.fn(),
+	GitignoreModuleService: vi.fn(function MockGitignoreModuleService(this: any) {
+		return {};
+	}),
 }));
 
 vi.mock("../../../../src/application/service/ide-module.service", () => ({
-	IdeModuleService: vi.fn(),
+	IdeModuleService: vi.fn(function MockIdeModuleService(this: any) {
+		return {};
+	}),
 }));
 
 vi.mock("../../../../src/application/service/license-module.service", () => ({
-	LicenseModuleService: vi.fn(),
+	LicenseModuleService: vi.fn(function MockLicenseModuleService(this: any) {
+		return {};
+	}),
 }));
 
 vi.mock("../../../../src/application/service/lint-staged-module.service", () => ({
-	LintStagedModuleService: vi.fn(),
+	LintStagedModuleService: vi.fn(function MockLintStagedModuleService(this: any) {
+		return {};
+	}),
 }));
 
 vi.mock("../../../../src/application/service/prettier-module.service", () => ({
-	PrettierModuleService: vi.fn(),
+	PrettierModuleService: vi.fn(function MockPrettierModuleService(this: any) {
+		return {};
+	}),
+}));
+
+vi.mock("../../../../src/application/service/prlint-module.service", () => ({
+	PrlintModuleService: vi.fn(function MockPrlintModuleService(this: any) {
+		return {};
+	}),
 }));
 
 vi.mock("../../../../src/application/service/semantic-release-module.service", () => ({
-	SemanticReleaseModuleService: vi.fn(),
+	SemanticReleaseModuleService: vi.fn(function MockSemanticReleaseModuleService(this: any) {
+		return {};
+	}),
 }));
 
 vi.mock("../../../../src/application/service/stylelint-module.service", () => ({
-	StylelintModuleService: vi.fn(),
+	StylelintModuleService: vi.fn(function MockStylelintModuleService(this: any) {
+		return {};
+	}),
 }));
 
 // Now import the class after all mocks are set up
@@ -60,6 +88,7 @@ import { IdeModuleService } from "../../../../src/application/service/ide-module
 import { LicenseModuleService } from "../../../../src/application/service/license-module.service";
 import { LintStagedModuleService } from "../../../../src/application/service/lint-staged-module.service";
 import { PrettierModuleService } from "../../../../src/application/service/prettier-module.service";
+import { PrlintModuleService } from "../../../../src/application/service/prlint-module.service";
 import { SemanticReleaseModuleService } from "../../../../src/application/service/semantic-release-module.service";
 import { StylelintModuleService } from "../../../../src/application/service/stylelint-module.service";
 
@@ -77,7 +106,9 @@ describe("ModuleServiceMapper", () => {
 		mockFileSystemService = {} as IFileSystemService;
 		mockConfigService = {} as IConfigService;
 
-		(CosmicConfigService as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockConfigService);
+		(CosmicConfigService as unknown as ReturnType<typeof vi.fn>).mockImplementation(function MockCosmicConfigServiceOverride(this: any) {
+			return mockConfigService as any;
+		});
 
 		// Create mapper instance
 		moduleServiceMapper = new ModuleServiceMapper(mockCliInterfaceService, mockFileSystemService);
@@ -130,6 +161,11 @@ describe("ModuleServiceMapper", () => {
 		it("should return PrettierModuleService for PRETTIER module", () => {
 			moduleServiceMapper.getModuleService(EModule.PRETTIER);
 			expect(PrettierModuleService).toHaveBeenCalledWith(mockCliInterfaceService, mockFileSystemService, expect.anything());
+		});
+
+		it("should return PrlintModuleService for PRLINT module", () => {
+			moduleServiceMapper.getModuleService(EModule.PRLINT);
+			expect(PrlintModuleService).toHaveBeenCalledWith(mockCliInterfaceService, mockFileSystemService, expect.anything());
 		});
 
 		it("should return SemanticReleaseModuleService for SEMANTIC_RELEASE module", () => {

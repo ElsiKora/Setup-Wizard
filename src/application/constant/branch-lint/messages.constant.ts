@@ -1,6 +1,9 @@
 export const BRANCH_LINT_CONFIG_MESSAGES: {
 	branchCreationNote: string;
 	branchLintDescription: string;
+	branchPatternDisabledValue: string;
+	branchPatternEnabledValue: string;
+	branchPatternLabel: string;
 	branchScriptDescription: string;
 	configurationFilesLabel: string;
 	generatedScriptsLabel: string;
@@ -9,6 +12,9 @@ export const BRANCH_LINT_CONFIG_MESSAGES: {
 } = {
 	branchCreationNote: "Use 'npm run {script}' to create and switch to new branches using an interactive interface.",
 	branchLintDescription: "Branch Lint configuration has been created.",
+	branchPatternDisabledValue: ":type/:name",
+	branchPatternEnabledValue: ":type/:ticket-:name",
+	branchPatternLabel: "Branch pattern:",
 	branchScriptDescription: "(for create new branch)",
 	configurationFilesLabel: "Configuration files:",
 	generatedScriptsLabel: "Generated scripts:",
