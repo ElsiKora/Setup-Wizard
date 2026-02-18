@@ -5,16 +5,20 @@
 export const BRANCH_LINT_CONFIG: {
 	/**
 	 * Generates a branch-lint configuration file content.
+	 * @param isTicketIdEnabled - Whether ticket placeholder is enabled in branch pattern
 	 * @returns String content for the branch-lint configuration file
 	 */
-	template: () => string;
+	template: (isTicketIdEnabled: boolean) => string;
 } = {
 	/**
 	 * Generates a branch-lint configuration file content.
 	 * Creates a configuration with branch types, ignore patterns, and validation rules.
+	 * @param isTicketIdEnabled - Whether ticket placeholder is enabled in branch pattern
 	 * @returns String content for the branch-lint configuration file
 	 */
-	template: () => {
+	template: (isTicketIdEnabled: boolean) => {
+		const branchPattern: string = isTicketIdEnabled ? ":type/:ticket-:name" : ":type/:name";
+
 		return `export default {
   branches: {
     bugfix: { description: "🐞 Fixing issues in existing functionality", title: "Bugfix" },
@@ -27,7 +31,7 @@ export const BRANCH_LINT_CONFIG: {
   rules: {
     "branch-max-length": 50,
     "branch-min-length": 5,
-    "branch-pattern": ":type/:name",
+    "branch-pattern": "${branchPattern}",
     "branch-prohibited": ["main", "master", "release"],
     "branch-subject-pattern": "[a-z0-9-]+",
   },

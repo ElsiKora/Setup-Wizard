@@ -1,6 +1,7 @@
 export default {
 	"branch-lint": {
 		isEnabled: true,
+		isTicketIdEnabled: true,
 	},
 	ci: {
 		isEnabled: true,
@@ -11,6 +12,18 @@ export default {
 	},
 	commitlint: {
 		isEnabled: true,
+		maxRetries: 3,
+		mode: "auto",
+		model: "claude-opus-4-5",
+		provider: "anthropic",
+		ticket: {
+			missingBranchLintBehavior: "error",
+			normalization: "upper",
+			pattern: "[a-z]{2,}-[0-9]+",
+			patternFlags: "i",
+			source: "branch-lint",
+		},
+		validationMaxRetries: 3,
 	},
 	eslint: {
 		features: ["sonar", "unicorn", "perfectionist", "jsdoc", "javascript", "typescript", "jsx", "json", "yaml", "checkFile", "packageJson", "markdown", "react", "nest", "next", "tanstack", "storybook", "node", "regexp", "typeorm", "i18next", "tailwindCss", "prettier", "stylistic", "css", "fsd", "noSecrets"],
