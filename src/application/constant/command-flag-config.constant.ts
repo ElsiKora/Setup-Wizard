@@ -53,6 +53,11 @@ export const COMMAND_FLAG_CONFIG: Record<EModule, ICommandFlagConfig> = {
 		fullFlag: "withPrettier",
 		shortFlag: "p",
 	},
+	[EModule.PRLINT]: {
+		description: "Add PRLint configuration",
+		fullFlag: "withPrlint",
+		shortFlag: "n",
+	},
 	[EModule.SEMANTIC_RELEASE]: {
 		description: "Add semantic-release configuration",
 		fullFlag: "withSemanticRelease",

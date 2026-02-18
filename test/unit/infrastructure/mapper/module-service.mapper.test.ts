@@ -59,6 +59,12 @@ vi.mock("../../../../src/application/service/prettier-module.service", () => ({
 	}),
 }));
 
+vi.mock("../../../../src/application/service/prlint-module.service", () => ({
+	PrlintModuleService: vi.fn(function MockPrlintModuleService(this: any) {
+		return {};
+	}),
+}));
+
 vi.mock("../../../../src/application/service/semantic-release-module.service", () => ({
 	SemanticReleaseModuleService: vi.fn(function MockSemanticReleaseModuleService(this: any) {
 		return {};
@@ -82,6 +88,7 @@ import { IdeModuleService } from "../../../../src/application/service/ide-module
 import { LicenseModuleService } from "../../../../src/application/service/license-module.service";
 import { LintStagedModuleService } from "../../../../src/application/service/lint-staged-module.service";
 import { PrettierModuleService } from "../../../../src/application/service/prettier-module.service";
+import { PrlintModuleService } from "../../../../src/application/service/prlint-module.service";
 import { SemanticReleaseModuleService } from "../../../../src/application/service/semantic-release-module.service";
 import { StylelintModuleService } from "../../../../src/application/service/stylelint-module.service";
 
@@ -154,6 +161,11 @@ describe("ModuleServiceMapper", () => {
 		it("should return PrettierModuleService for PRETTIER module", () => {
 			moduleServiceMapper.getModuleService(EModule.PRETTIER);
 			expect(PrettierModuleService).toHaveBeenCalledWith(mockCliInterfaceService, mockFileSystemService, expect.anything());
+		});
+
+		it("should return PrlintModuleService for PRLINT module", () => {
+			moduleServiceMapper.getModuleService(EModule.PRLINT);
+			expect(PrlintModuleService).toHaveBeenCalledWith(mockCliInterfaceService, mockFileSystemService, expect.anything());
 		});
 
 		it("should return SemanticReleaseModuleService for SEMANTIC_RELEASE module", () => {

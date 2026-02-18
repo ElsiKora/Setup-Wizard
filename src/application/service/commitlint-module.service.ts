@@ -9,6 +9,8 @@ import type { IConfigCommitlint } from "../interface/config/commitlint.interface
 import type { IFileSystemService } from "../interface/file-system-service.interface";
 import type { IModuleSetupResult } from "../interface/module-setup-result.interface";
 
+import { ECommitlintMode } from "../../domain/enum/commitlint-mode.enum";
+import { ECommitlintProvider } from "../../domain/enum/commitlint-provider.enum";
 import { ECommitlintTicketMissingBranchLintBehavior } from "../../domain/enum/commitlint-ticket-missing-branch-lint-behavior.enum";
 import { ECommitlintTicketNormalization } from "../../domain/enum/commitlint-ticket-normalization.enum";
 import { ECommitlintTicketSource } from "../../domain/enum/commitlint-ticket-source.enum";
@@ -27,6 +29,9 @@ import { COMMITLINT_CONFIG_SCRIPTS } from "../constant/commitlint/scripts.consta
 import { COMMITLINT_CONFIG_SUMMARY } from "../constant/commitlint/summary.constant";
 
 import { PackageJsonService } from "./package-json.service";
+
+const MAX_RETRY_COUNT: number = 10;
+const MIN_RETRY_COUNT: number = 1;
 
 /**
  * Service for setting up and managing Commitlint and Commitizen configuration.
@@ -130,6 +135,47 @@ export class CommitlintModuleService implements IModuleService {
 	}
 
 	/**
+	 * Reads generation model.
+	 * @param defaultModel - Default model value
+	 * @returns Promise resolving to configured model
+	 */
+	async readGenerationModel(defaultModel: string): Promise<string> {
+		try {
+			const model: string = await this.CLI_INTERFACE_SERVICE.text(COMMITLINT_CONFIG_MESSAGES.modelPrompt, "", defaultModel, (value: string) => (value.trim().length === 0 ? "Model is required" : undefined));
+
+			return model.trim().length > 0 ? model.trim() : defaultModel;
+		} catch (error) {
+			this.CLI_INTERFACE_SERVICE.handleError(COMMITLINT_CONFIG_MESSAGES.modelPromptError, error);
+
+			return defaultModel;
+		}
+	}
+
+	/**
+	 * Reads retry count with range validation.
+	 * @param prompt - Prompt message
+	 * @param errorPrompt - Error message
+	 * @param defaultValue - Default retry value
+	 * @returns Promise resolving to retry count
+	 */
+	async readRetryCount(prompt: string, errorPrompt: string, defaultValue: number): Promise<number> {
+		try {
+			const value: string = await this.CLI_INTERFACE_SERVICE.text(prompt, "", String(defaultValue), (retryCount: string) => {
+				const parsedValue: number = Number.parseInt(retryCount, 10);
+
+				return Number.isNaN(parsedValue) || parsedValue < MIN_RETRY_COUNT || parsedValue > MAX_RETRY_COUNT ? `Please enter a number between ${MIN_RETRY_COUNT} and ${MAX_RETRY_COUNT}` : undefined;
+			});
+			const parsedValue: number = Number.parseInt(value, 10);
+
+			return Number.isNaN(parsedValue) ? defaultValue : parsedValue;
+		} catch (error) {
+			this.CLI_INTERFACE_SERVICE.handleError(errorPrompt, error);
+
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * Reads regex pattern for ticket extraction.
 	 * @param defaultPattern - Default regex pattern
 	 * @returns Promise resolving to configured regex pattern
@@ -169,6 +215,12 @@ export class CommitlintModuleService implements IModuleService {
 	 */
 	async resolveCommitlintAiConfig(): Promise<IConfigCommitlint> {
 		const defaultCommitlintAiConfig: IConfigCommitlint = this.getDefaultCommitlintAiConfig();
+		const mode: ECommitlintMode = await this.selectGenerationMode(defaultCommitlintAiConfig.mode ?? COMMITLINT_AI_DEFAULTS.mode);
+		const provider: ECommitlintProvider = await this.selectGenerationProvider(defaultCommitlintAiConfig.provider ?? COMMITLINT_AI_DEFAULTS.provider);
+		const model: string = await this.readGenerationModel(this.config?.model ?? this.getDefaultModelByProvider(provider));
+		const maxRetries: number = await this.readRetryCount(COMMITLINT_CONFIG_MESSAGES.maxRetriesPrompt, COMMITLINT_CONFIG_MESSAGES.maxRetriesPromptError, defaultCommitlintAiConfig.maxRetries ?? COMMITLINT_AI_DEFAULTS.maxRetries);
+
+		const validationMaxRetries: number = await this.readRetryCount(COMMITLINT_CONFIG_MESSAGES.validationMaxRetriesPrompt, COMMITLINT_CONFIG_MESSAGES.validationMaxRetriesPromptError, defaultCommitlintAiConfig.validationMaxRetries ?? COMMITLINT_AI_DEFAULTS.validationMaxRetries);
 
 		const ticketDefaults: Required<IConfigCommitlintTicket> = {
 			missingBranchLintBehavior: defaultCommitlintAiConfig.ticket?.missingBranchLintBehavior ?? COMMITLINT_AI_DEFAULTS.ticket.missingBranchLintBehavior,
@@ -182,15 +234,15 @@ export class CommitlintModuleService implements IModuleService {
 
 		if (!isTicketEnabled) {
 			return {
-				maxRetries: defaultCommitlintAiConfig.maxRetries ?? COMMITLINT_AI_DEFAULTS.maxRetries,
-				mode: defaultCommitlintAiConfig.mode ?? COMMITLINT_AI_DEFAULTS.mode,
-				model: defaultCommitlintAiConfig.model ?? COMMITLINT_AI_DEFAULTS.model,
-				provider: defaultCommitlintAiConfig.provider ?? COMMITLINT_AI_DEFAULTS.provider,
+				maxRetries,
+				mode,
+				model,
+				provider,
 				ticket: {
 					...ticketDefaults,
 					source: ECommitlintTicketSource.NONE,
 				},
-				validationMaxRetries: defaultCommitlintAiConfig.validationMaxRetries ?? COMMITLINT_AI_DEFAULTS.validationMaxRetries,
+				validationMaxRetries,
 			};
 		}
 
@@ -210,10 +262,10 @@ export class CommitlintModuleService implements IModuleService {
 		}
 
 		return {
-			maxRetries: defaultCommitlintAiConfig.maxRetries ?? COMMITLINT_AI_DEFAULTS.maxRetries,
-			mode: defaultCommitlintAiConfig.mode ?? COMMITLINT_AI_DEFAULTS.mode,
-			model: defaultCommitlintAiConfig.model ?? COMMITLINT_AI_DEFAULTS.model,
-			provider: defaultCommitlintAiConfig.provider ?? COMMITLINT_AI_DEFAULTS.provider,
+			maxRetries,
+			mode,
+			model,
+			provider,
 			ticket: {
 				missingBranchLintBehavior: ticketMissingBranchLintBehavior,
 				normalization: ticketNormalization,
@@ -221,8 +273,52 @@ export class CommitlintModuleService implements IModuleService {
 				patternFlags: ticketPatternFlags,
 				source: ticketSource,
 			},
-			validationMaxRetries: defaultCommitlintAiConfig.validationMaxRetries ?? COMMITLINT_AI_DEFAULTS.validationMaxRetries,
+			validationMaxRetries,
 		};
+	}
+
+	/**
+	 * Selects generation mode.
+	 * @param defaultMode - Default mode value
+	 * @returns Promise resolving to selected mode
+	 */
+	async selectGenerationMode(defaultMode: ECommitlintMode): Promise<ECommitlintMode> {
+		const options: Array<ICliInterfaceServiceSelectOptions> = [
+			{ label: "auto - AI-powered generation", value: ECommitlintMode.AUTO },
+			{ label: "manual - guided commit composition", value: ECommitlintMode.MANUAL },
+		];
+
+		try {
+			return await this.CLI_INTERFACE_SERVICE.select<ECommitlintMode>(COMMITLINT_CONFIG_MESSAGES.modePrompt, options, defaultMode);
+		} catch (error) {
+			this.CLI_INTERFACE_SERVICE.handleError(COMMITLINT_CONFIG_MESSAGES.modePromptError, error);
+
+			return defaultMode;
+		}
+	}
+
+	/**
+	 * Selects generation provider.
+	 * @param defaultProvider - Default provider value
+	 * @returns Promise resolving to selected provider
+	 */
+	async selectGenerationProvider(defaultProvider: ECommitlintProvider): Promise<ECommitlintProvider> {
+		const options: Array<ICliInterfaceServiceSelectOptions> = [
+			{ label: "anthropic", value: ECommitlintProvider.ANTHROPIC },
+			{ label: "aws-bedrock", value: ECommitlintProvider.AWS_BEDROCK },
+			{ label: "azure-openai", value: ECommitlintProvider.AZURE_OPENAI },
+			{ label: "google", value: ECommitlintProvider.GOOGLE },
+			{ label: "ollama", value: ECommitlintProvider.OLLAMA },
+			{ label: "openai", value: ECommitlintProvider.OPENAI },
+		];
+
+		try {
+			return await this.CLI_INTERFACE_SERVICE.select<ECommitlintProvider>(COMMITLINT_CONFIG_MESSAGES.providerPrompt, options, defaultProvider);
+		} catch (error) {
+			this.CLI_INTERFACE_SERVICE.handleError(COMMITLINT_CONFIG_MESSAGES.providerPromptError, error);
+
+			return defaultProvider;
+		}
 	}
 
 	/**
@@ -354,14 +450,21 @@ export class CommitlintModuleService implements IModuleService {
 	 */
 	private displaySetupSummary(commitlintAiConfig: IConfigCommitlint = this.getDefaultCommitlintAiConfig(), isCommitCommandEnabled: boolean = true): void {
 		const commitScriptDescription: string = isCommitCommandEnabled ? COMMITLINT_CONFIG_SUMMARY.commitDescription : COMMITLINT_CONFIG_SUMMARY.commitCommandDisabledDescription;
+		const generationMode: ECommitlintMode = commitlintAiConfig.mode ?? COMMITLINT_AI_DEFAULTS.mode;
+		const generationProvider: ECommitlintProvider = commitlintAiConfig.provider ?? COMMITLINT_AI_DEFAULTS.provider;
+		const generationModel: string = commitlintAiConfig.model ?? COMMITLINT_AI_DEFAULTS.model;
+		const generationMaxRetries: number = commitlintAiConfig.maxRetries ?? COMMITLINT_AI_DEFAULTS.maxRetries;
+		const generationValidationMaxRetries: number = commitlintAiConfig.validationMaxRetries ?? COMMITLINT_AI_DEFAULTS.validationMaxRetries;
 		const ticketSource: ECommitlintTicketSource = commitlintAiConfig.ticket?.source ?? COMMITLINT_AI_DEFAULTS.ticket.source;
 		const ticketNormalization: ECommitlintTicketNormalization = commitlintAiConfig.ticket?.normalization ?? COMMITLINT_AI_DEFAULTS.ticket.normalization;
 
 		const ticketMissingBranchLintBehavior: ECommitlintTicketMissingBranchLintBehavior = commitlintAiConfig.ticket?.missingBranchLintBehavior ?? COMMITLINT_AI_DEFAULTS.ticket.missingBranchLintBehavior;
 
+		const generationDescription: string = COMMITLINT_CONFIG_SUMMARY.generationConfigurationDescription.replace("{mode}", generationMode).replace("{provider}", generationProvider).replace("{model}", generationModel).replace("{maxRetries}", String(generationMaxRetries)).replace("{validationMaxRetries}", String(generationValidationMaxRetries));
+
 		const ticketDescription: string = COMMITLINT_CONFIG_SUMMARY.ticketConfigurationDescription.replace("{source}", ticketSource).replace("{normalization}", ticketNormalization).replace("{missingBranchLintBehavior}", ticketMissingBranchLintBehavior);
 
-		const summary: Array<string> = [COMMITLINT_CONFIG_MESSAGES.configurationCreated, "", COMMITLINT_CONFIG_MESSAGES.generatedScriptsLabel, commitScriptDescription, "", COMMITLINT_CONFIG_MESSAGES.configurationFilesLabel, COMMITLINT_CONFIG_SUMMARY.configFileDescription, COMMITLINT_CONFIG_SUMMARY.aiConfigFileDescription, COMMITLINT_CONFIG_SUMMARY.huskyCommitMsgDescription, "", ticketDescription, "", COMMITLINT_CONFIG_MESSAGES.huskyGitHooksInfo];
+		const summary: Array<string> = [COMMITLINT_CONFIG_MESSAGES.configurationCreated, "", generationDescription, ticketDescription, "", COMMITLINT_CONFIG_MESSAGES.generatedScriptsLabel, commitScriptDescription, "", COMMITLINT_CONFIG_MESSAGES.configurationFilesLabel, COMMITLINT_CONFIG_SUMMARY.configFileDescription, COMMITLINT_CONFIG_SUMMARY.aiConfigFileDescription, COMMITLINT_CONFIG_SUMMARY.huskyCommitMsgDescription, "", COMMITLINT_CONFIG_MESSAGES.huskyGitHooksInfo];
 
 		if (isCommitCommandEnabled) {
 			summary.push(COMMITLINT_CONFIG_MESSAGES.commitizenDescription);
@@ -409,6 +512,43 @@ export class CommitlintModuleService implements IModuleService {
 			},
 			validationMaxRetries: this.config?.validationMaxRetries ?? COMMITLINT_AI_DEFAULTS.validationMaxRetries,
 		};
+	}
+
+	/**
+	 * Returns default model for selected provider.
+	 * @param provider - Selected provider
+	 * @returns Default model name
+	 */
+	private getDefaultModelByProvider(provider: ECommitlintProvider): string {
+		switch (provider) {
+			case ECommitlintProvider.ANTHROPIC: {
+				return "claude-opus-4-5";
+			}
+
+			case ECommitlintProvider.AWS_BEDROCK: {
+				return "claude-sonnet-4-5";
+			}
+
+			case ECommitlintProvider.AZURE_OPENAI: {
+				return "gpt-4o";
+			}
+
+			case ECommitlintProvider.GOOGLE: {
+				return "gemini-2.5-pro-preview-05-06";
+			}
+
+			case ECommitlintProvider.OLLAMA: {
+				return "llama3";
+			}
+
+			case ECommitlintProvider.OPENAI: {
+				return "gpt-4o-mini";
+			}
+
+			default: {
+				return COMMITLINT_AI_DEFAULTS.model;
+			}
+		}
 	}
 
 	/**

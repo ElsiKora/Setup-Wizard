@@ -126,6 +126,7 @@ npx @elsikora/setup-wizard init --withEslint --withPrettier --withLintStaged
 - `-l, --withLicense`: Add a LICENSE file (defaults to MIT).
 - `-t, --withLintStaged`: Add lint-staged configuration with Husky pre-commit hook.
 - `-p, --withPrettier`: Add Prettier configuration for code formatting.
+- `-n, --withPrlint`: Add PRLint configuration (AI generation + PR content linting rules).
 - `-r, --withSemanticRelease`: Add Semantic Release configuration for automated versioning and publishing.
 - `-s, --withStylelint`: Add Stylelint configuration for CSS/SCSS linting.
 - `-T, --withTesting`: Add testing configuration (currently focuses on Vitest).
@@ -159,6 +160,18 @@ export default {
 	},
 	commitlint: {
 		isEnabled: true, // Enables commit message linting
+		maxRetries: 3,
+		mode: "auto",
+		model: "claude-opus-4-5",
+		provider: "anthropic",
+		ticket: {
+			missingBranchLintBehavior: "error", // Team strict default
+			normalization: "upper", // Team strict default
+			pattern: "[a-z]{2,}-[0-9]+", // Team strict default
+			patternFlags: "i", // Team strict default
+			source: "branch-lint", // Team strict default
+		},
+		validationMaxRetries: 3,
 	},
 	eslint: {
 		features: [
@@ -212,6 +225,33 @@ export default {
 	},
 	prettier: {
 		isEnabled: true, // Note: Default in provided config is false
+	},
+	prlint: {
+		generation: {
+			model: "claude-opus-4-5",
+			provider: "anthropic",
+			retries: 3,
+			validationRetries: 3,
+		},
+		github: {
+			base: "dev",
+			isDraft: false,
+			prohibitedBranches: ["main", "master"],
+		},
+		isEnabled: true,
+		isScriptsEnabled: true,
+		lint: {
+			forbiddenPlaceholders: ["WIP", "TODO", "<!--", "TEMPLATE", "lorem ipsum", "[ ]", "<replace-me>"],
+			requiredSections: ["Summary", "Scope", "Changes", "Acceptance Criteria", "Test Plan", "Risks", "Linear"],
+			titlePattern: "^(?<type>[a-z]+)\\((?<scope>[a-z0-9-]+)\\): (?<subject>.+) \\| (?<ticket>[A-Za-z]{2,}-\\d+)$",
+		},
+		ticket: {
+			missingBranchLintBehavior: "error", // Team strict default
+			normalization: "upper", // Team strict default
+			pattern: "[a-z]{2,}-[0-9]+", // Team strict default
+			patternFlags: "i", // Team strict default
+			source: "branch-lint", // Team strict default
+		},
 	},
 	"semantic-release": {
 		developBranch: "dev",
@@ -290,6 +330,16 @@ npx @elsikora/setup-wizard init --withBranchLint
 This sets up `@elsikora/git-branch-lint` with a pre-push hook. During setup, wizard asks whether to enable optional ticket-id support in branch names (`:type/:ticket-:name`). Configure rules in `.elsikora/git-branch-lint.config.js`.
 
 By combining flags or using the interactive mode, you can precisely tailor the setup to any JavaScript or TypeScript project, ensuring consistency and best practices from the start.
+
+### Enabling PRLint:
+
+To configure pull request generation/linting with interactive defaults:
+
+```bash
+npx @elsikora/setup-wizard init --withPrlint
+```
+
+This installs `@elsikora/prlint`, creates `.elsikora/prlint.config.js`, and can add `prlint` scripts (`prlint`, `prlint:generate`, `prlint:create`, `prlint:context`, `prlint:fix`). Ticket defaults are Enter-friendly and team-strict (`source=branch-lint`, `missingBranchLintBehavior=error`, `normalization=upper`, `pattern=[a-z]{2,}-[0-9]+`, `patternFlags=i`).
 
 ## 🛣 Roadmap
 

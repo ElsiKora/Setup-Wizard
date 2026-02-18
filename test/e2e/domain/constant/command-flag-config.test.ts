@@ -75,6 +75,11 @@ describe("Command Flag Config Constant E2E test", () => {
 		expect(COMMAND_FLAG_CONFIG[EModule.PRETTIER].shortFlag).toBe("p");
 		expect(COMMAND_FLAG_CONFIG[EModule.PRETTIER].description).toBe("Add Prettier configuration");
 
+		expect(COMMAND_FLAG_CONFIG[EModule.PRLINT]).toBeDefined();
+		expect(COMMAND_FLAG_CONFIG[EModule.PRLINT].fullFlag).toBe("withPrlint");
+		expect(COMMAND_FLAG_CONFIG[EModule.PRLINT].shortFlag).toBe("n");
+		expect(COMMAND_FLAG_CONFIG[EModule.PRLINT].description).toBe("Add PRLint configuration");
+
 		expect(COMMAND_FLAG_CONFIG[EModule.SEMANTIC_RELEASE]).toBeDefined();
 		expect(COMMAND_FLAG_CONFIG[EModule.SEMANTIC_RELEASE].fullFlag).toBe("withSemanticRelease");
 		expect(COMMAND_FLAG_CONFIG[EModule.SEMANTIC_RELEASE].shortFlag).toBe("r");

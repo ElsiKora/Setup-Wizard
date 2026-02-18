@@ -17,6 +17,14 @@ interface ICommitlintConfigMessages {
 	failedSetupError: string;
 	generatedScriptsLabel: string;
 	huskyGitHooksInfo: string;
+	maxRetriesPrompt: string;
+	maxRetriesPromptError: string;
+	modelPrompt: string;
+	modelPromptError: string;
+	modePrompt: string;
+	modePromptError: string;
+	providerPrompt: string;
+	providerPromptError: string;
 	settingUpSpinner: string;
 	setupCompleteTitle: string;
 	ticketEnabledPrompt: string;
@@ -29,6 +37,8 @@ interface ICommitlintConfigMessages {
 	ticketPatternPromptError: string;
 	ticketSourcePrompt: string;
 	ticketSourcePromptError: string;
+	validationMaxRetriesPrompt: string;
+	validationMaxRetriesPromptError: string;
 }
 
 export const COMMITLINT_CONFIG_MESSAGES: ICommitlintConfigMessages = {
@@ -50,6 +60,14 @@ export const COMMITLINT_CONFIG_MESSAGES: ICommitlintConfigMessages = {
 	failedSetupError: "Failed to complete Commitlint setup",
 	generatedScriptsLabel: "Generated scripts:",
 	huskyGitHooksInfo: "Husky git hooks have been set up to validate your commits.",
+	maxRetriesPrompt: "Max retries for AI generation (1-10):",
+	maxRetriesPromptError: "Failed to read max retries",
+	modelPrompt: "Generation model:",
+	modelPromptError: "Failed to read generation model",
+	modePrompt: "Select commit generation mode:",
+	modePromptError: "Failed to select commit mode",
+	providerPrompt: "Select generation provider:",
+	providerPromptError: "Failed to select generation provider",
 	settingUpSpinner: "Setting up Commitlint and Commitizen configuration...",
 	setupCompleteTitle: "Commitlint Setup",
 	ticketEnabledPrompt: "Enable automatic ticket extraction for commit footer Refs?",
@@ -62,4 +80,6 @@ export const COMMITLINT_CONFIG_MESSAGES: ICommitlintConfigMessages = {
 	ticketPatternPromptError: "Failed to read ticket regex pattern",
 	ticketSourcePrompt: "Select ticket source strategy:",
 	ticketSourcePromptError: "Failed to select ticket source strategy",
+	validationMaxRetriesPrompt: "Max retries for validation fixes (1-10):",
+	validationMaxRetriesPromptError: "Failed to read validation max retries",
 };
