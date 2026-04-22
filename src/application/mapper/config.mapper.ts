@@ -34,7 +34,7 @@ export const ConfigMapper: {
 	 * @returns Command properties for initialization
 	 */
 	fromConfigToInitCommandProperties(config: IConfig): TInitCommandProperties {
-		const properties: TInitCommandProperties = {} as TInitCommandProperties;
+		const properties: TInitCommandProperties = {};
 
 		for (const key in config) {
 			if (Object.prototype.hasOwnProperty.call(config, key)) {
@@ -123,7 +123,7 @@ export const ConfigMapper: {
 	 * @returns Configuration object
 	 */
 	fromSetupResultsToConfig(setupResults: Partial<Record<EModule, IModuleSetupResult>>): IConfig {
-		const config: IConfig = {} as IConfig;
+		const config: IConfig = {};
 
 		for (const key in setupResults) {
 			if (Object.prototype.hasOwnProperty.call(setupResults, key)) {

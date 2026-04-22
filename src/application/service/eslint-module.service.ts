@@ -20,6 +20,7 @@ import { EPackageJsonDependencyType } from "../../domain/enum/package-json-depen
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
 import { ESLINT_CONFIG } from "../constant/eslint/config.constant";
 import { ESLINT_CONFIG_CORE_DEPENDENCIES } from "../constant/eslint/core-dependencies.constant";
+import { ESLINT_CONFIG_DEPENDENCY_VERSIONS } from "../constant/eslint/dependency-versions.constant";
 import { ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME } from "../constant/eslint/elsikora-package-name.constant";
 import { ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION } from "../constant/eslint/eslint-minimum-required-version.constant";
 import { ESLINT_CONFIG_ESLINT_PACKAGE_NAME } from "../constant/eslint/eslint-package-name.constant";
@@ -245,6 +246,18 @@ export class EslintModuleService implements IModuleService {
 		}
 
 		return [...dependencies];
+	}
+
+	/**
+	 * Collects npm package specs with compatible version ranges for ESLint setup.
+	 * @returns Array of package specs ready for installation
+	 */
+	private collectDependencySpecs(): Array<string> {
+		return this.collectDependencies().map((packageName: string) => {
+			const version: string | undefined = ESLINT_CONFIG_DEPENDENCY_VERSIONS[packageName];
+
+			return version ? `${packageName}@${version}` : packageName;
+		});
 	}
 
 	/**
@@ -498,8 +511,8 @@ export class EslintModuleService implements IModuleService {
 		this.CLI_INTERFACE_SERVICE.startSpinner(ESLINT_CONFIG_MESSAGES.settingUpConfig);
 
 		try {
-			const packages: Array<string> = this.collectDependencies();
-			await this.PACKAGE_JSON_SERVICE.installPackages(packages, "latest", EPackageJsonDependencyType.DEV);
+			const packageSpecs: Array<string> = this.collectDependencySpecs();
+			await this.PACKAGE_JSON_SERVICE.installPackages(packageSpecs, undefined, EPackageJsonDependencyType.DEV);
 			await this.createConfig();
 			await this.setupScripts();
 

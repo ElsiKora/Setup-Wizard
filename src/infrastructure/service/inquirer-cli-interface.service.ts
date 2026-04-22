@@ -90,14 +90,14 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		}
 
 		try {
-			const answer: { selection: Array<T> } = (await inquirer.prompt({
+			const answer: { selection: Array<T> } = await inquirer.prompt<{ selection: Array<T> }>({
 				choices,
 				message: `${message} (space to select)`,
 				name: "selection",
 				type: "checkbox",
 				// @ts-ignore
 				validate: isRequired ? (input: Array<unknown> | string): boolean | string | undefined => input.length > 0 || "You must select at least one option" : undefined,
-			})) as { selection: Array<T> };
+			});
 
 			return answer.selection;
 		} catch {
@@ -152,14 +152,14 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		}));
 
 		try {
-			const answer: { selection: Array<T> } = (await inquirer.prompt({
+			const answer: { selection: Array<T> } = await inquirer.prompt<{ selection: Array<T> }>({
 				choices,
 				message: `${message} (space to select)`,
 				name: "selection",
 				type: "checkbox",
 				// @ts-ignore
 				validate: isRequired ? (input: Array<unknown> | string): boolean | string | undefined => input.length > 0 || "You must select at least one option" : undefined,
-			})) as { selection: Array<T> };
+			});
 
 			return answer.selection;
 		} catch {
@@ -191,13 +191,13 @@ export class InquirerCliInterface implements ICliInterfaceService {
 		const choices: Array<{ name: string; value: string }> = options.map((opt: ICliInterfaceServiceSelectOptions) => ({ name: opt.label, value: opt.value }));
 
 		try {
-			const answer: { selection: T } = (await inquirer.prompt({
+			const answer: { selection: T } = await inquirer.prompt<{ selection: T }>({
 				choices,
 				default: initialValue,
 				message,
 				name: "selection",
 				type: "list",
-			})) as { selection: T };
+			});
 
 			return answer.selection;
 		} catch {

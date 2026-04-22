@@ -87,7 +87,7 @@ export class CosmicConfigService implements IConfigService {
 			return this.cachedConfig;
 		}
 
-		return {} as IConfig;
+		return {};
 	}
 
 	/**
@@ -128,10 +128,14 @@ export class CosmicConfigService implements IConfigService {
 	public async isModuleEnabled(module: EModule): Promise<boolean> {
 		try {
 			const config: IConfig = await this.get();
-			const moduleConfig: { isEnabled?: boolean } | undefined = config[module] as { isEnabled?: boolean } | undefined;
+			const moduleConfig: unknown = config[module];
 
-			if (!moduleConfig) {
+			if (!moduleConfig || typeof moduleConfig !== "object") {
 				return false;
+			}
+
+			if (!("isEnabled" in moduleConfig)) {
+				return true;
 			}
 
 			return moduleConfig.isEnabled !== false;
@@ -152,7 +156,7 @@ export class CosmicConfigService implements IConfigService {
 			await this.set(merged);
 		} catch (error) {
 			console.error("Error merging config:", error);
-			await this.set(partial as IConfig);
+			await this.set(partial);
 		}
 	}
 
@@ -161,7 +165,7 @@ export class CosmicConfigService implements IConfigService {
 	 * @param config - The complete configuration to save
 	 * @returns Promise that resolves when the configuration is saved
 	 */
-	public async set(config: IConfig): Promise<void> {
+	public async set(config: Partial<IConfig>): Promise<void> {
 		try {
 			const result: { config: IConfig; filepath: string; isEmpty?: boolean } | null = await this.EXPLORER.search();
 

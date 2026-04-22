@@ -6,6 +6,7 @@ import { EFramework } from "../../../../src/domain/enum/framework.enum";
 import { ESLINT_CONFIG_FILE_NAMES } from "../../../../src/application/constant/eslint/file-names.constant";
 import { ESLINT_CONFIG_FILE_NAME } from "../../../../src/application/constant/eslint/file-name.constant";
 import { ESLINT_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/eslint/core-dependencies.constant";
+import { ESLINT_CONFIG_DEPENDENCY_VERSIONS } from "../../../../src/application/constant/eslint/dependency-versions.constant";
 import { ESLINT_CONFIG_ESLINT_PACKAGE_NAME } from "../../../../src/application/constant/eslint/eslint-package-name.constant";
 import { ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION } from "../../../../src/application/constant/eslint/eslint-minimum-required-version.constant";
 import { ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME } from "../../../../src/application/constant/eslint/elsikora-package-name.constant";
@@ -575,10 +576,16 @@ describe("EslintModuleService", () => {
 			// Act
 			await (eslintService as any).setupSelectedFeatures();
 
-			// Assert
-			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith("Setting up ESLint configuration...");
-			expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(["eslint"], "latest", EPackageJsonDependencyType.DEV);
-			expect(eslintService["createConfig"]).toHaveBeenCalled();
+				// Assert
+				expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith("Setting up ESLint configuration...");
+					const expectedDependencySpecs = ["eslint"].map((packageName: string) => {
+						const version: string | undefined = ESLINT_CONFIG_DEPENDENCY_VERSIONS[packageName];
+
+						return version ? `${packageName}@${version}` : packageName;
+					});
+
+				expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(expectedDependencySpecs, undefined, EPackageJsonDependencyType.DEV);
+				expect(eslintService["createConfig"]).toHaveBeenCalled();
 			expect(eslintService["setupScripts"]).toHaveBeenCalled();
 			expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith("ESLint configuration completed successfully!");
 			expect(eslintService["displaySetupSummary"]).toHaveBeenCalled();

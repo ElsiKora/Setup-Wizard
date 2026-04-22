@@ -3,6 +3,7 @@ import { TypescriptModuleService } from "../../../../src/application/service/typ
 import { TYPESCRIPT_CONFIG_FILE_NAME } from "../../../../src/application/constant/typescript/config-file-name.constant";
 import { TYPESCRIPT_CONFIG } from "../../../../src/application/constant/typescript/config.constant";
 import { TYPESCRIPT_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/typescript/core-dependencies.constant";
+import { TYPESCRIPT_CONFIG_DEPENDENCY_VERSIONS } from "../../../../src/application/constant/typescript/dependency-versions.constant";
 import { TYPESCRIPT_CONFIG_FILE_NAMES } from "../../../../src/application/constant/typescript/file-names.constant";
 import { TYPESCRIPT_CONFIG_MESSAGES } from "../../../../src/application/constant/typescript/messages.constant";
 import { TYPESCRIPT_CONFIG_SCRIPTS } from "../../../../src/application/constant/typescript/scripts.constant";
@@ -449,8 +450,14 @@ describe("TypescriptModuleService", () => {
 					isDecoratorsEnabled: false,
 				});
 
+				const expectedDependencySpecs = TYPESCRIPT_CONFIG_CORE_DEPENDENCIES.map((packageName: string) => {
+					const version: string | undefined = TYPESCRIPT_CONFIG_DEPENDENCY_VERSIONS[packageName];
+
+					return version ? `${packageName}@${version}` : packageName;
+				});
+
 				expect(mockCliInterfaceService.startSpinner).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.settingUpSpinner);
-				expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
+				expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(expectedDependencySpecs, undefined, EPackageJsonDependencyType.DEV);
 				expect(typescriptService["createConfig"]).toHaveBeenCalledWith("./src", "./src", "./dist", false, false);
 				expect(typescriptService["setupScripts"]).toHaveBeenCalled();
 				expect(mockCliInterfaceService.stopSpinner).toHaveBeenCalledWith(TYPESCRIPT_CONFIG_MESSAGES.setupCompleteSpinner);

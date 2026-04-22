@@ -12,6 +12,7 @@ import { NodeCommandService } from "../../infrastructure/service/node-command.se
 import { TYPESCRIPT_CONFIG_FILE_NAME } from "../constant/typescript/config-file-name.constant";
 import { TYPESCRIPT_CONFIG } from "../constant/typescript/config.constant";
 import { TYPESCRIPT_CONFIG_CORE_DEPENDENCIES } from "../constant/typescript/core-dependencies.constant";
+import { TYPESCRIPT_CONFIG_DEPENDENCY_VERSIONS } from "../constant/typescript/dependency-versions.constant";
 import { TYPESCRIPT_CONFIG_FILE_NAMES } from "../constant/typescript/file-names.constant";
 import { TYPESCRIPT_CONFIG_MESSAGES } from "../constant/typescript/messages.constant";
 import { TYPESCRIPT_CONFIG_SCRIPTS } from "../constant/typescript/scripts.constant";
@@ -133,6 +134,18 @@ export class TypescriptModuleService implements IModuleService {
 
 			return false;
 		}
+	}
+
+	/**
+	 * Collects npm package specs with compatible version ranges for TypeScript setup.
+	 * @returns Array of package specs ready for installation
+	 */
+	private collectDependencySpecs(): Array<string> {
+		return TYPESCRIPT_CONFIG_CORE_DEPENDENCIES.map((packageName: string) => {
+			const version: string | undefined = TYPESCRIPT_CONFIG_DEPENDENCY_VERSIONS[packageName];
+
+			return version ? `${packageName}@${version}` : packageName;
+		});
 	}
 
 	/**
@@ -296,7 +309,7 @@ export class TypescriptModuleService implements IModuleService {
 
 			// Install and configure
 			this.CLI_INTERFACE_SERVICE.startSpinner(TYPESCRIPT_CONFIG_MESSAGES.settingUpSpinner);
-			await this.PACKAGE_JSON_SERVICE.installPackages(TYPESCRIPT_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
+			await this.PACKAGE_JSON_SERVICE.installPackages(this.collectDependencySpecs(), undefined, EPackageJsonDependencyType.DEV);
 			await this.createConfig(baseUrl, rootDirectory, outputDirectory, isCleanArchitectureEnabled, isDecoratorsEnabled);
 			await this.setupScripts();
 

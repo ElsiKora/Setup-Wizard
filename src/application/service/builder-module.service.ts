@@ -13,6 +13,7 @@ import { EPackageJsonDependencyType } from "../../domain/enum/package-json-depen
 import { NodeCommandService } from "../../infrastructure/service/node-command.service";
 import { BUILD_TOOL_CONFIG } from "../constant/builder/build-tool-config.constant";
 import { BUILDER_CONFIG } from "../constant/builder/config.constant";
+import { BUILDER_CONFIG_DEPENDENCY_VERSIONS } from "../constant/builder/dependency-versions.constant";
 import { BUILDER_CONFIG_FILE_NAMES } from "../constant/builder/file-names.constant";
 import { BUILDER_CONFIG_MESSAGES } from "../constant/builder/messages.constant";
 import { BUILDER_ROLLUP_PLUGIN_GENERATE_PACKAGE_JSON } from "../constant/builder/package-names.constant";
@@ -134,6 +135,19 @@ export class BuilderModuleService implements IModuleService {
 
 			return false;
 		}
+	}
+
+	/**
+	 * Collects npm package specs with compatible version ranges for builder setup.
+	 * @param packages - Raw package names selected for installation
+	 * @returns Array of package specs ready for installation
+	 */
+	private collectDependencySpecs(packages: Array<string>): Array<string> {
+		return packages.map((packageName: string) => {
+			const version: string | undefined = BUILDER_CONFIG_DEPENDENCY_VERSIONS[packageName];
+
+			return version ? `${packageName}@${version}` : packageName;
+		});
 	}
 
 	/**
@@ -546,7 +560,7 @@ export class BuilderModuleService implements IModuleService {
 			this.CLI_INTERFACE_SERVICE.startSpinner(BUILDER_CONFIG_MESSAGES.settingUpSpinner);
 
 			// Install core dependencies
-			await this.PACKAGE_JSON_SERVICE.installPackages([...toolConfig.coreDependencies], "latest", EPackageJsonDependencyType.DEV);
+			await this.PACKAGE_JSON_SERVICE.installPackages(this.collectDependencySpecs([...toolConfig.coreDependencies]), undefined, EPackageJsonDependencyType.DEV);
 
 			// Install optional dependencies based on features
 			const optionalDeps: Array<string> = [];
@@ -573,7 +587,7 @@ export class BuilderModuleService implements IModuleService {
 			}
 
 			if (optionalDeps.length > 0) {
-				await this.PACKAGE_JSON_SERVICE.installPackages(optionalDeps, "latest", EPackageJsonDependencyType.DEV);
+				await this.PACKAGE_JSON_SERVICE.installPackages(this.collectDependencySpecs(optionalDeps), undefined, EPackageJsonDependencyType.DEV);
 			}
 
 			// Create configuration files
