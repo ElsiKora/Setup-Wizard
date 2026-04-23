@@ -8,6 +8,7 @@ import { ESLINT_CONFIG_FILE_NAME } from "../../../../src/application/constant/es
 import { ESLINT_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/eslint/core-dependencies.constant";
 import { ESLINT_CONFIG_DEPENDENCY_VERSIONS } from "../../../../src/application/constant/eslint/dependency-versions.constant";
 import { ESLINT_CONFIG_ESLINT_PACKAGE_NAME } from "../../../../src/application/constant/eslint/eslint-package-name.constant";
+import { ESLINT_CONFIG_ESLINT_MAXIMUM_SUPPORTED_VERSION } from "../../../../src/application/constant/eslint/eslint-maximum-supported-version.constant";
 import { ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION } from "../../../../src/application/constant/eslint/eslint-minimum-required-version.constant";
 import { ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME } from "../../../../src/application/constant/eslint/elsikora-package-name.constant";
 import { ESLINT_CONFIG_MESSAGES } from "../../../../src/application/constant/eslint/messages.constant";
@@ -172,6 +173,25 @@ describe("EslintModuleService", () => {
 			expect(mockCliInterfaceService.confirm).toHaveBeenCalled();
 			expect(mockCliInterfaceService.warn).toHaveBeenCalled();
 			expect(mockPackageJsonService.uninstallPackages).not.toHaveBeenCalled();
+		});
+
+		it("should ask to replace when ESLint version is newer than supported and user agrees", async () => {
+			mockPackageJsonService.getInstalledDependencyVersion.mockResolvedValueOnce({
+				flag: EPackageJsonDependencyVersionFlag.CARET,
+				isPrerelease: false,
+				majorVersion: ESLINT_CONFIG_ESLINT_MAXIMUM_SUPPORTED_VERSION + 1,
+				minorVersion: 0,
+				patchVersion: 0,
+				version: `${ESLINT_CONFIG_ESLINT_MAXIMUM_SUPPORTED_VERSION + 1}.0.0`,
+			});
+			mockCliInterfaceService.confirm.mockResolvedValueOnce(true);
+
+			const result = await eslintService.checkEslintVersion();
+
+			expect(result).toBe(true);
+			expect(mockCliInterfaceService.info).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.eslintVersionHigher(String(ESLINT_CONFIG_ESLINT_MAXIMUM_SUPPORTED_VERSION + 1), String(ESLINT_CONFIG_ESLINT_MAXIMUM_SUPPORTED_VERSION)));
+			expect(mockCliInterfaceService.confirm).toHaveBeenCalledWith(ESLINT_CONFIG_MESSAGES.removeEslintVersion(String(ESLINT_CONFIG_ESLINT_MAXIMUM_SUPPORTED_VERSION + 1)), true);
+			expect(mockPackageJsonService.uninstallPackages).toHaveBeenCalledWith(ESLINT_CONFIG_ESLINT_PACKAGE_NAME);
 		});
 	});
 

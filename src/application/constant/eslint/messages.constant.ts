@@ -13,6 +13,7 @@ interface IEslintConfigMessages {
 	eslintSetupFailed: string;
 	eslintUninstalledSuccessfully: string;
 	eslintUpdateCancelled: string;
+	eslintVersionHigher: (current: string, supported: string) => string;
 	eslintVersionLower: (current: string, required: string) => string;
 	existingConfigAborted: string;
 	existingConfigDetected: string;
@@ -57,6 +58,7 @@ export const ESLINT_CONFIG_MESSAGES: IEslintConfigMessages = {
 	eslintSetupFailed: "Failed to complete ESLint setup",
 	eslintUninstalledSuccessfully: "ESLint uninstalled successfully.",
 	eslintUpdateCancelled: "ESLint update cancelled. Setup cannot proceed with the current version.",
+	eslintVersionHigher: (current: string, supported: string): string => `Detected ESLint version ${current}, which is higher than supported version ${supported}.`,
 	eslintVersionLower: (current: string, required: string): string => `Detected ESLint version ${current}, which is lower than required version ${required}.`,
 	existingConfigAborted: "Existing ElsiKora ESLint configuration detected. Setup aborted.",
 	existingConfigDetected: "An existing ElsiKora ESLint configuration is detected. Would you like to uninstall it?",
@@ -77,7 +79,7 @@ export const ESLINT_CONFIG_MESSAGES: IEslintConfigMessages = {
 	noFeaturesSelected: "No features selected.",
 	noFrameworkConfigurations: "No framework-specific configurations",
 	noFrameworksDetected: "No frameworks detected",
-	removeEslintVersion: (version: string): string => `Do you want to remove ESLint version ${version} and install the latest version?`,
+	removeEslintVersion: (version: string): string => `Do you want to remove ESLint version ${version} and install a compatible version?`,
 	selectFeatures: "Select the features you want to enable:",
 	settingUpConfig: "Setting up ESLint configuration...",
 	setupEslintPrompt: "Do you want to set up ESLint for your project?",

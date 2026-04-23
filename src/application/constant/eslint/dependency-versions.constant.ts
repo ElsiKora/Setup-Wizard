@@ -1,6 +1,6 @@
 export const ESLINT_CONFIG_DEPENDENCY_VERSIONS: Record<string, string> = {
 	"@conarti/eslint-plugin-feature-sliced": "^1.0.5",
-	"@elsikora/eslint-config": "^3.10.0",
+	"@elsikora/eslint-config": "/Users/davrron/Desktop/work/Utils/ESLint-Config/elsikora-eslint-config-3.10.0-dev.2.tgz",
 	"@elsikora/eslint-plugin-nestjs-typed": "^3.0.1",
 	"@eslint-react/eslint-plugin": "^1.53.1",
 	"@next/eslint-plugin-next": "^16.1.6",
@@ -13,7 +13,7 @@ export const ESLINT_CONFIG_DEPENDENCY_VERSIONS: Record<string, string> = {
 	"eslint-plugin-ng-module-sort": "^1.3.2",
 	"eslint-plugin-no-secrets": "^2.2.1",
 	"eslint-plugin-react": "^7.37.5",
-	"eslint-plugin-storybook": "^9.0.12",
+	"eslint-plugin-storybook": "^10.3.5",
 	"eslint-plugin-typeorm-typescript": "^0.5.0",
 	"tsc-files": "^1.1.4",
 };

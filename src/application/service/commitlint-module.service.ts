@@ -20,6 +20,7 @@ import { NodeCommandService } from "../../infrastructure/service/node-command.se
 import { COMMITLINT_AI_CONFIG, COMMITLINT_AI_DEFAULTS } from "../constant/commitlint/ai-config.constant";
 import { COMMITLINT_CONFIG } from "../constant/commitlint/config.constant";
 import { COMMITLINT_CONFIG_CORE_DEPENDENCIES } from "../constant/commitlint/core-dependencies.constant";
+import { COMMITLINT_CONFIG_DEPENDENCY_VERSIONS } from "../constant/commitlint/dependency-versions.constant";
 import { COMMITLINT_CONFIG_FILE_NAMES } from "../constant/commitlint/file-names.constant";
 import { COMMITLINT_CONFIG_FILE_PATHS } from "../constant/commitlint/file-paths.constant";
 import { COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT } from "../constant/commitlint/husky-commit-msg-script.constant";
@@ -435,6 +436,18 @@ export class CommitlintModuleService implements IModuleService {
 	}
 
 	/**
+	 * Collects npm package specs with compatible version ranges for Commitlint setup.
+	 * @returns Array of package specs ready for installation
+	 */
+	private collectDependencySpecs(): Array<string> {
+		return COMMITLINT_CONFIG_CORE_DEPENDENCIES.map((packageName: string) => {
+			const version: string | undefined = COMMITLINT_CONFIG_DEPENDENCY_VERSIONS[packageName];
+
+			return version ? `${packageName}@${version}` : packageName;
+		});
+	}
+
+	/**
 	 * Creates the Commitlint configuration file.
 	 * @param commitlintAiConfig - Commitlint AI configuration
 	 */
@@ -561,7 +574,7 @@ export class CommitlintModuleService implements IModuleService {
 		this.CLI_INTERFACE_SERVICE.startSpinner(COMMITLINT_CONFIG_MESSAGES.settingUpSpinner);
 
 		try {
-			await this.PACKAGE_JSON_SERVICE.installPackages(COMMITLINT_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
+			await this.PACKAGE_JSON_SERVICE.installPackages(this.collectDependencySpecs(), undefined, EPackageJsonDependencyType.DEV);
 			await this.createConfigs(commitlintAiConfig);
 			await this.setupHusky();
 

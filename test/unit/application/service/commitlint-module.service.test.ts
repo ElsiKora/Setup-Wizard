@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CommitlintModuleService } from "../../../../src/application/service/commitlint-module.service";
-import { EModule } from "../../../../src/domain/enum/module.enum";
 import { COMMITLINT_CONFIG_CORE_DEPENDENCIES } from "../../../../src/application/constant/commitlint/core-dependencies.constant";
+import { COMMITLINT_CONFIG_DEPENDENCY_VERSIONS } from "../../../../src/application/constant/commitlint/dependency-versions.constant";
 import { COMMITLINT_CONFIG_HUSKY_COMMIT_MSG_SCRIPT } from "../../../../src/application/constant/commitlint/husky-commit-msg-script.constant";
 import { COMMITLINT_CONFIG_MESSAGES } from "../../../../src/application/constant/commitlint/messages.constant";
 import { COMMITLINT_CONFIG_FILE_PATHS } from "../../../../src/application/constant/commitlint/file-paths.constant";
@@ -192,8 +192,14 @@ describe("CommitlintModuleService", () => {
 
 			await (commitlintService as any).setupCommitlint();
 
+			const expectedDependencySpecs = COMMITLINT_CONFIG_CORE_DEPENDENCIES.map((packageName: string) => {
+				const version: string | undefined = COMMITLINT_CONFIG_DEPENDENCY_VERSIONS[packageName];
+
+				return version ? `${packageName}@${version}` : packageName;
+			});
+
 			expect(mockCliInterfaceService.startSpinner).toHaveBeenCalled();
-			expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(COMMITLINT_CONFIG_CORE_DEPENDENCIES, "latest", EPackageJsonDependencyType.DEV);
+			expect(mockPackageJsonService.installPackages).toHaveBeenCalledWith(expectedDependencySpecs, undefined, EPackageJsonDependencyType.DEV);
 			expect(commitlintService["createConfigs"]).toHaveBeenCalled();
 			expect(commitlintService["setupHusky"]).toHaveBeenCalled();
 			expect(commitlintService["setupPackageJsonConfigs"]).toHaveBeenCalled();

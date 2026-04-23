@@ -22,6 +22,7 @@ import { ESLINT_CONFIG } from "../constant/eslint/config.constant";
 import { ESLINT_CONFIG_CORE_DEPENDENCIES } from "../constant/eslint/core-dependencies.constant";
 import { ESLINT_CONFIG_DEPENDENCY_VERSIONS } from "../constant/eslint/dependency-versions.constant";
 import { ESLINT_CONFIG_ELSIKORA_PACKAGE_NAME } from "../constant/eslint/elsikora-package-name.constant";
+import { ESLINT_CONFIG_ESLINT_MAXIMUM_SUPPORTED_VERSION } from "../constant/eslint/eslint-maximum-supported-version.constant";
 import { ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION } from "../constant/eslint/eslint-minimum-required-version.constant";
 import { ESLINT_CONFIG_ESLINT_PACKAGE_NAME } from "../constant/eslint/eslint-package-name.constant";
 import { ESLINT_CONFIG_FILE_NAME } from "../constant/eslint/file-name.constant";
@@ -103,8 +104,10 @@ export class EslintModuleService implements IModuleService {
 		if (eslintVersion) {
 			const majorVersion: number = eslintVersion.majorVersion;
 
-			if (majorVersion < ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION) {
-				this.CLI_INTERFACE_SERVICE.info(ESLINT_CONFIG_MESSAGES.eslintVersionLower(String(majorVersion), String(ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION)));
+			if (majorVersion < ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION || majorVersion > ESLINT_CONFIG_ESLINT_MAXIMUM_SUPPORTED_VERSION) {
+				const versionMessage: string = majorVersion < ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION ? ESLINT_CONFIG_MESSAGES.eslintVersionLower(String(majorVersion), String(ESLINT_CONFIG_ESLINT_MINIMUM_REQUIRED_VERSION)) : ESLINT_CONFIG_MESSAGES.eslintVersionHigher(String(majorVersion), String(ESLINT_CONFIG_ESLINT_MAXIMUM_SUPPORTED_VERSION));
+
+				this.CLI_INTERFACE_SERVICE.info(versionMessage);
 
 				const shouldRemove: boolean = await this.CLI_INTERFACE_SERVICE.confirm(ESLINT_CONFIG_MESSAGES.removeEslintVersion(String(majorVersion)), true);
 
